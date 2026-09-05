@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#101418" />
   <title>ビリヤード配置図メーカー｜球配置・ショットライン作成</title>
   <meta name="description" content="ビリヤードの球配置とショットラインをブラウザで作成・保存できる無料の配置図メーカー。手球と1〜15番の球に対応。" />
-  <link rel="stylesheet" href="styles.css?v=14" />
+  <link rel="stylesheet" href="styles.css?v=15" />
 </head>
 <body>
   <main class="app">
@@ -108,18 +108,34 @@
 </div>
 <button id="resetBtn">リセット</button>
 </section>
+
+    <section class="tip-point" aria-label="撞点">
+<p class="tip-label">撞点（手球のどこを撞くか）</p>
+<div class="tip-row">
+<div id="cueDiagram" class="cue-diagram">
+<div id="tipMark" class="tip-mark" hidden>
+</div>
+</div>
+<div class="tip-info">
+<p>白球の図をタップすると、撞く位置に赤い点がつきます。画像保存時にも一緒に書き出されます。</p>
+<button id="tipClearBtn" class="tip-clear">印を消す</button>
+</div>
+</div>
+</section>
     </div>
 
     <aside class="guide" aria-label="操作ガイド">
       <p class="guide-label">操作ガイド</p>
       <h2>配置の作り方</h2>
       <ol>
-        <li><b>球を置く</b><span>下の球をタップして、台の上でドラッグ</span></li>
+        <li><b>球を置く</b><span>下の球をタップして、台の上でドラッグ。すでにある球とは自動で重ならない位置に置かれます</span></li>
         <li><b>矢印・線を描く</b><span>球から球へなぞると、自動で両方の球につながります</span></li>
         <li><b>移動・伸縮</b><span>中央をドラッグで移動、線の端を直接つかむと伸縮できます</span></li>
         <li><b>削除</b><span>球も線もダブルクリックで削除できます</span></li>
+        <li><b>撞点を記録</b><span>台の下にある白球の図をタップすると、撞く位置に赤い印がつきます</span></li>
+        <li><b>保存済みを開く</b><span>右上の☰ボタンから、保存した配置の一覧を呼び出せます</span></li>
       </ol>
-      <p class="guide-tip">球につながった線の中央を動かすと、接続中の球も一緒に移動します。</p>
+      <p class="guide-tip">球につながった線の中央を動かすと、接続中の球も一緒に移動します。「画像」ボタンで台・球・撞点をまとめて画像として保存できます。</p>
     </aside>
     </div>
 
@@ -163,7 +179,7 @@
 <div id="savedList">
 </div>
 </dialog>
-  <script src="app.js?v=14">
+  <script src="app.js?v=15">
 </script>
 </body>
 </html>
