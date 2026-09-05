@@ -76,7 +76,7 @@ body{margin:0;background-color:#0c1013;background-image:radial-gradient(circle a
 .tray{width:100%;flex-direction:column;align-items:center;margin:0;gap:8px}
 .tray-balls{display:grid;grid-template-columns:repeat(2,22px);gap:5px 4px;justify-content:center;min-height:22px}
 .tray .mini{position:static;transform:none;width:22px;height:22px;font-size:8px;cursor:pointer}
-.tray button{background:none;border:0;color:var(--muted);font-size:11px}
+.tray button{border:1px solid #56636b;background:#20282e;color:#fff;border-radius:9px;padding:9px 5px;font-size:14px;font-weight:900;cursor:pointer}
 .board-column.landscape>.tray{width:100%;max-width:620px;margin:10px auto 0;padding-left:0;flex-direction:row;justify-content:center;gap:12px}
 .board-column.landscape>.tray .tray-balls{display:flex;flex-wrap:wrap;grid-template-columns:none;justify-content:center;gap:5px 4px;max-width:100%}
 #lines{position:absolute;inset:0;width:100%;height:100%;z-index:2;overflow:visible}

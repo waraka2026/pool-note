@@ -165,7 +165,7 @@ table.addEventListener('pointerdown',e=>{
   if(mode==='erase'&&ball){removeBall(ball.dataset.n);return}
   if(mode==='line'||mode==='plain'){
     const p=point(e),startBall=ball?.dataset.n||nearestBall(p,42),a=startBall?state[startBall]:p;lineStart={...p,ball:startBall};
-    const autoColor=activeLineColor==='auto';lineDraft={x1:a.x,y1:a.y,x2:p.x,y2:p.y,type:mode==='plain'?'plain':'arrow',startBall:startBall||null,endBall:null,color:autoColor?ballColor(startBall):activeLineColor,autoColor,width:activeLineWidth};table.setPointerCapture(e.pointerId);renderLines();return;
+    const autoColor=activeLineColor==='auto',colorBall=startBall||nearestBall(p,Infinity);lineDraft={x1:a.x,y1:a.y,x2:p.x,y2:p.y,type:mode==='plain'?'plain':'arrow',startBall:startBall||null,endBall:null,color:autoColor?ballColor(colorBall):activeLineColor,autoColor,width:activeLineWidth};table.setPointerCapture(e.pointerId);renderLines();return;
   }
   if(mode==='move'){selectedLine=-1;renderLines()}
 });
@@ -220,12 +220,18 @@ cueDiagram.addEventListener('pointercancel',()=>{tipDragging=false});
 document.querySelector('#tipClearBtn').onclick=()=>{tip=null;renderTip();markUnsaved()};
 
 function setMode(next,showHint=true){
-  mode=next;selectedLine=-1;renderLines();document.querySelectorAll('.tools [data-mode]').forEach(b=>b.classList.toggle('active',b.dataset.mode===next));
+  mode=next;selectedLine=-1;renderLines();
+  if(next!=='move')setGroupMoveMode(false);else refreshMoveButtons();
   drawBtn.classList.toggle('active',next==='line'||next==='plain');
   const hint=document.querySelector('#hint');hint.textContent=mode==='line'?'球から球へなぞると自動接続':mode==='plain'?'球から球へなぞると自動接続':mode==='erase'?'球または線をタップして消去':'球をドラッグ。線の端をつかむと伸縮';hint.style.opacity=1;setTimeout(()=>hint.style.opacity=0,1800);
   if(!showHint)hint.style.opacity=0;
 }
 document.querySelectorAll('.tools [data-mode]').forEach(btn=>btn.onclick=()=>{colorPanel.hidden=true;setMode(btn.dataset.mode)});
+function refreshMoveButtons(){
+  document.querySelectorAll('.tools [data-mode]').forEach(b=>b.classList.toggle('active',b.dataset.mode===mode&&!groupMoveMode));
+  const groupBtn=document.querySelector('#groupMoveBtn');groupBtn.classList.toggle('active',groupMoveMode);groupBtn.setAttribute('aria-pressed',String(groupMoveMode));
+}
+function setGroupMoveMode(value){groupMoveMode=value;refreshMoveButtons()}
 
 const colorPanel=document.querySelector('#lineColorPanel'),drawBtn=document.querySelector('#drawBtn'),swatches=document.querySelector('#lineColorSwatches'),autoColorBtn=document.querySelector('#autoColorBtn'),lineColorPicker=document.querySelector('#lineColorPicker'),colorArrowBtn=document.querySelector('#colorArrowBtn'),colorPlainBtn=document.querySelector('#colorPlainBtn');
 function refreshColorChoice(){autoColorBtn.classList.toggle('active',activeLineChoice==='auto');swatches.querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.dataset.choice===activeLineChoice));colorArrowBtn.classList.toggle('active',mode==='line');colorPlainBtn.classList.toggle('active',mode==='plain')}
@@ -237,8 +243,8 @@ const lineWidthRange=document.querySelector('#lineWidthRange'),lineWidthValue=do
 lineWidthRange.oninput=()=>{activeLineWidth=Number(lineWidthRange.value);lineWidthValue.textContent=activeLineWidth};
 const groupMoveBtn=document.querySelector('#groupMoveBtn');
 groupMoveBtn.onclick=()=>{
-  groupMoveMode=!groupMoveMode;groupMoveBtn.classList.toggle('active',groupMoveMode);groupMoveBtn.setAttribute('aria-pressed',String(groupMoveMode));
   colorPanel.hidden=true;if(mode!=='move')setMode('move',false);
+  setGroupMoveMode(!groupMoveMode);
   const hint=document.querySelector('#hint');hint.textContent=groupMoveMode?'まとめて移動：どこをつかんでも全部一緒に動く':'球をドラッグ。線の端をつかむと伸縮';hint.style.opacity=1;setTimeout(()=>hint.style.opacity=0,1800);
 };
 autoColorBtn.onclick=()=>{activeLineColor='auto';activeLineChoice='auto';usePaletteMode();refreshColorChoice()};lineColorPicker.oninput=()=>{activeLineColor=lineColorPicker.value;activeLineChoice='custom';usePaletteMode();refreshColorChoice()};refreshColorChoice();
@@ -249,10 +255,9 @@ document.addEventListener('pointerdown',e=>{if(colorPanel.hidden||colorPanel.con
 const memoDialogEl=document.querySelector('#memoDialog'),memoInput=document.querySelector('#memo'),memoColor=document.querySelector('#memoColor'),memoBackground=document.querySelector('#memoBackground'),memoTransparent=document.querySelector('#memoTransparent'),memoFont=document.querySelector('#memoFont'),memoSize=document.querySelector('#memoSize');
 const guideDialog=document.querySelector('#guideDialog');
 function setTopMenu(activeId){document.querySelectorAll('.primary-menu button').forEach(b=>b.classList.toggle('active',b.id===activeId))}
-document.querySelector('#currentLayoutBtn').onclick=()=>{setTopMenu('currentLayoutBtn');window.scrollTo({top:0,behavior:'smooth'})};
 document.querySelector('#guideBtn').onclick=()=>{setTopMenu('guideBtn');if(!guideDialog.open)guideDialog.showModal()};
 document.querySelector('#guideCloseBtn').onclick=()=>guideDialog.close();
-guideDialog.addEventListener('close',()=>setTopMenu('currentLayoutBtn'));
+guideDialog.addEventListener('close',()=>setTopMenu(null));
 document.querySelector('#memoBtn').onclick=()=>{memoInput.value='';memoTransparent.checked=false;memoBackground.disabled=false;memoDialogEl.showModal()};
 memoTransparent.onchange=()=>{memoBackground.disabled=memoTransparent.checked};
 memoDialogEl.addEventListener('close',()=>{const text=memoInput.value.trim();if(memoDialogEl.returnValue==='ok'&&text){const offset=(notes.length%5)*5;notes.push({text,color:memoColor.value,background:memoTransparent.checked?'transparent':memoBackground.value,font:memoFont.value,size:Number(memoSize.value),x:50+offset,y:50+offset});renderNotes();markUnsaved()}memoInput.value=''});
@@ -350,7 +355,7 @@ function renderSavedDialog(){
 }
 const savedDialogEl=document.querySelector('#savedDialog');
 document.querySelector('#savedBtn').onclick=()=>{setTopMenu('savedBtn');renderSavedDialog();if(!savedDialogEl.open)savedDialogEl.showModal()};
-savedDialogEl.addEventListener('close',()=>setTopMenu('currentLayoutBtn'));
+savedDialogEl.addEventListener('close',()=>setTopMenu(null));
 document.querySelector('#savedCardView').onclick=()=>{savedView='cards';renderSavedDialog()};
 document.querySelector('#savedListView').onclick=()=>{savedView='list';renderSavedDialog()};
 document.querySelector('#savedSort').onchange=e=>{savedSortOrder=e.target.value;renderSavedDialog()};
