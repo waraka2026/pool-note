@@ -53,7 +53,7 @@ function setOrientation(next,rotateContent=true,mark=true){
 portraitBtn.onclick=()=>setOrientation('portrait');
 landscapeBtn.onclick=()=>setOrientation('landscape');
 
-const tableAndTip=document.querySelector('.table-and-tip'),orientationControlEl=document.querySelector('.orientation-control'),toolsNav=document.querySelector('.tools');
+const tableAndTip=document.querySelector('.table-and-tip'),orientationControlEl=document.querySelector('.orientation-control');
 function isNarrowScreen(){return window.innerWidth<=640}
 function updateSideLayout(){
   if(orientation==='landscape'){
@@ -67,8 +67,8 @@ function availableTableWidth(){
   return Math.max(140,total-ocW-scW-20);
 }
 function availableTableHeight(){
-  const vh=window.visualViewport?window.visualViewport.height:window.innerHeight,top=tableAndTip.getBoundingClientRect().top,toolsH=toolsNav.getBoundingClientRect().height;
-  let reserve=toolsH+16;
+  const vh=window.visualViewport?window.visualViewport.height:window.innerHeight,top=tableAndTip.getBoundingClientRect().top;
+  let reserve=16;
   if(orientation==='landscape')reserve+=trayEl.getBoundingClientRect().height+12;
   return Math.max(140,vh-top-reserve);
 }

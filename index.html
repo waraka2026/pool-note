@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#101418" />
   <title>ビリヤード配置図メーカー｜球配置・ショットライン作成</title>
   <meta name="description" content="ビリヤードの球配置とショットラインをブラウザで作成・保存できる無料の配置図メーカー。手球と1〜15番の球に対応。" />
-  <link rel="stylesheet" href="styles.css?v=30" />
+  <link rel="stylesheet" href="styles.css?v=31" />
 </head>
 <body>
   <main class="app">
@@ -20,6 +20,41 @@
     <nav class="primary-menu" aria-label="画面メニュー">
       <button id="guideBtn" type="button">配置の作り方</button>
       <button id="savedBtn" type="button">保存した配置</button>
+    </nav>
+
+    <nav class="tools" aria-label="編集ツール">
+      <section id="lineColorPanel" class="line-color-panel" hidden aria-label="矢印と線の設定">
+        <div class="color-panel-head">
+          <div><b>矢印・線</b><small>種類と色を選択。もう一度同じ種類を押すと解除</small></div>
+          <button id="lineColorClose" class="color-panel-close" type="button" aria-label="設定を閉じる">× 閉じる</button>
+        </div>
+        <div class="line-width-control" aria-label="線の太さ">
+          <span>太さ</span>
+          <input id="lineWidthRange" type="range" min="1" max="8" step="1" value="2" />
+          <span id="lineWidthValue" class="line-width-value">2</span>
+        </div>
+        <div class="color-line-types" aria-label="描画の種類">
+          <button id="colorArrowBtn" type="button">↗ 矢印</button>
+          <button id="colorPlainBtn" type="button">╱ 線</button>
+        </div>
+        <button id="autoColorBtn" class="auto-color-btn" type="button">球の色に合わせる（デフォルト）</button>
+        <div id="lineColorSwatches" class="line-color-swatches"></div>
+        <label class="custom-color">その他の色（自由に選ぶ） <input id="lineColorPicker" type="color" value="#ff2f92" /></label>
+      </section>
+      <div class="tools-row">
+        <button data-mode="move" class="active">
+<span>↔</span>移動</button>
+        <button id="groupMoveBtn" type="button" aria-pressed="false">
+<span>⛓</span>まとめて移動</button>
+        <button id="drawBtn">
+<span>↗</span><b>矢印・線</b></button>
+        <button data-mode="erase">
+<span>⌫</span>消去</button>
+        <button id="memoBtn">
+<span>✎</span>メモ</button>
+        <button id="saveBtn" class="save">
+<span>✓</span>保存</button>
+      </div>
     </nav>
 
     <section class="title-row">
@@ -152,40 +187,6 @@
 
     </div>
 
-    <nav class="tools" aria-label="編集ツール">
-      <section id="lineColorPanel" class="line-color-panel" hidden aria-label="矢印と線の設定">
-        <div class="color-panel-head">
-          <div><b>矢印・線</b><small>種類と色を選択。もう一度同じ種類を押すと解除</small></div>
-          <button id="lineColorClose" class="color-panel-close" type="button" aria-label="設定を閉じる">× 閉じる</button>
-        </div>
-        <div class="line-width-control" aria-label="線の太さ">
-          <span>太さ</span>
-          <input id="lineWidthRange" type="range" min="1" max="8" step="1" value="2" />
-          <span id="lineWidthValue" class="line-width-value">2</span>
-        </div>
-        <div class="color-line-types" aria-label="描画の種類">
-          <button id="colorArrowBtn" type="button">↗ 矢印</button>
-          <button id="colorPlainBtn" type="button">╱ 線</button>
-        </div>
-        <button id="autoColorBtn" class="auto-color-btn" type="button">球の色に合わせる（デフォルト）</button>
-        <div id="lineColorSwatches" class="line-color-swatches"></div>
-        <label class="custom-color">その他の色（自由に選ぶ） <input id="lineColorPicker" type="color" value="#ff2f92" /></label>
-      </section>
-      <div class="tools-row">
-        <button data-mode="move" class="active">
-<span>↔</span>移動</button>
-        <button id="groupMoveBtn" type="button" aria-pressed="false">
-<span>⛓</span>まとめて移動</button>
-        <button id="drawBtn">
-<span>↗</span><b>矢印・線</b></button>
-        <button data-mode="erase">
-<span>⌫</span>消去</button>
-        <button id="memoBtn">
-<span>✎</span>メモ</button>
-        <button id="saveBtn" class="save">
-<span>✓</span>保存</button>
-      </div>
-    </nav>
   </main>
 
   <dialog id="memoDialog">
@@ -260,7 +261,7 @@
 <div id="savedList">
 </div>
 </dialog>
-  <script src="app.js?v=28">
+  <script src="app.js?v=29">
 </script>
 </body>
 </html>
