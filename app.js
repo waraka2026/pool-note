@@ -91,12 +91,10 @@ table.addEventListener('pointermove',e=>{
   if(lineStart){const p=point(e),endBall=nearestBall(p,42,lineStart.ball),b=endBall?state[endBall]:p;lineDraft.x2=b.x;lineDraft.y2=b.y;lineDraft.endBall=endBall||null;renderLines();return}
   if(!draggingLine)return;e.preventDefault();const p=point(e),l=lines[draggingLine.i],o=draggingLine.original;
   if(draggingLine.kind==='start'){
-    if(o.startBall&&state[o.startBall]){state[o.startBall]=p;syncBallLines(o.startBall);updateBallPositions()}
-    else{l.startBall=null;l.x1=p.x;l.y1=p.y}
+    l.startBall=null;l.x1=p.x;l.y1=p.y;
   }
   else if(draggingLine.kind==='end'){
-    if(o.endBall&&state[o.endBall]){state[o.endBall]=p;syncBallLines(o.endBall);updateBallPositions()}
-    else{l.endBall=null;l.x2=p.x;l.y2=p.y}
+    l.endBall=null;l.x2=p.x;l.y2=p.y;
   }
   else{
     const ballIds=draggingLine.ballIds,free=[];if(!o.startBall)free.push({x:o.x1,y:o.y1});if(!o.endBall)free.push({x:o.x2,y:o.y2});const moving=free.concat(ballIds.map(n=>draggingLine.originalBalls[n]));
@@ -109,8 +107,6 @@ table.addEventListener('pointerup',()=>{
   if(lineStart){if(lineDraft&&lineLengthPx(lineDraft)>8){lines.push({...lineDraft});selectedLine=lines.length-1;markUnsaved()}lineStart=null;lineDraft=null;setMode('move',false);renderLines();return}
   if(draggingLine){
     const l=lines[draggingLine.i];
-    if(draggingLine.kind==='start'){const n=nearestBall({x:l.x1,y:l.y1},42,l.endBall);if(n){l.startBall=n;l.x1=state[n].x;l.y1=state[n].y;if(l.autoColor)l.color=ballColor(n)}else if(l.autoColor)l.color=ballColor(null)}
-    else if(draggingLine.kind==='end'){const n=nearestBall({x:l.x2,y:l.y2},42,l.startBall);if(n){l.endBall=n;l.x2=state[n].x;l.y2=state[n].y}}
     draggingLine=null;if(lineLengthPx(l)<5)removeLine(selectedLine);else{renderLines();markUnsaved()}
   }
 });
@@ -122,6 +118,7 @@ svg.addEventListener('pointerdown',e=>{
   const original={...l},ballIds=[...new Set([original.startBall,original.endBall].filter(Boolean))],originalBalls={};ballIds.forEach(n=>originalBalls[n]={...state[n]});draggingLine={i,kind,start:p,original,ballIds,originalBalls};table.setPointerCapture(e.pointerId);renderLines();
 });
 svg.addEventListener('dblclick',e=>{if(e.target.dataset.i===undefined)return;e.preventDefault();e.stopPropagation();removeLine(Number(e.target.dataset.i))});
+table.addEventListener('dblclick',e=>{const ball=e.target.closest('.ball');if(!ball)return;e.preventDefault();e.stopPropagation();removeBall(ball.dataset.n)});
 
 function updateTip(e){
   const r=cueDiagram.getBoundingClientRect();let x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;
@@ -145,6 +142,8 @@ const colorPanel=document.querySelector('#lineColorPanel'),swatches=document.que
 function refreshColorChoice(){autoColorBtn.classList.toggle('active',activeLineColor==='auto');swatches.querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.dataset.color===activeLineColor))}
 [['cue','白'],...[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15].map(n=>[n,n])].forEach(([n,label])=>{const b=document.createElement('button');b.type='button';b.className='color-swatch';b.dataset.color=ballColor(n);b.textContent=label;b.title=`${label}の色`;b.style.background=ballColor(n);b.onclick=()=>{activeLineColor=b.dataset.color;refreshColorChoice()};swatches.append(b)});
 autoColorBtn.onclick=()=>{activeLineColor='auto';refreshColorChoice()};lineColorPicker.oninput=()=>{activeLineColor=lineColorPicker.value;refreshColorChoice()};refreshColorChoice();
+document.querySelector('#lineColorClose').onclick=()=>{colorPanel.hidden=true};
+document.addEventListener('pointerdown',e=>{if(colorPanel.hidden||colorPanel.contains(e.target)||e.target.closest('.tools [data-mode="line"],.tools [data-mode="plain"]'))return;colorPanel.hidden=true});
 
 const memoDialogEl=document.querySelector('#memoDialog'),memoInput=document.querySelector('#memo'),memoColor=document.querySelector('#memoColor');
 document.querySelector('#memoBtn').onclick=()=>{memoInput.value='';memoDialogEl.showModal()};
@@ -173,10 +172,15 @@ function drawExportNotes(ctx,clothX,clothY,clothW,clothH){
     const x=clothX+clothW*note.x/100,y=clothY+clothH*note.y/100,rows=note.text.split('\n');rows.forEach((row,i)=>{const ty=y+(i-(rows.length-1)/2)*20;ctx.strokeStyle='#07110d';ctx.lineWidth=5;ctx.strokeText(row,x,ty);ctx.fillStyle=note.color||'#ffe15b';ctx.fillText(row,x,ty)})
   });
 }
-function drawSidePockets(ctx,w,h){
-  const y=h/2,ph=28,pw=15,left=3,right=w-3;ctx.fillStyle='#020202';
-  ctx.beginPath();ctx.moveTo(left+pw,y-ph/2);ctx.lineTo(left+pw,y+ph/2);ctx.lineTo(left+7,y+ph/2);ctx.quadraticCurveTo(left,y+ph/2,left,y+7);ctx.lineTo(left,y-7);ctx.quadraticCurveTo(left,y-ph/2,left+7,y-ph/2);ctx.closePath();ctx.fill();
-  ctx.beginPath();ctx.moveTo(right-pw,y-ph/2);ctx.lineTo(right-7,y-ph/2);ctx.quadraticCurveTo(right,y-ph/2,right,y-7);ctx.lineTo(right,y+7);ctx.quadraticCurveTo(right,y+ph/2,right-7,y+ph/2);ctx.lineTo(right-pw,y+ph/2);ctx.closePath();ctx.fill();
+function drawSidePockets(ctx,frameRect){
+  ctx.fillStyle='#020202';
+  for(const selector of ['.p3','.p4']){
+    const el=tableFrame.querySelector(selector),r=el.getBoundingClientRect(),x=r.left-frameRect.left,y=r.top-frameRect.top,w=r.width,h=r.height,left=selector==='.p3';
+    ctx.beginPath();
+    if(left){ctx.moveTo(x+w,y);ctx.lineTo(x+w,y+h);ctx.lineTo(x+h/2,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h/2);ctx.quadraticCurveTo(x,y,x+h/2,y)}
+    else{ctx.moveTo(x,y);ctx.lineTo(x+w-h/2,y);ctx.quadraticCurveTo(x+w,y,x+w,y+h/2);ctx.quadraticCurveTo(x+w,y+h,x+w-h/2,y+h);ctx.lineTo(x,y+h)}
+    ctx.closePath();ctx.fill();
+  }
 }
 function drawWoodFrame(ctx,w,h){
   roundedRect(ctx,0,0,w,h,16);ctx.save();ctx.clip();
@@ -190,10 +194,10 @@ function downloadImage(){
   const c=document.createElement('canvas'),ctx=c.getContext('2d');c.width=Math.round(width*scale);c.height=Math.round(height*scale);ctx.scale(scale,scale);
   const cx=clothRect.left-frameRect.left,cy=clothRect.top-frameRect.top,cw=clothRect.width,ch=clothRect.height;
   drawWoodFrame(ctx,frameW,frameH);
-  ctx.save();roundedRect(ctx,cx,cy,cw,ch,2);ctx.clip();const clothGrad=ctx.createLinearGradient(cx,0,cx+cw,0);clothGrad.addColorStop(0,'#08ae7d');clothGrad.addColorStop(1,'#08aa7a');ctx.fillStyle=clothGrad;ctx.fillRect(cx,cy,cw,ch);ctx.strokeStyle='#ffffff52';ctx.lineWidth=.45;ctx.setLineDash([1.5,1.5]);
+  ctx.save();roundedRect(ctx,cx,cy,cw,ch,2);ctx.clip();const clothGrad=ctx.createLinearGradient(cx,0,cx+cw,0);clothGrad.addColorStop(0,'#08ae7d');clothGrad.addColorStop(1,'#08aa7a');ctx.fillStyle=clothGrad;ctx.fillRect(cx,cy,cw,ch);ctx.strokeStyle='rgba(255,255,255,.42)';ctx.lineWidth=.6;ctx.setLineDash([2,2]);
   for(let i=1;i<4;i++){ctx.beginPath();ctx.moveTo(cx+cw*i/4,cy);ctx.lineTo(cx+cw*i/4,cy+ch);ctx.stroke()}for(let i=1;i<8;i++){ctx.beginPath();ctx.moveTo(cx,cy+ch*i/8);ctx.lineTo(cx+cw,cy+ch*i/8);ctx.stroke()}ctx.setLineDash([]);lines.forEach(l=>drawExportLine(ctx,l,cx,cy,cw,ch));Object.entries(state).forEach(([n,p])=>drawCanvasBall(ctx,n,cx+cw*p.x/100,cy+ch*p.y/100,10));drawExportNotes(ctx,cx,cy,cw,ch);ctx.restore();
   ctx.fillStyle='#fff';for(let i=1;i<=3;i++)for(const y of [10,frameH-10]){ctx.beginPath();ctx.arc(52+(frameW-104)*(i-.5)/3,y,2,0,Math.PI*2);ctx.fill()}for(let i=1;i<=7;i++)for(const x of [10,frameW-10]){ctx.beginPath();ctx.arc(x,52+(frameH-104)*(i-.5)/7,2,0,Math.PI*2);ctx.fill()}
-  ctx.fillStyle='#020202';ctx.strokeStyle='#49180f';ctx.lineWidth=2;for(const [x,y] of [[18,18],[frameW-18,18],[18,frameH-18],[frameW-18,frameH-18]]){ctx.save();ctx.translate(x,y);ctx.rotate(Math.PI/4);roundedRect(ctx,-10,-10,20,20,7);ctx.fill();ctx.stroke();ctx.restore()}drawSidePockets(ctx,frameW,frameH);
+  ctx.fillStyle='#020202';ctx.strokeStyle='#49180f';ctx.lineWidth=2;for(const [x,y] of [[18,18],[frameW-18,18],[18,frameH-18],[frameW-18,frameH-18]]){ctx.save();ctx.translate(x,y);ctx.rotate(Math.PI/4);roundedRect(ctx,-10,-10,20,20,7);ctx.fill();ctx.stroke();ctx.restore()}drawSidePockets(ctx,frameRect);
   ctx.fillStyle='#151b20';ctx.fillRect(frameW,0,extra,frameH);ctx.fillStyle='#d5aa58';ctx.font='bold 13px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('撞点',frameW+extra/2,24);
   const bx=frameW+extra/2,by=67,br=27;drawCanvasBall(ctx,'cue',bx,by,br);
   if(tip){ctx.beginPath();ctx.arc(bx-br+tip.x*br*2,by-br+tip.y*br*2,3.5,0,Math.PI*2);ctx.fillStyle='#e6382e';ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=1;ctx.stroke()}
