@@ -86,11 +86,11 @@ body{margin:0;background-color:#0c1013;background-image:radial-gradient(circle a
 .table-note{position:absolute;max-width:88%;padding:4px 7px;border-radius:5px;background:#07110d;font-size:18px;font-weight:900;line-height:1.35;white-space:pre-wrap;text-align:center;text-shadow:0 2px 3px #000,0 0 5px #000;transform:translate(-50%,-50%);cursor:move;user-select:none;touch-action:pinch-zoom;pointer-events:auto}
 .tools{position:relative;z-index:10;width:min(100%,480px);margin:0 0 12px}
 .tools-row{padding:10px 12px;background:transparent;border-top:1px solid #303940;justify-content:space-around}
-.tools button{border:1px solid transparent;background:none;color:#fff;font-size:10px;min-width:42px;border-radius:10px}
-.tools span{display:block;font-size:22px;margin-bottom:2px}
-.tools button b{font:inherit;font-weight:500;white-space:nowrap}
-.tools button.active{color:var(--gold);border-color:var(--gold);background:#d5aa5818}
-.tools .save{background:#fff;color:#151b20;border-radius:13px;padding:7px 10px}
+.tools-row>button{border:1px solid transparent;background:none;color:#fff;font-size:10px;min-width:42px;border-radius:10px}
+.tools-row>button>span{display:block;font-size:22px;margin-bottom:2px}
+.tools-row>button b{font:inherit;font-weight:500;white-space:nowrap}
+.tools-row>button.active{color:var(--gold);border-color:var(--gold);background:#d5aa5818}
+.tools-row>.save{background:#fff;color:#151b20;border-radius:13px;padding:7px 10px}
 .line-color-panel{position:absolute;z-index:12;left:50%;top:100%;transform:translateX(-50%);margin-top:10px;width:min(calc(100% - 24px),420px);padding:12px;background:#192026f7;border:1px solid #46525a;border-radius:15px;box-shadow:0 14px 35px #000b;backdrop-filter:blur(14px)}
 .color-panel-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
 .color-panel-head b,.color-panel-head small{display:block}
@@ -163,7 +163,7 @@ dialog form>button{width:100%;border:0;border-radius:12px;padding:13px;backgroun
 .tray-balls{grid-template-columns:repeat(2,20px)}
 .tray .mini{width:20px;height:20px}
 .tools-row{overflow-x:auto;justify-content:flex-start;gap:3px}
-.tools button{flex:0 0 47px}
+.tools-row>button{flex:0 0 47px}
 }
 @media(max-width:390px){.table-and-tip{gap:6px}.orientation-control{width:38px;flex-basis:38px}.orientation-control span{font-size:9px}.orientation-control button{padding:7px 2px}.side-controls,.tip-point{width:52px;flex-basis:52px}.cue-diagram{width:50px;height:50px}.tip-help{font-size:10px}.tray-balls{grid-template-columns:repeat(2,18px)}.tray .mini{width:18px;height:18px}}
 
