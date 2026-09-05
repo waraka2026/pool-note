@@ -168,3 +168,15 @@ dialog form>button{width:100%;border:0;border-radius:12px;padding:13px;backgroun
 @media(max-width:390px){.table-and-tip{gap:6px}.orientation-control{width:38px;flex-basis:38px}.orientation-control span{font-size:9px}.orientation-control button{padding:7px 2px}.side-controls,.tip-point{width:52px;flex-basis:52px}.cue-diagram{width:50px;height:50px}.tip-help{font-size:10px}.tray-balls{grid-template-columns:repeat(2,18px)}.tray .mini{width:18px;height:18px}}
 
 #saveState[hidden]{display:none}
+
+/* Compact text tools and original round palette balls. */
+.primary-menu{flex-wrap:wrap;overflow:visible}
+.quick-help{font-size:11px;line-height:1.5;color:var(--muted);padding:4px 9px}
+.tools{width:min(100%,640px)}
+.tools-row{flex-wrap:wrap;justify-content:flex-start;gap:2px;padding:8px 4px;overflow:visible}
+.tools-row>button{display:inline-flex;align-items:center;justify-content:center;gap:4px;flex:0 0 auto;min-width:0;padding:7px 5px;font-size:13px;white-space:nowrap;border-radius:6px}
+.tools-row>button>span{display:inline;font-size:14px;margin:0}
+.tools-row>.tool-separator{display:inline;font-size:12px;color:#69757e;margin:0;user-select:none}
+.tools-row>.save{padding:7px 8px;border-radius:6px}
+.tools .color-swatch{width:32px;min-width:0;height:32px;padding:0;border-radius:50%;justify-self:center;flex:none}
+@media(max-width:390px){.tools-row{gap:0}.tools-row>button{font-size:12px;padding:7px 3px}.tools-row>button>span{font-size:12px}.tools-row>.tool-separator{font-size:10px}.line-color-swatches{gap:7px 3px}.tools .color-swatch{width:28px;height:28px}}
