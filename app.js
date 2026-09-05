@@ -7,7 +7,7 @@ const svg=document.querySelector('#lines');
 const cueDiagram=document.querySelector('#cueDiagram');
 const tipMark=document.querySelector('#tipMark');
 
-let mode='move',draggingBall=null,draggingLine=null,lineStart=null,lineDraft=null,lines=[],notes=[],state={},selectedLine=-1,tip=null,tipDragging=false,activeLineColor='auto';
+let mode='move',draggingBall=null,draggingLine=null,lineStart=null,lineDraft=null,lines=[],notes=[],state={},selectedLine=-1,tip=null,tipDragging=false,activeLineColor='auto',activeLineChoice='auto',paletteLineType='line';
 let ballPress=null,ballMoved=false,lastBallTap=null;
 const defs=`<defs></defs>`;
 
@@ -20,7 +20,9 @@ function ballEl(n,x,y,mini=false){
   const el=document.createElement('div'),striped=!['cue','ghost'].includes(n)&&Number(n)>8;
   el.className=`ball ${mini?'mini':''} ${n==='cue'?'cue':''} ${n==='ghost'?'ghost':''} ${striped?'striped':''}`;
   if(!['cue','ghost'].includes(n))el.style.setProperty('--ball',colors[Number(n)-1]);
-  el.dataset.n=n;el.style.left=x+'%';el.style.top=y+'%';el.innerHTML=['cue','ghost'].includes(n)?'':`<span>${n}</span>`;el.setAttribute('aria-label',n==='cue'?'手玉':n==='ghost'?'イメージボール':`${n}番ボール`);return el;
+  el.dataset.n=n;el.style.left=x+'%';el.style.top=y+'%';el.innerHTML=['cue','ghost'].includes(n)?'':`<span>${n}</span>`;el.setAttribute('aria-label',n==='cue'?'手玉':n==='ghost'?'イメージボール':`${n}番ボール`);
+  if(!mini)el.addEventListener('dblclick',e=>{e.preventDefault();e.stopPropagation();removeBall(n)});
+  return el;
 }
 function renderBalls(){layer.innerHTML='';Object.entries(state).forEach(([n,p])=>layer.append(ballEl(n,p.x,p.y)))}
 function updateBallPositions(){Object.entries(state).forEach(([n,p])=>{const el=layer.querySelector(`[data-n="${n}"]`);if(el){el.style.left=p.x+'%';el.style.top=p.y+'%'}})}
@@ -66,7 +68,7 @@ function lineLengthPx(l){const r=table.getBoundingClientRect(),v=visibleEnds(l);
 function lineMarkup(l,i,draft=false){
   const v=visibleEnds(l),len=lineLengthPx(l),isArrow=l.type!=='plain',color=l.color||ballColor(l.startBall),markerId=`arrow-${draft?'draft':i}`,marker=isArrow&&len>14?` marker-end="url(#${markerId})"`:'',selected=!draft&&selectedLine===i?' selected-line':'';
   const markerDef=isArrow&&len>14?`<defs><marker id="${markerId}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10Z" fill="${color}"/></marker></defs>`:'';
-  const visual=len>3?`${markerDef}<line style="--line-color:${color}" class="${isArrow?'shot-line':'plain-line'}${selected}${draft?' draft-line':''}" x1="${v.x1}%" y1="${v.y1}%" x2="${v.x2}%" y2="${v.y2}%"${marker}/>`:'';
+  const visual=len>3?`${markerDef}<line data-i="${i}" style="--line-color:${color}" class="${isArrow?'shot-line':'plain-line'}${selected}${draft?' draft-line':''}" x1="${v.x1}%" y1="${v.y1}%" x2="${v.x2}%" y2="${v.y2}%"${marker}/>`:'';
   const hit=draft||len<=3?'':`<line data-i="${i}" class="line-hit" x1="${v.x1}%" y1="${v.y1}%" x2="${v.x2}%" y2="${v.y2}%"/>`;return `<g>${visual}${hit}</g>`;
 }
 function renderLines(){let html=defs+lines.map((l,i)=>lineMarkup(l,i)).join('');if(lineDraft)html+=lineMarkup(lineDraft,-1,true);svg.innerHTML=html}
@@ -103,7 +105,7 @@ table.addEventListener('pointermove',e=>{
   }renderLines();
 });
 table.addEventListener('pointerup',()=>{
-  if(draggingBall){const n=draggingBall,now=Date.now();draggingBall=null;ballPress=null;if(!ballMoved){if(lastBallTap&&lastBallTap.n===n&&now-lastBallTap.time<420){lastBallTap=null;removeBall(n);return}lastBallTap={n,time:now}}else lastBallTap=null;markUnsaved();return}
+  if(draggingBall){const n=draggingBall,now=Date.now();draggingBall=null;ballPress=null;if(!ballMoved){if(lastBallTap&&lastBallTap.n===n&&now-lastBallTap.time<650){lastBallTap=null;removeBall(n);return}lastBallTap={n,time:now}}else lastBallTap=null;markUnsaved();return}
   if(lineStart){if(lineDraft&&lineLengthPx(lineDraft)>8){lines.push({...lineDraft});selectedLine=lines.length-1;markUnsaved()}lineStart=null;lineDraft=null;setMode('move',false);renderLines();return}
   if(draggingLine){
     const l=lines[draggingLine.i];
@@ -132,18 +134,21 @@ cueDiagram.addEventListener('pointercancel',()=>{tipDragging=false});
 document.querySelector('#tipClearBtn').onclick=()=>{tip=null;renderTip();markUnsaved()};
 
 function setMode(next,showHint=true){
-  mode=next;selectedLine=-1;renderLines();document.querySelectorAll('.tools [data-mode]').forEach(b=>b.classList.toggle('active',b.dataset.mode===next));if(!['line','plain'].includes(next))document.querySelector('#lineColorPanel').hidden=true;
+  mode=next;selectedLine=-1;renderLines();document.querySelectorAll('.tools [data-mode]').forEach(b=>b.classList.toggle('active',b.dataset.mode===next));
   const hint=document.querySelector('#hint');hint.textContent=mode==='line'?'球から球へなぞると自動接続':mode==='plain'?'球から球へなぞると自動接続':mode==='erase'?'球または線をタップして消去':'球をドラッグ。線の端をつかむと伸縮';hint.style.opacity=1;setTimeout(()=>hint.style.opacity=0,1800);
   if(!showHint)hint.style.opacity=0;
 }
-document.querySelectorAll('.tools [data-mode]').forEach(btn=>btn.onclick=()=>{setMode(btn.dataset.mode);if(['line','plain'].includes(btn.dataset.mode))document.querySelector('#lineColorPanel').hidden=false});
+document.querySelectorAll('.tools [data-mode]').forEach(btn=>btn.onclick=()=>{if(['line','plain'].includes(btn.dataset.mode)){activeLineColor='auto';activeLineChoice='auto';refreshColorChoice()}colorPanel.hidden=true;colorBtn.classList.remove('active');setMode(btn.dataset.mode)});
 
-const colorPanel=document.querySelector('#lineColorPanel'),swatches=document.querySelector('#lineColorSwatches'),autoColorBtn=document.querySelector('#autoColorBtn'),lineColorPicker=document.querySelector('#lineColorPicker');
-function refreshColorChoice(){autoColorBtn.classList.toggle('active',activeLineColor==='auto');swatches.querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.dataset.color===activeLineColor))}
-[['cue','白'],...[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15].map(n=>[n,n])].forEach(([n,label])=>{const b=document.createElement('button');b.type='button';b.className='color-swatch';b.dataset.color=ballColor(n);b.textContent=label;b.title=`${label}の色`;b.style.background=ballColor(n);b.onclick=()=>{activeLineColor=b.dataset.color;refreshColorChoice()};swatches.append(b)});
-autoColorBtn.onclick=()=>{activeLineColor='auto';refreshColorChoice()};lineColorPicker.oninput=()=>{activeLineColor=lineColorPicker.value;refreshColorChoice()};refreshColorChoice();
-document.querySelector('#lineColorClose').onclick=()=>{colorPanel.hidden=true};
-document.addEventListener('pointerdown',e=>{if(colorPanel.hidden||colorPanel.contains(e.target)||e.target.closest('.tools [data-mode="line"],.tools [data-mode="plain"]'))return;colorPanel.hidden=true});
+const colorPanel=document.querySelector('#lineColorPanel'),colorBtn=document.querySelector('#colorBtn'),swatches=document.querySelector('#lineColorSwatches'),autoColorBtn=document.querySelector('#autoColorBtn'),lineColorPicker=document.querySelector('#lineColorPicker'),colorArrowBtn=document.querySelector('#colorArrowBtn'),colorPlainBtn=document.querySelector('#colorPlainBtn');
+function refreshColorChoice(){autoColorBtn.classList.toggle('active',activeLineChoice==='auto');swatches.querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.dataset.choice===activeLineChoice));colorArrowBtn.classList.toggle('active',paletteLineType==='line');colorPlainBtn.classList.toggle('active',paletteLineType==='plain')}
+function usePaletteMode(){setMode(paletteLineType,false);colorBtn.classList.add('active')}
+[['cue','白'],...[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15].map(n=>[n,n])].forEach(([n,label])=>{const b=document.createElement('button');b.type='button';b.className='color-swatch';b.dataset.choice=String(n);b.dataset.color=ballColor(n);b.textContent=label;b.title=`${label}の色`;b.style.background=n==='cue'?'#fff':Number(n)>8?`linear-gradient(#fff 0 22%,${ballColor(n)} 22% 76%,#fff 76%)`:ballColor(n);b.onclick=()=>{activeLineColor=b.dataset.color;activeLineChoice=b.dataset.choice;usePaletteMode();refreshColorChoice()};swatches.append(b)});
+colorArrowBtn.onclick=()=>{paletteLineType='line';usePaletteMode();refreshColorChoice()};colorPlainBtn.onclick=()=>{paletteLineType='plain';usePaletteMode();refreshColorChoice()};
+autoColorBtn.onclick=()=>{activeLineColor='auto';activeLineChoice='auto';usePaletteMode();refreshColorChoice()};lineColorPicker.oninput=()=>{activeLineColor=lineColorPicker.value;activeLineChoice='custom';usePaletteMode();refreshColorChoice()};refreshColorChoice();
+colorBtn.onclick=()=>{if(['line','plain'].includes(mode))paletteLineType=mode;colorPanel.hidden=!colorPanel.hidden;colorBtn.classList.toggle('active',!colorPanel.hidden);refreshColorChoice()};
+document.querySelector('#lineColorClose').onclick=()=>{colorPanel.hidden=true;colorBtn.classList.remove('active')};
+document.addEventListener('pointerdown',e=>{if(colorPanel.hidden||colorPanel.contains(e.target)||e.target.closest('#colorBtn'))return;colorPanel.hidden=true;colorBtn.classList.remove('active')});
 
 const memoDialogEl=document.querySelector('#memoDialog'),memoInput=document.querySelector('#memo'),memoColor=document.querySelector('#memoColor');
 document.querySelector('#memoBtn').onclick=()=>{memoInput.value='';memoDialogEl.showModal()};
