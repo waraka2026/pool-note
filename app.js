@@ -212,7 +212,7 @@ function downloadImage(){
   const a=document.createElement('a');a.download=(document.querySelector('#title').value||'ビリヤード配置')+'.png';a.href=c.toDataURL('image/png');a.click();
 }
 document.querySelector('#imageBtn').onclick=downloadImage;
-function formatSavedTime(value){if(!value)return'';const d=new Date(value);if(Number.isNaN(d.getTime()))return String(value);return d.toLocaleString('ja-JP',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})}
+function formatSavedTime(value){if(!value)return'';if(/^\d{4}\/\d{1,2}\/\d{1,2}$/.test(String(value)))return `${value}（時刻記録なし）`;const d=new Date(value);if(Number.isNaN(d.getTime()))return String(value);return d.toLocaleString('ja-JP',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})}
 document.querySelector('#saveBtn').onclick=()=>{
   const saved=JSON.parse(localStorage.getItem('poolNotes')||'[]'),now=new Date().toISOString(),data={title:document.querySelector('#title').value||'名称なし',state:structuredClone(state),lines:structuredClone(lines),notes:structuredClone(notes),tip:tip?{...tip}:null,result:document.querySelector('input[name=result]:checked')?.value||'',updatedAt:now};let label='新規保存済み';
   const index=currentSaveId===null?-1:saved.findIndex(s=>String(s.id)===String(currentSaveId));
