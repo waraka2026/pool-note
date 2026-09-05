@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <meta name="theme-color" content="#101418" />
+  <title>ビリヤード配置図メーカー｜球配置・ショットライン作成</title>
+  <meta name="description" content="ビリヤードの球配置とショットラインをブラウザで作成・保存できる無料の配置図メーカー。手球と1〜15番の球に対応。" />
+  <link rel="stylesheet" href="styles.css?v=14" />
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div>
+<p class="eyebrow">BILLIARDS LAYOUT MAKER</p>
+<h1>ビリヤード配置図メーカー</h1>
+</div>
+      <button id="savedBtn" class="icon-btn" aria-label="保存一覧">☰</button>
+    </header>
+
+    <section class="title-row">
+      <input id="title" value="今日の配置" aria-label="配置タイトル" />
+      <span id="saveState">未保存</span>
+    </section>
+
+    <div class="workspace">
+    <div class="board-column">
+    <section class="table-wrap" aria-label="ビリヤード台">
+      <div id="table" class="table">
+        <div class="rail top">
+<i>
+</i>
+<i>
+</i>
+<i>
+</i>
+</div>
+<div class="rail bottom">
+<i>
+</i>
+<i>
+</i>
+<i>
+</i>
+</div>
+        <div class="rail left">
+<i>
+</i>
+<i>
+</i>
+<i>
+</i>
+<i>
+</i>
+<i>
+</i>
+<i>
+</i>
+<i>
+</i>
+</div>
+        <div class="rail right">
+<i>
+</i>
+<i>
+</i>
+<i>
+</i>
+<i>
+</i>
+<i>
+</i>
+<i>
+</i>
+<i>
+</i>
+</div>
+        <div class="cloth">
+<div class="head-line">
+</div>
+<div class="spot head-spot">
+</div>
+<div class="spot foot-spot">
+</div>
+<svg id="lines">
+</svg>
+<div id="ballsLayer">
+</div>
+</div>
+        <b class="pocket p1">
+</b>
+<b class="pocket p2">
+</b>
+<b class="pocket p3">
+</b>
+<b class="pocket p4">
+</b>
+<b class="pocket p5">
+</b>
+<b class="pocket p6">
+</b>
+      </div>
+      <div class="hint" id="hint">球をドラッグして配置</div>
+    </section>
+
+    <section class="tray">
+<div id="trayBalls" class="tray-balls">
+</div>
+<button id="resetBtn">リセット</button>
+</section>
+    </div>
+
+    <aside class="guide" aria-label="操作ガイド">
+      <p class="guide-label">操作ガイド</p>
+      <h2>配置の作り方</h2>
+      <ol>
+        <li><b>球を置く</b><span>下の球をタップして、台の上でドラッグ</span></li>
+        <li><b>矢印・線を描く</b><span>球から球へなぞると、自動で両方の球につながります</span></li>
+        <li><b>移動・伸縮</b><span>中央をドラッグで移動、線の端を直接つかむと伸縮できます</span></li>
+        <li><b>削除</b><span>球も線もダブルクリックで削除できます</span></li>
+      </ol>
+      <p class="guide-tip">球につながった線の中央を動かすと、接続中の球も一緒に移動します。</p>
+    </aside>
+    </div>
+
+    <nav class="tools" aria-label="編集ツール">
+      <button data-mode="move" class="active">
+<span>✋</span>移動</button>
+      <button data-mode="line">
+<span>↗</span>矢印</button>
+      <button data-mode="plain">
+<span>╱</span>線</button>
+      <button data-mode="erase">
+<span>⌫</span>消去</button>
+      <button id="memoBtn">
+<span>✎</span>メモ</button>
+      <button id="imageBtn">
+<span>▣</span>画像</button>
+      <button id="saveBtn" class="save">
+<span>✓</span>保存</button>
+    </nav>
+  </main>
+
+  <dialog id="memoDialog">
+<form method="dialog">
+<h2>ショットメモ</h2>
+<textarea id="memo" placeholder="例：右下を撞いて、2クッションで戻す">
+</textarea>
+<div class="result">
+<label>
+<input type="radio" name="result" value="成功">○ 成功</label>
+<label>
+<input type="radio" name="result" value="失敗">× 失敗</label>
+</div>
+<button value="ok">完了</button>
+</form>
+</dialog>
+  <dialog id="savedDialog">
+<div class="dialog-head">
+<h2>保存した配置</h2>
+<button onclick="savedDialog.close()">×</button>
+</div>
+<div id="savedList">
+</div>
+</dialog>
+  <script src="app.js?v=14">
+</script>
+</body>
+</html>
