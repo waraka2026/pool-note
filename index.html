@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#101418" />
   <title>ビリヤード配置図メーカー｜球配置・ショットライン作成</title>
   <meta name="description" content="ビリヤードの球配置とショットラインをブラウザで作成・保存できる無料の配置図メーカー。手球と1〜15番の球に対応。" />
-  <link rel="stylesheet" href="styles.css?v=21" />
+  <link rel="stylesheet" href="styles.css?v=23" />
 </head>
 <body>
   <main class="app">
@@ -195,10 +195,22 @@
 <h2>保存した配置</h2>
 <button onclick="savedDialog.close()">×</button>
 </div>
+<div class="saved-controls">
+  <div class="saved-view-buttons" aria-label="表示方法">
+    <button id="savedCardView" type="button">カード</button>
+    <button id="savedListView" type="button">一覧</button>
+  </div>
+  <label>並び順
+    <select id="savedSort">
+      <option value="newest">更新日時：新しい順</option>
+      <option value="oldest">更新日時：古い順</option>
+    </select>
+  </label>
+</div>
 <div id="savedList">
 </div>
 </dialog>
-  <script src="app.js?v=22">
+  <script src="app.js?v=23">
 </script>
 </body>
 </html>
