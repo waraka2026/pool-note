@@ -57,7 +57,7 @@ body{margin:0;background:radial-gradient(circle at top,#25313a,#0c1013 55%);colo
 .ball.striped{background:linear-gradient(#fff 0 22%,var(--ball) 22% 76%,#fff 76%)}
 .ball span{background:#fff;border-radius:50%;min-width:11px;height:11px;display:grid;place-items:center;position:relative;z-index:2}
 .tray{width:100%;flex-direction:column;align-items:center;margin:0;gap:8px}
-.tray-balls{display:grid;grid-template-columns:22px;gap:4px;justify-content:center;min-height:22px}
+.tray-balls{display:grid;grid-template-columns:repeat(2,22px);gap:5px 4px;justify-content:center;min-height:22px}
 .tray .mini{position:static;transform:none;width:22px;height:22px;font-size:8px;cursor:pointer}
 .tray button{background:none;border:0;color:var(--muted);font-size:11px}
 #lines{position:absolute;inset:0;width:100%;height:100%;z-index:2;overflow:visible}
@@ -66,15 +66,27 @@ body{margin:0;background:radial-gradient(circle at top,#25313a,#0c1013 55%);colo
 .selected-line{stroke-width:3}
 .draft-line{opacity:.75}
 .line-hit{stroke:transparent;stroke-width:16;pointer-events:stroke;cursor:move}
+#notesLayer{position:absolute;inset:0;z-index:4;pointer-events:none}
+.table-note{position:absolute;max-width:88%;padding:3px 6px;border-radius:5px;background:#07110db8;font-size:15px;font-weight:900;line-height:1.35;white-space:pre-wrap;text-align:center;text-shadow:0 2px 3px #000,0 0 5px #000;transform:translate(-50%,-50%);cursor:move;user-select:none;touch-action:none;pointer-events:auto}
 .tools{position:fixed;z-index:10;bottom:0;left:50%;transform:translateX(-50%);width:min(100%,480px);padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:#151b20ed;border-top:1px solid #303940;backdrop-filter:blur(16px);justify-content:space-around}
 .tools button{border:0;background:none;color:#8f9ba4;font-size:10px;min-width:42px}
 .tools span{display:block;font-size:22px;margin-bottom:2px}
 .tools button.active{color:var(--gold)}
 .tools .save{background:var(--gold);color:#18130c;border-radius:13px;padding:7px 10px}
+.line-color-panel{position:fixed;z-index:12;left:50%;bottom:78px;transform:translateX(-50%);width:min(calc(100% - 24px),420px);padding:12px;background:#192026f7;border:1px solid #46525a;border-radius:15px;box-shadow:0 14px 35px #000b;backdrop-filter:blur(14px)}
+.color-panel-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
+.color-panel-head button{border:1px solid #63717a;background:#28333a;color:#fff;border-radius:9px;padding:6px 9px;font-weight:700}
+.color-panel-head button.active{border-color:var(--gold);color:var(--gold)}
+.line-color-swatches{display:grid;grid-template-columns:repeat(8,1fr);gap:7px}
+.color-swatch{position:relative;height:30px;border:2px solid #ffffff55;border-radius:8px;color:#111;font-size:10px;font-weight:900;text-shadow:0 1px #fff;cursor:pointer}
+.color-swatch.active{outline:2px solid #fff;outline-offset:2px}
+.custom-color{display:flex;align-items:center;justify-content:space-between;margin-top:10px;color:#c7d0d5;font-size:13px}
+.custom-color input,.memo-color input{width:48px;height:30px;border:0;background:none;padding:0}
 dialog{width:min(calc(100% - 32px),430px);border:1px solid #3c474f;border-radius:20px;background:#192026;color:#fff;padding:20px}
 dialog::backdrop{background:#000a;backdrop-filter:blur(3px)}
 dialog h2{margin:0 0 15px}
 textarea{width:100%;height:130px;border:1px solid #3b4850;border-radius:12px;background:#10161a;color:#fff;padding:12px;font:inherit}
+.memo-color{display:flex;align-items:center;justify-content:space-between;margin:10px 0;color:#d9e0e4;font-size:14px}
 .result{display:flex;gap:12px;margin:14px 0}
 .result label{flex:1;background:#252e34;padding:11px;border-radius:10px}
 dialog form>button{width:100%;border:0;border-radius:12px;padding:13px;background:var(--gold);font-weight:800}
@@ -102,4 +114,4 @@ dialog form>button{width:100%;border:0;border-radius:12px;padding:13px;backgroun
 .tools{overflow-x:auto;justify-content:flex-start;gap:3px}
 .tools button{flex:0 0 47px}
 }
-@media(max-width:390px){.table-and-tip{gap:7px}.table{width:min(68vw,calc(60vh / 2),280px)}.side-controls,.tip-point{width:62px;flex-basis:62px}.cue-diagram{width:58px;height:58px}.tray-balls{grid-template-columns:20px}.tray .mini{width:20px;height:20px}}
+@media(max-width:390px){.table-and-tip{gap:7px}.table{width:min(68vw,calc(60vh / 2),280px)}.side-controls,.tip-point{width:62px;flex-basis:62px}.cue-diagram{width:58px;height:58px}.tray-balls{grid-template-columns:repeat(2,20px)}.tray .mini{width:20px;height:20px}}

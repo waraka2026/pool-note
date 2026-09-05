@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#101418" />
   <title>ビリヤード配置図メーカー｜球配置・ショットライン作成</title>
   <meta name="description" content="ビリヤードの球配置とショットラインをブラウザで作成・保存できる無料の配置図メーカー。手球と1〜15番の球に対応。" />
-  <link rel="stylesheet" href="styles.css?v=17" />
+  <link rel="stylesheet" href="styles.css?v=18" />
 </head>
 <body>
   <main class="app">
@@ -87,6 +87,8 @@
 </svg>
 <div id="ballsLayer">
 </div>
+<div id="notesLayer">
+</div>
 </div>
         <b class="pocket p1">
 </b>
@@ -127,16 +129,22 @@
       <p class="guide-label">操作ガイド</p>
       <h2>配置の作り方</h2>
       <ol>
-        <li><b>球を置く</b><span>右の縦一列から球をタップして、台の上でドラッグ。点線の球はイメージボールです</span></li>
-        <li><b>矢印・線を描く</b><span>球から球へなぞると自動接続し、描き始めた球と同じ色になります</span></li>
+        <li><b>球を置く</b><span>右の2列から球をタップして、台の上でドラッグ。点線の球はイメージボールです</span></li>
+        <li><b>矢印・線を描く</b><span>描き始めた球と同じ色になります。矢印・線ボタンから各球色や自由色も選べます</span></li>
         <li><b>移動・伸縮</b><span>中央をドラッグで移動、線の端を直接つかむと伸縮できます</span></li>
-        <li><b>削除</b><span>球も線もダブルクリックで削除できます</span></li>
+        <li><b>削除</b><span>球・線・配置したメモはダブルクリックで削除できます</span></li>
         <li><b>撞点を記録</b><span>台の右にある大きい手玉をタップし、赤い点を好きな位置へドラッグできます</span></li>
         <li><b>保存済みを開く</b><span>右上の☰ボタンから、保存した配置の一覧を呼び出せます</span></li>
       </ol>
-      <p class="guide-tip">球につながった線の中央を動かすと、接続中の球も一緒に移動します。「画像」ボタンで台・球・撞点をまとめて画像として保存できます。</p>
+      <p class="guide-tip">メモは台の上に表示され、ドラッグで自由に移動できます。「画像」ボタンで台・球・線・メモ・撞点をまとめて保存できます。</p>
     </aside>
     </div>
+
+    <section id="lineColorPanel" class="line-color-panel" hidden aria-label="線の色">
+      <div class="color-panel-head"><b>線の色</b><button id="autoColorBtn" type="button">球の色（自動）</button></div>
+      <div id="lineColorSwatches" class="line-color-swatches"></div>
+      <label class="custom-color">自由な色 <input id="lineColorPicker" type="color" value="#ff2f92" /></label>
+    </section>
 
     <nav class="tools" aria-label="編集ツール">
       <button data-mode="move" class="active">
@@ -161,6 +169,7 @@
 <h2>ショットメモ</h2>
 <textarea id="memo" placeholder="例：右下を撞いて、2クッションで戻す">
 </textarea>
+<label class="memo-color">文字色 <input id="memoColor" type="color" value="#ffe15b"></label>
 <div class="result">
 <label>
 <input type="radio" name="result" value="成功">○ 成功</label>
@@ -178,7 +187,7 @@
 <div id="savedList">
 </div>
 </dialog>
-  <script src="app.js?v=17">
+  <script src="app.js?v=18">
 </script>
 </body>
 </html>
