@@ -3,14 +3,16 @@ const table=document.querySelector('.cloth');
 const tableFrame=document.querySelector('.table');
 const layer=document.querySelector('#ballsLayer');
 const svg=document.querySelector('#lines');
+const cueDiagram=document.querySelector('#cueDiagram');
+const tipMark=document.querySelector('#tipMark');
 
-let mode='move',draggingBall=null,draggingLine=null,lineStart=null,lineDraft=null,lines=[],state={},selectedLine=-1;
+let mode='move',draggingBall=null,draggingLine=null,lineStart=null,lineDraft=null,lines=[],state={},selectedLine=-1,tip=null;
 let ballPress=null,ballMoved=false,lastBallTap=null;
 const defs=`<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10Z" fill="white"/></marker></defs>`;
 
 function markUnsaved(){document.querySelector('#saveState').textContent='未保存'}
-function defaultState(){state={1:{x:40,y:35},9:{x:62,y:20}};lines=[];selectedLine=-1;render();markUnsaved()}
-function clearTable(){state={};lines=[];selectedLine=-1;render();markUnsaved()}
+function defaultState(){state={1:{x:40,y:35},9:{x:62,y:20}};lines=[];tip=null;selectedLine=-1;render();markUnsaved()}
+function clearTable(){state={};lines=[];tip=null;selectedLine=-1;render();markUnsaved()}
 function ballEl(n,x,y,mini=false){
   const el=document.createElement('div'),striped=n!=='cue'&&Number(n)>8;
   el.className=`ball ${mini?'mini':''} ${n==='cue'?'cue':''} ${striped?'striped':''}`;
@@ -19,9 +21,24 @@ function ballEl(n,x,y,mini=false){
 }
 function renderBalls(){layer.innerHTML='';Object.entries(state).forEach(([n,p])=>layer.append(ballEl(n,p.x,p.y)))}
 function updateBallPositions(){Object.entries(state).forEach(([n,p])=>{const el=layer.querySelector(`[data-n="${n}"]`);if(el){el.style.left=p.x+'%';el.style.top=p.y+'%'}})}
+function freeSpot(){
+  const r=table.getBoundingClientRect(),minDist=24,existing=Object.values(state);
+  const fitsPx=(px,py)=>existing.every(b=>Math.hypot(b.x*r.width/100-px,b.y*r.height/100-py)>=minDist);
+  const cx=r.width/2,cy=r.height/2;
+  if(fitsPx(cx,cy))return{x:50,y:50};
+  for(let ring=1;ring<=16;ring++){
+    const radius=ring*(minDist*.85),steps=Math.max(8,ring*8);
+    for(let i=0;i<steps;i++){
+      const angle=(i/steps)*Math.PI*2,px=cx+radius*Math.cos(angle),py=cy+radius*Math.sin(angle);
+      if(px<r.width*.05||px>r.width*.95||py<r.height*.03||py>r.height*.97)continue;
+      if(fitsPx(px,py))return{x:px/r.width*100,y:py/r.height*100};
+    }
+  }
+  return{x:50,y:50};
+}
 function renderTray(){
   const tray=document.querySelector('#trayBalls');tray.innerHTML='';
-  ['cue',1,2,3,4,5,6,7,8,9,10,11,12,13,14,15].filter(n=>!state[n]).forEach(n=>{const ball=ballEl(n,0,0,true);ball.onclick=()=>{state[n]={x:50,y:50};render();markUnsaved()};tray.append(ball)});
+  ['cue',1,2,3,4,5,6,7,8,9,10,11,12,13,14,15].filter(n=>!state[n]).forEach(n=>{const ball=ballEl(n,0,0,true);ball.onclick=()=>{state[n]=freeSpot();render();markUnsaved()};tray.append(ball)});
 }
 function point(e){const r=table.getBoundingClientRect();return{x:Math.max(2,Math.min(98,(e.clientX-r.left)/r.width*100)),y:Math.max(2,Math.min(98,(e.clientY-r.top)/r.height*100))}}
 function nearestBall(p,maxPx=36,exclude=null){
@@ -40,7 +57,8 @@ function lineMarkup(l,i,draft=false){
   const hit=draft||len<=3?'':`<line data-i="${i}" class="line-hit" x1="${v.x1}%" y1="${v.y1}%" x2="${v.x2}%" y2="${v.y2}%"/>`;return `<g>${visual}${hit}</g>`;
 }
 function renderLines(){let html=defs+lines.map((l,i)=>lineMarkup(l,i)).join('');if(lineDraft)html+=lineMarkup(lineDraft,-1,true);svg.innerHTML=html}
-function render(){renderBalls();renderLines();renderTray()}
+function renderTip(){if(tip){tipMark.hidden=false;tipMark.style.left=(tip.x*100)+'%';tipMark.style.top=(tip.y*100)+'%'}else{tipMark.hidden=true}}
+function render(){renderBalls();renderLines();renderTray();renderTip()}
 function removeBall(n){delete state[n];lines=lines.filter(l=>String(l.startBall)!==String(n)&&String(l.endBall)!==String(n));selectedLine=-1;render();markUnsaved()}
 function removeLine(i){if(i<0||i>=lines.length)return;lines.splice(i,1);selectedLine=-1;renderLines();markUnsaved()}
 
@@ -91,6 +109,13 @@ svg.addEventListener('pointerdown',e=>{
 });
 svg.addEventListener('dblclick',e=>{if(e.target.dataset.i===undefined)return;e.preventDefault();e.stopPropagation();removeLine(Number(e.target.dataset.i))});
 
+cueDiagram.addEventListener('pointerdown',e=>{
+  const r=cueDiagram.getBoundingClientRect();let x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;
+  const dx=x-.5,dy=y-.5,d=Math.hypot(dx,dy);if(d>.46){const k=.46/d;x=.5+dx*k;y=.5+dy*k}
+  tip={x,y};renderTip();markUnsaved();
+});
+document.querySelector('#tipClearBtn').onclick=()=>{tip=null;renderTip();markUnsaved()};
+
 function setMode(next,showHint=true){
   mode=next;selectedLine=-1;renderLines();document.querySelectorAll('.tools [data-mode]').forEach(b=>b.classList.toggle('active',b.dataset.mode===next));
   const hint=document.querySelector('#hint');hint.textContent=mode==='line'?'球から球へなぞると自動接続':mode==='plain'?'球から球へなぞると自動接続':mode==='erase'?'球または線をタップして消去':'球をドラッグ。線の端をつかむと伸縮';hint.style.opacity=1;setTimeout(()=>hint.style.opacity=0,1800);
@@ -116,21 +141,36 @@ function drawExportLine(ctx,l,clothX,clothY,clothW,clothH){
   ctx.strokeStyle='#fff';ctx.fillStyle='#fff';ctx.lineWidth=2;ctx.setLineDash(l.type==='plain'?[]:[8,5]);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.setLineDash([]);
   if(l.type!=='plain'&&len>14){const a=Math.atan2(dy,dx);ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-12*Math.cos(a-.48),y2-12*Math.sin(a-.48));ctx.lineTo(x2-12*Math.cos(a+.48),y2-12*Math.sin(a+.48));ctx.closePath();ctx.fill()}
 }
+function drawWoodFrame(ctx,w,h){
+  roundedRect(ctx,0,0,w,h,16);ctx.save();ctx.clip();
+  for(let y=-2;y<h;y+=7){ctx.fillStyle='#934526';ctx.fillRect(0,y,w,2);ctx.fillStyle='#a9522e';ctx.fillRect(0,y+2,w,3);ctx.fillStyle='#7d351f';ctx.fillRect(0,y+5,w,2)}
+  ctx.restore();
+  ctx.save();roundedRect(ctx,1,1,w-2,h-2,15);ctx.strokeStyle='#6d2d1c';ctx.lineWidth=2;ctx.stroke();
+  roundedRect(ctx,3.5,3.5,w-7,h-7,13);ctx.strokeStyle='#b9633c';ctx.lineWidth=2;ctx.stroke();ctx.restore();
+}
 function downloadImage(){
-  const frameRect=tableFrame.getBoundingClientRect(),clothRect=table.getBoundingClientRect(),scale=3,width=frameRect.width,height=frameRect.height,c=document.createElement('canvas'),ctx=c.getContext('2d');c.width=Math.round(width*scale);c.height=Math.round(height*scale);ctx.scale(scale,scale);
-  const cx=clothRect.left-frameRect.left,cy=clothRect.top-frameRect.top,cw=clothRect.width,ch=clothRect.height,wood=ctx.createLinearGradient(0,0,width,0);wood.addColorStop(0,'#7d351f');wood.addColorStop(.5,'#a9522e');wood.addColorStop(1,'#7d351f');ctx.fillStyle=wood;roundedRect(ctx,0,0,width,height,16);ctx.fill();
-  ctx.save();roundedRect(ctx,cx,cy,cw,ch,2);ctx.clip();ctx.fillStyle='#08aa7a';ctx.fillRect(cx,cy,cw,ch);ctx.strokeStyle='#ffffff52';ctx.lineWidth=.45;ctx.setLineDash([1.5,1.5]);
+  const frameRect=tableFrame.getBoundingClientRect(),clothRect=table.getBoundingClientRect(),scale=3,width=frameRect.width,frameH=frameRect.height,extra=tip?76:0,height=frameH+extra;
+  const c=document.createElement('canvas'),ctx=c.getContext('2d');c.width=Math.round(width*scale);c.height=Math.round(height*scale);ctx.scale(scale,scale);
+  const cx=clothRect.left-frameRect.left,cy=clothRect.top-frameRect.top,cw=clothRect.width,ch=clothRect.height;
+  drawWoodFrame(ctx,width,frameH);
+  ctx.save();roundedRect(ctx,cx,cy,cw,ch,2);ctx.clip();const clothGrad=ctx.createLinearGradient(cx,0,cx+cw,0);clothGrad.addColorStop(0,'#08ae7d');clothGrad.addColorStop(1,'#08aa7a');ctx.fillStyle=clothGrad;ctx.fillRect(cx,cy,cw,ch);ctx.strokeStyle='#ffffff52';ctx.lineWidth=.45;ctx.setLineDash([1.5,1.5]);
   for(let i=1;i<4;i++){ctx.beginPath();ctx.moveTo(cx+cw*i/4,cy);ctx.lineTo(cx+cw*i/4,cy+ch);ctx.stroke()}for(let i=1;i<8;i++){ctx.beginPath();ctx.moveTo(cx,cy+ch*i/8);ctx.lineTo(cx+cw,cy+ch*i/8);ctx.stroke()}ctx.setLineDash([]);lines.forEach(l=>drawExportLine(ctx,l,cx,cy,cw,ch));Object.entries(state).forEach(([n,p])=>drawCanvasBall(ctx,n,cx+cw*p.x/100,cy+ch*p.y/100,10));ctx.restore();
-  ctx.fillStyle='#fff';for(let i=1;i<=3;i++)for(const y of [10,height-10]){ctx.beginPath();ctx.arc(52+(width-104)*(i-.5)/3,y,2,0,Math.PI*2);ctx.fill()}for(let i=1;i<=7;i++)for(const x of [10,width-10]){ctx.beginPath();ctx.arc(x,52+(height-104)*(i-.5)/7,2,0,Math.PI*2);ctx.fill()}
-  ctx.fillStyle='#020202';ctx.strokeStyle='#49180f';ctx.lineWidth=2;for(const [x,y] of [[18,18],[width-18,18],[18,height-18],[width-18,height-18]]){ctx.save();ctx.translate(x,y);ctx.rotate(Math.PI/4);roundedRect(ctx,-10,-10,20,20,7);ctx.fill();ctx.stroke();ctx.restore()}ctx.beginPath();ctx.ellipse(7.5,height/2,7.5,14,0,Math.PI/2,Math.PI*1.5);ctx.fill();ctx.beginPath();ctx.ellipse(width-7.5,height/2,7.5,14,0,-Math.PI/2,Math.PI/2);ctx.fill();
+  ctx.fillStyle='#fff';for(let i=1;i<=3;i++)for(const y of [10,frameH-10]){ctx.beginPath();ctx.arc(52+(width-104)*(i-.5)/3,y,2,0,Math.PI*2);ctx.fill()}for(let i=1;i<=7;i++)for(const x of [10,width-10]){ctx.beginPath();ctx.arc(x,52+(frameH-104)*(i-.5)/7,2,0,Math.PI*2);ctx.fill()}
+  ctx.fillStyle='#020202';ctx.strokeStyle='#49180f';ctx.lineWidth=2;for(const [x,y] of [[18,18],[width-18,18],[18,frameH-18],[width-18,frameH-18]]){ctx.save();ctx.translate(x,y);ctx.rotate(Math.PI/4);roundedRect(ctx,-10,-10,20,20,7);ctx.fill();ctx.stroke();ctx.restore()}ctx.beginPath();ctx.ellipse(7.5,frameH/2,7.5,14,0,Math.PI/2,Math.PI*1.5);ctx.fill();ctx.beginPath();ctx.ellipse(width-7.5,frameH/2,7.5,14,0,-Math.PI/2,Math.PI/2);ctx.fill();
+  if(tip){
+    const fy=frameH;ctx.fillStyle='#151b20';roundedRect(ctx,0,fy,width,extra,0);ctx.save();ctx.beginPath();ctx.moveTo(0,fy);ctx.lineTo(width,fy);ctx.lineTo(width,fy+extra-16);ctx.quadraticCurveTo(width,fy+extra,width-16,fy+extra);ctx.lineTo(16,fy+extra);ctx.quadraticCurveTo(0,fy+extra,0,fy+extra-16);ctx.closePath();ctx.fill();ctx.restore();
+    ctx.fillStyle='#d5aa58';ctx.font='bold 13px system-ui';ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText('撞点',14,fy+extra/2);
+    const bx=width-40,by=fy+extra/2,br=19;drawCanvasBall(ctx,'cue',bx,by,br);
+    ctx.beginPath();ctx.arc(bx-br+tip.x*br*2,by-br+tip.y*br*2,2.8,0,Math.PI*2);ctx.fillStyle='#e6382e';ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=1;ctx.stroke();
+  }
   const a=document.createElement('a');a.download=(document.querySelector('#title').value||'ビリヤード配置')+'.png';a.href=c.toDataURL('image/png');a.click();
 }
 document.querySelector('#imageBtn').onclick=downloadImage;
 document.querySelector('#saveBtn').onclick=()=>{
-  const saved=JSON.parse(localStorage.getItem('poolNotes')||'[]');saved.unshift({id:Date.now(),title:document.querySelector('#title').value||'名称なし',date:new Date().toLocaleDateString('ja-JP'),state:structuredClone(state),lines:structuredClone(lines),memo:document.querySelector('#memo').value,result:document.querySelector('input[name=result]:checked')?.value||''});localStorage.setItem('poolNotes',JSON.stringify(saved.slice(0,30)));document.querySelector('#saveState').textContent='保存済み';const btn=document.querySelector('#saveBtn');btn.innerHTML='<span>✓</span>保存済';setTimeout(()=>btn.innerHTML='<span>✓</span>保存',1200);
+  const saved=JSON.parse(localStorage.getItem('poolNotes')||'[]');saved.unshift({id:Date.now(),title:document.querySelector('#title').value||'名称なし',date:new Date().toLocaleDateString('ja-JP'),state:structuredClone(state),lines:structuredClone(lines),tip:tip?{...tip}:null,memo:document.querySelector('#memo').value,result:document.querySelector('input[name=result]:checked')?.value||''});localStorage.setItem('poolNotes',JSON.stringify(saved.slice(0,30)));document.querySelector('#saveState').textContent='保存済み';const btn=document.querySelector('#saveBtn');btn.innerHTML='<span>✓</span>保存済';setTimeout(()=>btn.innerHTML='<span>✓</span>保存',1200);
 };
 document.querySelector('#savedBtn').onclick=()=>{
   const saved=JSON.parse(localStorage.getItem('poolNotes')||'[]');savedList.innerHTML=saved.length?saved.map((s,i)=>`<div class="saved-card"><b>${s.title}</b><small>${s.date} ${s.result?`・${s.result}`:''}</small><button data-load="${i}">この配置を開く</button></div>`).join(''):'<p>保存した配置はまだありません。</p>';
-  savedList.querySelectorAll('button').forEach(b=>b.onclick=()=>{const s=saved[Number(b.dataset.load)];state=structuredClone(s.state);lines=structuredClone(s.lines||[]);selectedLine=-1;title.value=s.title;memo.value=s.memo||'';render();savedDialog.close()});savedDialog.showModal();
+  savedList.querySelectorAll('button').forEach(b=>b.onclick=()=>{const s=saved[Number(b.dataset.load)];state=structuredClone(s.state);lines=structuredClone(s.lines||[]);tip=s.tip?{...s.tip}:null;selectedLine=-1;title.value=s.title;memo.value=s.memo||'';render();savedDialog.close()});savedDialog.showModal();
 };
 defaultState();
