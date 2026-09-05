@@ -6,14 +6,14 @@ const svg=document.querySelector('#lines');
 const cueDiagram=document.querySelector('#cueDiagram');
 const tipMark=document.querySelector('#tipMark');
 
-let mode='move',draggingBall=null,draggingLine=null,lineStart=null,lineDraft=null,lines=[],state={},selectedLine=-1,tip=null;
+let mode='move',draggingBall=null,draggingLine=null,lineStart=null,lineDraft=null,lines=[],state={},selectedLine=-1,tip=null,tipDragging=false;
 let ballPress=null,ballMoved=false,lastBallTap=null;
 const defs=`<defs></defs>`;
 
 function ballColor(n){return n==='cue'?'#fff':n==='ghost'?'#dce7e3':colors[Number(n)-1]||'#fff'}
 
 function markUnsaved(){document.querySelector('#saveState').textContent='未保存'}
-function defaultState(){state={1:{x:40,y:35},9:{x:62,y:20}};lines=[];tip=null;selectedLine=-1;render();markUnsaved()}
+function defaultState(){state={};lines=[];tip=null;selectedLine=-1;render();markUnsaved()}
 function clearTable(){state={};lines=[];tip=null;selectedLine=-1;render();markUnsaved()}
 function ballEl(n,x,y,mini=false){
   const el=document.createElement('div'),striped=!['cue','ghost'].includes(n)&&Number(n)>8;
@@ -112,11 +112,15 @@ svg.addEventListener('pointerdown',e=>{
 });
 svg.addEventListener('dblclick',e=>{if(e.target.dataset.i===undefined)return;e.preventDefault();e.stopPropagation();removeLine(Number(e.target.dataset.i))});
 
-cueDiagram.addEventListener('pointerdown',e=>{
+function updateTip(e){
   const r=cueDiagram.getBoundingClientRect();let x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;
   const dx=x-.5,dy=y-.5,d=Math.hypot(dx,dy);if(d>.46){const k=.46/d;x=.5+dx*k;y=.5+dy*k}
   tip={x,y};renderTip();markUnsaved();
-});
+}
+cueDiagram.addEventListener('pointerdown',e=>{tipDragging=true;cueDiagram.setPointerCapture(e.pointerId);updateTip(e)});
+cueDiagram.addEventListener('pointermove',e=>{if(tipDragging)updateTip(e)});
+cueDiagram.addEventListener('pointerup',()=>{tipDragging=false});
+cueDiagram.addEventListener('pointercancel',()=>{tipDragging=false});
 document.querySelector('#tipClearBtn').onclick=()=>{tip=null;renderTip();markUnsaved()};
 
 function setMode(next,showHint=true){

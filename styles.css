@@ -12,6 +12,7 @@ body{margin:0;background:radial-gradient(circle at top,#25313a,#0c1013 55%);colo
 .title-row span{font-size:11px;color:var(--muted)}
 .table-wrap{position:relative;padding:0;display:flex;justify-content:center}
 .table-and-tip{display:flex;justify-content:center;align-items:flex-start;gap:13px}
+.side-controls{width:76px;flex:0 0 76px;display:flex;flex-direction:column;align-items:center;gap:10px}
 .workspace{display:grid;grid-template-columns:minmax(300px,480px) 270px;gap:24px;justify-content:center;align-items:start}
 .board-column{min-width:0}
 .guide{background:linear-gradient(145deg,#1d252b,#151b20);border:1px solid #354047;border-radius:18px;padding:20px;box-shadow:0 16px 36px #0005;position:sticky;top:18px}
@@ -55,14 +56,14 @@ body{margin:0;background:radial-gradient(circle at top,#25313a,#0c1013 55%);colo
 .ball.ghost:before{display:none}
 .ball.striped{background:linear-gradient(#fff 0 22%,var(--ball) 22% 76%,#fff 76%)}
 .ball span{background:#fff;border-radius:50%;min-width:11px;height:11px;display:grid;place-items:center;position:relative;z-index:2}
-.tray{justify-content:space-between;align-items:flex-start;margin:12px 2px;gap:8px}
-.tray-balls{display:grid;grid-template-columns:repeat(8,22px);gap:5px 4px;min-height:22px}
+.tray{width:100%;flex-direction:column;align-items:center;margin:0;gap:8px}
+.tray-balls{display:grid;grid-template-columns:22px;gap:4px;justify-content:center;min-height:22px}
 .tray .mini{position:static;transform:none;width:22px;height:22px;font-size:8px;cursor:pointer}
 .tray button{background:none;border:0;color:var(--muted);font-size:11px}
 #lines{position:absolute;inset:0;width:100%;height:100%;z-index:2;overflow:visible}
 .shot-line{stroke:var(--line-color,#fff);stroke-width:2;stroke-dasharray:8 5;filter:drop-shadow(0 1px 2px #000)}
 .plain-line{stroke:var(--line-color,#fff);stroke-width:2;filter:drop-shadow(0 1px 2px #000)}
-.selected-line{stroke:#ffe19a;stroke-width:2.8}
+.selected-line{stroke-width:3}
 .draft-line{opacity:.75}
 .line-hit{stroke:transparent;stroke-width:16;pointer-events:stroke;cursor:move}
 .tools{position:fixed;z-index:10;bottom:0;left:50%;transform:translateX(-50%);width:min(100%,480px);padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:#151b20ed;border-top:1px solid #303940;backdrop-filter:blur(16px);justify-content:space-around}
@@ -83,7 +84,7 @@ dialog form>button{width:100%;border:0;border-radius:12px;padding:13px;backgroun
 .saved-card b,.saved-card small{display:block}
 .saved-card small{color:var(--muted);margin-top:4px}
 .saved-card button{margin-top:9px;border:0;border-radius:8px;padding:7px 11px;background:#3a464e;color:#fff}
-.tip-point{width:76px;flex:0 0 76px;text-align:center;padding-top:7px}
+.tip-point{width:76px;text-align:center;padding-top:7px}
 .tip-label{margin:0 0 8px;color:var(--gold);font-size:14px;font-weight:800}
 .cue-diagram{position:relative;width:70px;height:70px;border-radius:50%;cursor:crosshair;touch-action:none;background:radial-gradient(circle at 30% 24%,#fff 0 8%,transparent 23%),radial-gradient(circle at 66% 72%,#d8d1a7 0,#fffdf2 50%,#fff 72%);border:1px solid #fff;box-shadow:-5px -6px 11px #fff7 inset,6px 8px 12px #0008,0 0 0 4px #ffffff12}
 .cue-diagram:after{content:"";position:absolute;inset:8px;border:1px dashed #77808766;border-radius:50%;pointer-events:none}
@@ -96,8 +97,9 @@ dialog form>button{width:100%;border:0;border-radius:12px;padding:13px;backgroun
 }
 @media(max-width:640px){.app{width:min(100%,480px)}
 .workspace{display:block}
+.table{width:min(70vw,calc(63vh / 2),300px)}
 .guide{position:static;margin:18px 2px 0}
 .tools{overflow-x:auto;justify-content:flex-start;gap:3px}
 .tools button{flex:0 0 47px}
 }
-@media(max-width:390px){.table-and-tip{gap:7px}.table{width:min(68vw,calc(60vh / 2),280px)}.tip-point{width:62px;flex-basis:62px}.cue-diagram{width:58px;height:58px}}
+@media(max-width:390px){.table-and-tip{gap:7px}.table{width:min(68vw,calc(60vh / 2),280px)}.side-controls,.tip-point{width:62px;flex-basis:62px}.cue-diagram{width:58px;height:58px}.tray-balls{grid-template-columns:20px}.tray .mini{width:20px;height:20px}}
