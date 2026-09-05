@@ -71,7 +71,7 @@ body{margin:0;background:radial-gradient(circle at top,#25313a,#0c1013 55%);colo
 .tools{position:fixed;z-index:10;bottom:0;left:50%;transform:translateX(-50%);width:min(100%,480px);padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:#151b20ed;border-top:1px solid #303940;backdrop-filter:blur(16px);justify-content:space-around}
 .tools button{border:1px solid transparent;background:none;color:#fff;font-size:10px;min-width:42px;border-radius:10px}
 .tools span{display:block;font-size:22px;margin-bottom:2px}
-.tools button.active{color:#fff;border-color:#ffffffb8;background:#ffffff12}
+.tools button.active{color:var(--gold);border-color:var(--gold);background:#d5aa5818}
 .tools .save{background:#fff;color:#151b20;border-radius:13px;padding:7px 10px}
 .line-color-panel{position:fixed;z-index:12;left:50%;bottom:78px;transform:translateX(-50%);width:min(calc(100% - 24px),420px);padding:12px;background:#192026f7;border:1px solid #46525a;border-radius:15px;box-shadow:0 14px 35px #000b;backdrop-filter:blur(14px)}
 .color-panel-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
@@ -99,8 +99,10 @@ dialog form>button{width:100%;border:0;border-radius:12px;padding:13px;backgroun
 .dialog-head{justify-content:space-between}
 .dialog-head button{background:none;border:0;color:#fff;font-size:24px}
 .saved-card{background:#232c32;border-radius:12px;padding:13px;margin-top:10px}
+.saved-title-input{width:100%;border:1px solid #52606a;border-radius:8px;background:#182026;color:#fff;font-size:16px;font-weight:800;padding:8px 9px}
 .saved-card b,.saved-card small{display:block}
-.saved-card small{color:var(--muted);margin-top:4px}
+.saved-card small{color:var(--muted);margin-top:6px;line-height:1.55}
+.saved-actions{display:flex;gap:7px;flex-wrap:wrap}
 .saved-card button{margin-top:9px;border:0;border-radius:8px;padding:7px 11px;background:#3a464e;color:#fff}
 .tip-point{width:76px;text-align:center;padding-top:7px}
 .tip-label{margin:0 0 8px;color:var(--gold);font-size:14px;font-weight:800}
