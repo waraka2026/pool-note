@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#101418" />
   <title>ビリヤード配置図メーカー｜球配置・ショットライン作成</title>
   <meta name="description" content="ビリヤードの球配置とショットラインをブラウザで作成・保存できる無料の配置図メーカー。手球と1〜15番の球に対応。" />
-  <link rel="stylesheet" href="styles.css?v=38" />
+  <link rel="stylesheet" href="styles.css?v=39" />
 </head>
 <body>
   <main class="app">
@@ -223,7 +223,10 @@
 <label>
 <input type="radio" name="result" value="失敗">× 失敗</label>
 </div>
+<div class="memo-actions">
+<button value="cancel" class="memo-cancel">閉じる</button>
 <button value="ok">完了</button>
+</div>
 </form>
 </dialog>
   <dialog id="guideDialog" class="guide-dialog">
@@ -264,6 +267,6 @@
 <div id="savedList">
 </div>
 </dialog>
-  <script src="app.js?v=33"></script>
+  <script src="app.js?v=34"></script>
 </body>
 </html>

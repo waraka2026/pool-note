@@ -84,6 +84,17 @@ function layoutTable(){
 window.addEventListener('resize',layoutTable);
 window.addEventListener('orientationchange',()=>setTimeout(layoutTable,50));
 if(window.visualViewport)window.visualViewport.addEventListener('resize',layoutTable);
+
+function isPhoneSized(){return Math.min(window.screen.width,window.screen.height)<=500}
+function syncOrientationToDevice(){
+  if(!isPhoneSized())return;
+  const type=(screen.orientation&&screen.orientation.type)||(Math.abs(window.orientation||0)===90?'landscape':'portrait');
+  if(type.startsWith('landscape'))setOrientation('landscape');
+  else if(type.startsWith('portrait'))setOrientation('portrait');
+}
+if(screen.orientation)screen.orientation.addEventListener('change',syncOrientationToDevice);
+window.addEventListener('orientationchange',()=>setTimeout(syncOrientationToDevice,50));
+syncOrientationToDevice();
 function ballEl(n,x,y,mini=false){
   const kind=ballKind(n),el=document.createElement('div'),striped=!['cue','ghost'].includes(kind)&&Number(kind)>8;
   el.className=`ball ${mini?'mini':''} ${kind==='cue'?'cue':''} ${kind==='ghost'?'ghost':''} ${striped?'striped':''}`;
