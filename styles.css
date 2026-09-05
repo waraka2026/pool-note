@@ -1,15 +1,16 @@
 :root{--bg:#101418;--panel:#192026;--muted:#94a0a9;--gold:#d5aa58;--felt:#087c62;--wood:#704020}
 *{box-sizing:border-box}
-body{margin:0;background:radial-gradient(circle at top,#25313a,#0c1013 55%);color:#f7f3ea;font-family:system-ui,-apple-system,"Noto Sans JP",sans-serif;min-height:100vh}
+html{min-height:100%;background:#0c1013;overscroll-behavior-y:none}
+body{margin:0;background-color:#0c1013;background-image:radial-gradient(circle at top,#25313a,#0c1013 55%);background-repeat:no-repeat;color:#f7f3ea;font-family:system-ui,-apple-system,"Noto Sans JP",sans-serif;min-height:100vh;min-height:100dvh;overscroll-behavior-y:none}
 .app{width:min(100%,1040px);margin:auto;min-height:100vh;padding:18px 16px 100px}
 .topbar,.title-row,.tray,.tools,.dialog-head{display:flex;align-items:center}
 .topbar{justify-content:space-between}
 .eyebrow{font-size:10px;letter-spacing:.25em;color:var(--gold);margin:0 0 2px}
 .topbar h1{font-family:Georgia,"Noto Serif JP",serif;letter-spacing:.03em;margin:0;font-size:23px}
-.icon-btn{border:1px solid #39434b;background:#1b2228;color:#fff;border-radius:50%;width:42px;height:42px;font-size:20px}
-.layout-menu-row{display:flex;justify-content:flex-end;margin-top:10px;border-bottom:1px solid #39434b}
-.layout-menu-row button{border:0;border-bottom:2px solid transparent;background:none;color:#fff;padding:8px 4px 7px;font-size:14px;font-weight:800;cursor:pointer}
-.layout-menu-row button:hover,.layout-menu-row button:focus-visible{border-bottom-color:var(--gold);color:var(--gold);outline:0}
+.primary-menu{display:flex;align-items:center;gap:4px;margin-top:12px;border-bottom:1px solid #39434b;overflow-x:auto;scrollbar-width:none}
+.primary-menu::-webkit-scrollbar{display:none}
+.primary-menu button{flex:0 0 auto;border:0;border-bottom:2px solid transparent;background:none;color:#dbe1e4;padding:9px 12px 8px;font-size:14px;font-weight:800;cursor:pointer;white-space:nowrap}
+.primary-menu button.active,.primary-menu button:hover,.primary-menu button:focus-visible{border-bottom-color:var(--gold);color:var(--gold);outline:0}
 .title-row{margin:16px 0 12px;gap:10px}
 .title-row input{flex:1;background:transparent;border:0;border-bottom:1px solid #39434b;color:#fff;font-size:18px;font-weight:700;padding:6px 2px;outline:0}
 .title-row span{font-size:11px;color:var(--muted)}
@@ -85,10 +86,11 @@ body{margin:0;background:radial-gradient(circle at top,#25313a,#0c1013 55%);colo
 .draft-line{opacity:.75}
 .line-hit{stroke:transparent;stroke-width:16;pointer-events:stroke;cursor:move}
 #notesLayer{position:absolute;inset:0;z-index:4;pointer-events:none}
-.table-note{position:absolute;max-width:88%;padding:3px 6px;border-radius:5px;background:#07110db8;font-size:15px;font-weight:900;line-height:1.35;white-space:pre-wrap;text-align:center;text-shadow:0 2px 3px #000,0 0 5px #000;transform:translate(-50%,-50%);cursor:move;user-select:none;touch-action:none;pointer-events:auto}
+.table-note{position:absolute;max-width:88%;padding:4px 7px;border-radius:5px;background:#07110d;font-size:18px;font-weight:900;line-height:1.35;white-space:pre-wrap;text-align:center;text-shadow:0 2px 3px #000,0 0 5px #000;transform:translate(-50%,-50%);cursor:move;user-select:none;touch-action:none;pointer-events:auto}
 .tools{position:fixed;z-index:10;bottom:0;left:50%;transform:translateX(-50%);width:min(100%,480px);padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:#151b20ed;border-top:1px solid #303940;backdrop-filter:blur(16px);justify-content:space-around}
 .tools button{border:1px solid transparent;background:none;color:#fff;font-size:10px;min-width:42px;border-radius:10px}
 .tools span{display:block;font-size:22px;margin-bottom:2px}
+.tools button b{font:inherit;font-weight:500;white-space:nowrap}
 .tools button.active{color:var(--gold);border-color:var(--gold);background:#d5aa5818}
 .tools .save{background:#fff;color:#151b20;border-radius:13px;padding:7px 10px}
 .line-color-panel{position:fixed;z-index:12;left:50%;bottom:78px;transform:translateX(-50%);width:min(calc(100% - 24px),420px);padding:12px;background:#192026f7;border:1px solid #46525a;border-radius:15px;box-shadow:0 14px 35px #000b;backdrop-filter:blur(14px)}
@@ -105,12 +107,15 @@ body{margin:0;background:radial-gradient(circle at top,#25313a,#0c1013 55%);colo
 .color-swatch{position:relative;height:32px;border:2px solid #ffffff88;border-radius:50%;color:#050505;font-size:11px;font-weight:900;-webkit-text-stroke:1.4px #fff;paint-order:stroke fill;text-shadow:none;cursor:pointer;box-shadow:inset -3px -3px 5px #0006,inset 2px 2px 4px #fff8}
 .color-swatch.active{outline:2px solid #fff;outline-offset:2px}
 .custom-color{display:flex;align-items:center;justify-content:space-between;margin-top:10px;color:#c7d0d5;font-size:13px}
-.custom-color input,.memo-color input{width:48px;height:30px;border:0;background:none;padding:0}
+.custom-color input,.memo-style-grid input{width:48px;height:30px;border:0;background:none;padding:0}
 dialog{width:min(calc(100% - 32px),430px);border:1px solid #3c474f;border-radius:20px;background:#192026;color:#fff;padding:20px}
 dialog::backdrop{background:#000a;backdrop-filter:blur(3px)}
 dialog h2{margin:0 0 15px}
 textarea{width:100%;height:130px;border:1px solid #3b4850;border-radius:12px;background:#10161a;color:#fff;padding:12px;font:inherit}
-.memo-color{display:flex;align-items:center;justify-content:space-between;margin:10px 0;color:#d9e0e4;font-size:14px}
+.memo-style-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:11px 0}
+.memo-style-grid label{display:flex;align-items:center;justify-content:space-between;gap:8px;background:#252e34;border-radius:9px;padding:8px 9px;color:#d9e0e4;font-size:13px}
+.memo-style-grid select{min-width:86px;border:1px solid #52606a;border-radius:7px;background:#182026;color:#fff;padding:6px}
+.memo-transparent{display:flex;align-items:center;gap:7px;margin:0 0 10px;color:#d9e0e4;font-size:13px}
 .result{display:flex;gap:12px;margin:14px 0}
 .result label{flex:1;background:#252e34;padding:11px;border-radius:10px}
 dialog form>button{width:100%;border:0;border-radius:12px;padding:13px;background:var(--gold);font-weight:800}
@@ -143,6 +148,9 @@ dialog form>button{width:100%;border:0;border-radius:12px;padding:13px;backgroun
 .tip-help{margin:9px 0 5px;color:var(--muted);font-size:11px;line-height:1.3}
 .tip-clear{border:0;background:none;color:#d8dde0;font-size:11px;text-decoration:underline;padding:3px;cursor:pointer}
 @media(max-width:640px){.app{width:min(100%,480px)}
+.topbar h1{font-size:21px}
+.primary-menu{margin-top:10px}
+.primary-menu button{padding-left:9px;padding-right:9px;font-size:13px}
 .table{width:260px;height:520px}
 .board-column.landscape .table{width:520px;height:260px}
 .board-column.landscape>.tray{width:520px;padding-left:48px}

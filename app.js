@@ -15,6 +15,12 @@ const landscapeBtn=document.querySelector('#landscapeBtn');
 let mode='move',draggingBall=null,draggingLine=null,lineStart=null,lineDraft=null,lines=[],notes=[],state={},selectedLine=-1,tip=null,tipDragging=false,activeLineColor='auto',activeLineChoice='auto',paletteLineType='line',currentSaveId=null,repeatBallSeq=0,orientation='portrait';
 let ballPress=null,ballMoved=false,lastBallTap=null,lastLineTap=null,savedView='cards',savedSortOrder='newest';
 const defs=`<defs></defs>`;
+const noteFonts={
+  gothic:'system-ui,-apple-system,"Noto Sans JP",sans-serif',
+  mincho:'Georgia,"Yu Mincho","Hiragino Mincho ProN",serif',
+  rounded:'"Arial Rounded MT Bold","Hiragino Maru Gothic ProN",system-ui,sans-serif',
+  hand:'"Klee One","Yuji Syuku","Segoe Print",cursive'
+};
 
 function ballKind(n){const id=String(n);return id==='cue'||id.startsWith('cue-')?'cue':id==='ghost'||id.startsWith('ghost-')?'ghost':id}
 function ballColor(n){const kind=ballKind(n);return kind==='cue'?'#fff':kind==='ghost'?'#dce7e3':colors[Number(kind)-1]||'#fff'}
@@ -77,7 +83,7 @@ function renderTray(){
 }
 function renderNotes(){
   notesLayer.innerHTML='';notes.forEach((note,i)=>{
-    const el=document.createElement('div');el.className='table-note';el.textContent=note.text;el.style.left=note.x+'%';el.style.top=note.y+'%';el.style.color=note.color||'#ffe15b';
+    const el=document.createElement('div');el.className='table-note';el.textContent=note.text;el.style.left=note.x+'%';el.style.top=note.y+'%';el.style.color=note.color||'#ffe15b';el.style.background=note.background==='transparent'?'transparent':note.background||'#07110d';el.style.fontFamily=noteFonts[note.font]||noteFonts.gothic;el.style.fontSize=(Number(note.size)||18)+'px';
     el.addEventListener('pointerdown',e=>{e.stopPropagation();el.setPointerCapture(e.pointerId)});
     el.addEventListener('pointermove',e=>{if(!el.hasPointerCapture(e.pointerId))return;const p=point(e);note.x=p.x;note.y=p.y;el.style.left=p.x+'%';el.style.top=p.y+'%'});
     el.addEventListener('pointerup',e=>{if(el.hasPointerCapture(e.pointerId))el.releasePointerCapture(e.pointerId);markUnsaved()});
@@ -136,7 +142,7 @@ table.addEventListener('pointermove',e=>{
 });
 table.addEventListener('pointerup',()=>{
   if(draggingBall){const n=draggingBall,now=Date.now();draggingBall=null;ballPress=null;if(!ballMoved){if(lastBallTap&&lastBallTap.n===n&&now-lastBallTap.time<650){lastBallTap=null;removeBall(n);return}lastBallTap={n,time:now}}else lastBallTap=null;markUnsaved();return}
-  if(lineStart){if(lineDraft&&lineLengthPx(lineDraft)>8){lines.push({...lineDraft});selectedLine=lines.length-1;markUnsaved()}lineStart=null;lineDraft=null;setMode('move',false);renderLines();return}
+  if(lineStart){if(lineDraft&&lineLengthPx(lineDraft)>8){lines.push({...lineDraft});selectedLine=lines.length-1;markUnsaved()}lineStart=null;lineDraft=null;renderLines();return}
   if(draggingLine){
     const l=lines[draggingLine.i];
     draggingLine=null;if(lineLengthPx(l)<5)removeLine(selectedLine);else{renderLines();markUnsaved()}
@@ -165,27 +171,33 @@ document.querySelector('#tipClearBtn').onclick=()=>{tip=null;renderTip();markUns
 
 function setMode(next,showHint=true){
   mode=next;selectedLine=-1;renderLines();document.querySelectorAll('.tools [data-mode]').forEach(b=>b.classList.toggle('active',b.dataset.mode===next));
+  drawBtn.classList.toggle('active',next==='line'||next==='plain');
   const hint=document.querySelector('#hint');hint.textContent=mode==='line'?'球から球へなぞると自動接続':mode==='plain'?'球から球へなぞると自動接続':mode==='erase'?'球または線をタップして消去':'球をドラッグ。線の端をつかむと伸縮';hint.style.opacity=1;setTimeout(()=>hint.style.opacity=0,1800);
   if(!showHint)hint.style.opacity=0;
 }
-document.querySelectorAll('.tools [data-mode]').forEach(btn=>btn.onclick=()=>{if(['line','plain'].includes(btn.dataset.mode)){activeLineColor='auto';activeLineChoice='auto';refreshColorChoice()}colorPanel.hidden=true;colorBtn.classList.remove('active');setMode(btn.dataset.mode)});
+document.querySelectorAll('.tools [data-mode]').forEach(btn=>btn.onclick=()=>{colorPanel.hidden=true;setMode(btn.dataset.mode)});
 
-const colorPanel=document.querySelector('#lineColorPanel'),colorBtn=document.querySelector('#colorBtn'),swatches=document.querySelector('#lineColorSwatches'),autoColorBtn=document.querySelector('#autoColorBtn'),lineColorPicker=document.querySelector('#lineColorPicker'),colorArrowBtn=document.querySelector('#colorArrowBtn'),colorPlainBtn=document.querySelector('#colorPlainBtn');
-function refreshColorChoice(){autoColorBtn.classList.toggle('active',activeLineChoice==='auto');swatches.querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.dataset.choice===activeLineChoice));colorArrowBtn.classList.toggle('active',paletteLineType==='line');colorPlainBtn.classList.toggle('active',paletteLineType==='plain')}
-function usePaletteMode(){setMode(paletteLineType,false);colorBtn.classList.add('active')}
+const colorPanel=document.querySelector('#lineColorPanel'),drawBtn=document.querySelector('#drawBtn'),swatches=document.querySelector('#lineColorSwatches'),autoColorBtn=document.querySelector('#autoColorBtn'),lineColorPicker=document.querySelector('#lineColorPicker'),colorArrowBtn=document.querySelector('#colorArrowBtn'),colorPlainBtn=document.querySelector('#colorPlainBtn');
+function refreshColorChoice(){autoColorBtn.classList.toggle('active',activeLineChoice==='auto');swatches.querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.dataset.choice===activeLineChoice));colorArrowBtn.classList.toggle('active',mode==='line');colorPlainBtn.classList.toggle('active',mode==='plain')}
+function usePaletteMode(){setMode(paletteLineType,false);refreshColorChoice()}
 [['cue','白'],...[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15].map(n=>[n,n])].forEach(([n,label])=>{const b=document.createElement('button');b.type='button';b.className='color-swatch';b.dataset.choice=String(n);b.dataset.color=ballColor(n);b.textContent=label;b.title=`${label}の色`;b.style.background=n==='cue'?'#fff':Number(n)>8?`linear-gradient(#fff 0 22%,${ballColor(n)} 22% 76%,#fff 76%)`:ballColor(n);b.onclick=()=>{activeLineColor=b.dataset.color;activeLineChoice=b.dataset.choice;usePaletteMode();refreshColorChoice()};swatches.append(b)});
-colorArrowBtn.onclick=()=>{paletteLineType='line';usePaletteMode();refreshColorChoice()};colorPlainBtn.onclick=()=>{paletteLineType='plain';usePaletteMode();refreshColorChoice()};
+function toggleDrawType(next){paletteLineType=next;if(mode===next)setMode('move',false);else setMode(next,false);refreshColorChoice()}
+colorArrowBtn.onclick=()=>toggleDrawType('line');colorPlainBtn.onclick=()=>toggleDrawType('plain');
 autoColorBtn.onclick=()=>{activeLineColor='auto';activeLineChoice='auto';usePaletteMode();refreshColorChoice()};lineColorPicker.oninput=()=>{activeLineColor=lineColorPicker.value;activeLineChoice='custom';usePaletteMode();refreshColorChoice()};refreshColorChoice();
-colorBtn.onclick=()=>{if(['line','plain'].includes(mode))paletteLineType=mode;colorPanel.hidden=!colorPanel.hidden;colorBtn.classList.toggle('active',!colorPanel.hidden);refreshColorChoice()};
-document.querySelector('#lineColorClose').onclick=()=>{colorPanel.hidden=true;colorBtn.classList.remove('active')};
-document.addEventListener('pointerdown',e=>{if(colorPanel.hidden||colorPanel.contains(e.target)||e.target.closest('#colorBtn'))return;colorPanel.hidden=true;colorBtn.classList.remove('active')});
+drawBtn.onclick=()=>{if(['line','plain'].includes(mode))paletteLineType=mode;colorPanel.hidden=!colorPanel.hidden;refreshColorChoice()};
+document.querySelector('#lineColorClose').onclick=()=>{colorPanel.hidden=true};
+document.addEventListener('pointerdown',e=>{if(colorPanel.hidden||colorPanel.contains(e.target)||e.target.closest('#drawBtn'))return;colorPanel.hidden=true});
 
-const memoDialogEl=document.querySelector('#memoDialog'),memoInput=document.querySelector('#memo'),memoColor=document.querySelector('#memoColor');
+const memoDialogEl=document.querySelector('#memoDialog'),memoInput=document.querySelector('#memo'),memoColor=document.querySelector('#memoColor'),memoBackground=document.querySelector('#memoBackground'),memoTransparent=document.querySelector('#memoTransparent'),memoFont=document.querySelector('#memoFont'),memoSize=document.querySelector('#memoSize');
 const guideDialog=document.querySelector('#guideDialog');
-document.querySelector('#guideBtn').onclick=()=>{if(!guideDialog.open)guideDialog.showModal()};
+function setTopMenu(activeId){document.querySelectorAll('.primary-menu button').forEach(b=>b.classList.toggle('active',b.id===activeId))}
+document.querySelector('#currentLayoutBtn').onclick=()=>{setTopMenu('currentLayoutBtn');window.scrollTo({top:0,behavior:'smooth'})};
+document.querySelector('#guideBtn').onclick=()=>{setTopMenu('guideBtn');if(!guideDialog.open)guideDialog.showModal()};
 document.querySelector('#guideCloseBtn').onclick=()=>guideDialog.close();
-document.querySelector('#memoBtn').onclick=()=>{memoInput.value='';memoDialogEl.showModal()};
-memoDialogEl.addEventListener('close',()=>{const text=memoInput.value.trim();if(memoDialogEl.returnValue==='ok'&&text){const offset=(notes.length%5)*5;notes.push({text,color:memoColor.value,x:50+offset,y:50+offset});renderNotes();markUnsaved()}memoInput.value=''});
+guideDialog.addEventListener('close',()=>setTopMenu('currentLayoutBtn'));
+document.querySelector('#memoBtn').onclick=()=>{memoInput.value='';memoTransparent.checked=false;memoBackground.disabled=false;memoDialogEl.showModal()};
+memoTransparent.onchange=()=>{memoBackground.disabled=memoTransparent.checked};
+memoDialogEl.addEventListener('close',()=>{const text=memoInput.value.trim();if(memoDialogEl.returnValue==='ok'&&text){const offset=(notes.length%5)*5;notes.push({text,color:memoColor.value,background:memoTransparent.checked?'transparent':memoBackground.value,font:memoFont.value,size:Number(memoSize.value),x:50+offset,y:50+offset});renderNotes();markUnsaved()}memoInput.value=''});
 document.querySelector('#resetBtn').onclick=clearTable;
 
 function roundedRect(ctx,x,y,w,h,r){ctx.beginPath();ctx.roundRect(x,y,w,h,r)}
@@ -207,8 +219,12 @@ function drawExportLine(ctx,l,clothX,clothY,clothW,clothH){
   if(l.type!=='plain'&&len>14){const a=Math.atan2(dy,dx);ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-12*Math.cos(a-.48),y2-12*Math.sin(a-.48));ctx.lineTo(x2-12*Math.cos(a+.48),y2-12*Math.sin(a+.48));ctx.closePath();ctx.fill()}
 }
 function drawExportNotes(ctx,clothX,clothY,clothW,clothH){
-  ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='900 15px system-ui';ctx.lineJoin='round';notes.forEach(note=>{
-    const x=clothX+clothW*note.x/100,y=clothY+clothH*note.y/100,rows=note.text.split('\n');rows.forEach((row,i)=>{const ty=y+(i-(rows.length-1)/2)*20;ctx.strokeStyle='#07110d';ctx.lineWidth=5;ctx.strokeText(row,x,ty);ctx.fillStyle=note.color||'#ffe15b';ctx.fillText(row,x,ty)})
+  ctx.textAlign='center';ctx.textBaseline='middle';ctx.lineJoin='round';notes.forEach(note=>{
+    const x=clothX+clothW*note.x/100,y=clothY+clothH*note.y/100,size=Number(note.size)||18,family=noteFonts[note.font]||noteFonts.gothic,rows=note.text.split('\n'),lineHeight=size*1.35;
+    ctx.font=`900 ${size}px ${family}`;
+    const textWidth=Math.max(...rows.map(row=>ctx.measureText(row).width),1),boxWidth=textWidth+14,boxHeight=rows.length*lineHeight+8;
+    if(note.background!=='transparent'){ctx.fillStyle=note.background||'#07110d';roundedRect(ctx,x-boxWidth/2,y-boxHeight/2,boxWidth,boxHeight,5);ctx.fill()}
+    rows.forEach((row,i)=>{const ty=y+(i-(rows.length-1)/2)*lineHeight;ctx.strokeStyle='#07110d';ctx.lineWidth=3;ctx.strokeText(row,x,ty);ctx.fillStyle=note.color||'#ffe15b';ctx.fillText(row,x,ty)})
   });
 }
 function drawSidePockets(ctx,frameRect){
@@ -275,7 +291,9 @@ function renderSavedDialog(){
     actions.append(edit,rename,open,image,del);details.append(input,meta,actions);card.append(summary,details);list.append(card);
   });
 }
-document.querySelector('#savedBtn').onclick=()=>{renderSavedDialog();const dialog=document.querySelector('#savedDialog');if(!dialog.open)dialog.showModal()};
+const savedDialogEl=document.querySelector('#savedDialog');
+document.querySelector('#savedBtn').onclick=()=>{setTopMenu('savedBtn');renderSavedDialog();if(!savedDialogEl.open)savedDialogEl.showModal()};
+savedDialogEl.addEventListener('close',()=>setTopMenu('currentLayoutBtn'));
 document.querySelector('#savedCardView').onclick=()=>{savedView='cards';renderSavedDialog()};
 document.querySelector('#savedListView').onclick=()=>{savedView='list';renderSavedDialog()};
 document.querySelector('#savedSort').onchange=e=>{savedSortOrder=e.target.value;renderSavedDialog()};

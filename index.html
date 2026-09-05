@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#101418" />
   <title>ビリヤード配置図メーカー｜球配置・ショットライン作成</title>
   <meta name="description" content="ビリヤードの球配置とショットラインをブラウザで作成・保存できる無料の配置図メーカー。手球と1〜15番の球に対応。" />
-  <link rel="stylesheet" href="styles.css?v=24" />
+  <link rel="stylesheet" href="styles.css?v=25" />
 </head>
 <body>
   <main class="app">
@@ -15,12 +15,13 @@
 <p class="eyebrow">BILLIARDS LAYOUT MAKER</p>
 <h1>ビリヤード配置図メーカー</h1>
 </div>
-      <button id="savedBtn" class="icon-btn" aria-label="保存一覧">☰</button>
     </header>
 
-    <div class="layout-menu-row">
-      <button id="guideBtn" type="button">？ 配置の作り方</button>
-    </div>
+    <nav class="primary-menu" aria-label="画面メニュー">
+      <button id="currentLayoutBtn" class="active" type="button">今日の配置</button>
+      <button id="guideBtn" type="button">配置の作り方</button>
+      <button id="savedBtn" type="button">保存した配置</button>
+    </nav>
 
     <section class="title-row">
       <input id="title" value="今日の配置" aria-label="配置タイトル" />
@@ -152,10 +153,10 @@
 
     </div>
 
-    <section id="lineColorPanel" class="line-color-panel" hidden aria-label="線の色">
+    <section id="lineColorPanel" class="line-color-panel" hidden aria-label="矢印と線の設定">
       <div class="color-panel-head">
-        <div><b>矢印・線の色</b><small>基本は描き始めた球と同じ色</small></div>
-        <button id="lineColorClose" class="color-panel-close" type="button" aria-label="色パネルを閉じる">× 閉じる</button>
+        <div><b>矢印・線</b><small>種類と色を選択。もう一度同じ種類を押すと解除</small></div>
+        <button id="lineColorClose" class="color-panel-close" type="button" aria-label="設定を閉じる">× 閉じる</button>
       </div>
       <div class="color-line-types" aria-label="描画の種類">
         <button id="colorArrowBtn" type="button">↗ 矢印</button>
@@ -169,12 +170,8 @@
     <nav class="tools" aria-label="編集ツール">
       <button data-mode="move" class="active">
 <span>↔</span>移動</button>
-      <button data-mode="line">
-<span>↗</span>矢印</button>
-      <button data-mode="plain">
-<span>╱</span>線</button>
-      <button id="colorBtn">
-<span>●</span>カラー</button>
+      <button id="drawBtn">
+<span>↗</span><b>矢印・線</b></button>
       <button data-mode="erase">
 <span>⌫</span>消去</button>
       <button id="memoBtn">
@@ -191,7 +188,26 @@
 <h2>ショットメモ</h2>
 <textarea id="memo" placeholder="例：右下を撞いて、2クッションで戻す">
 </textarea>
-<label class="memo-color">文字色 <input id="memoColor" type="color" value="#ffe15b"></label>
+<div class="memo-style-grid">
+  <label>文字色 <input id="memoColor" type="color" value="#ffe15b"></label>
+  <label>背景色 <input id="memoBackground" type="color" value="#07110d"></label>
+  <label>フォント
+    <select id="memoFont">
+      <option value="gothic">ゴシック</option>
+      <option value="mincho">明朝</option>
+      <option value="rounded">丸ゴシック</option>
+      <option value="hand">手書き風</option>
+    </select>
+  </label>
+  <label>文字サイズ
+    <select id="memoSize">
+      <option value="15">小</option>
+      <option value="18" selected>中</option>
+      <option value="22">大</option>
+    </select>
+  </label>
+</div>
+<label class="memo-transparent"><input id="memoTransparent" type="checkbox"> 背景色なし</label>
 <div class="result">
 <label>
 <input type="radio" name="result" value="成功">○ 成功</label>
@@ -209,8 +225,8 @@
     <ol>
       <li><b>台の向きを選ぶ</b><span>台の左にある「縦」「横」で切り替えます。配置した球・線・メモは消えず、向きに合わせて回転します</span></li>
       <li><b>球を置く</b><span>球の一覧からタップして、台の上でドラッグ。手玉と点線のイメージボールは何個でも置けます</span></li>
-      <li><b>矢印・線を描く</b><span>矢印・線ボタンは、描き始めた球と同じ色で描画します。色を変えるときだけ「カラー」を使います</span></li>
-      <li><b>色を指定して描く</b><span>「カラー」を開き、矢印か線を選んでから、1〜15番の球色または自由色を選べます</span></li>
+      <li><b>矢印・線を描く</b><span>「矢印・線」を開いて種類と色を選びます。選んだ機能は、同じ種類をもう一度押して解除するまで続けて描けます</span></li>
+      <li><b>色を指定して描く</b><span>基本は描き始めた球と同じ色です。1〜15番の球色または自由色にも変更できます</span></li>
       <li><b>移動・追従を外す</b><span>線の中央をドラッグで移動。先端をつかむと球への追従が外れ、その端を自由に動かせます</span></li>
       <li><b>削除</b><span>消去ボタンを選ばなくても、球・線・配置したメモをダブルクリックすると削除できます</span></li>
       <li><b>撞点を記録</b><span>大きい手玉をタップし、赤い点を好きな位置へドラッグできます</span></li>
@@ -238,7 +254,7 @@
 <div id="savedList">
 </div>
 </dialog>
-  <script src="app.js?v=24">
+  <script src="app.js?v=25">
 </script>
 </body>
 </html>
