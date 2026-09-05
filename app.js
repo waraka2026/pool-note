@@ -46,7 +46,6 @@ function setOrientation(next,rotateContent=true,mark=true){
   landscapeBtn.classList.toggle('active',next==='landscape');
   portraitBtn.setAttribute('aria-pressed',String(next==='portrait'));
   landscapeBtn.setAttribute('aria-pressed',String(next==='landscape'));
-  if(next==='landscape')boardColumn.append(trayEl);else sideControls.append(trayEl);
   render();
   layoutTable();
   if(mark)markUnsaved();
@@ -55,9 +54,17 @@ portraitBtn.onclick=()=>setOrientation('portrait');
 landscapeBtn.onclick=()=>setOrientation('landscape');
 
 const tableAndTip=document.querySelector('.table-and-tip'),orientationControlEl=document.querySelector('.orientation-control'),toolsNav=document.querySelector('.tools');
+function isNarrowScreen(){return window.innerWidth<=640}
+function updateSideLayout(){
+  if(orientation==='landscape'){
+    if(trayEl.parentElement!==boardColumn)boardColumn.append(trayEl);
+  }else if(trayEl.parentElement!==sideControls){
+    sideControls.append(trayEl);
+  }
+}
 function availableTableWidth(){
   const total=boardColumn.clientWidth,ocW=orientationControlEl.getBoundingClientRect().width,scW=sideControls.getBoundingClientRect().width;
-  return Math.max(140,total-ocW-scW-30);
+  return Math.max(140,total-ocW-scW-20);
 }
 function availableTableHeight(){
   const vh=window.visualViewport?window.visualViewport.height:window.innerHeight,top=tableAndTip.getBoundingClientRect().top,toolsH=toolsNav.getBoundingClientRect().height;
@@ -66,8 +73,9 @@ function availableTableHeight(){
   return Math.max(140,vh-top-reserve);
 }
 function layoutTable(){
-  const wRatio=orientation==='landscape'?2:1,hRatio=orientation==='landscape'?1:2;
-  let unit=Math.min(availableTableWidth()/wRatio,availableTableHeight()/hRatio,310);
+  updateSideLayout();
+  const wRatio=orientation==='landscape'?2:1,hRatio=orientation==='landscape'?1:2,maxUnit=isNarrowScreen()?520:310;
+  let unit=Math.min(availableTableWidth()/wRatio,availableTableHeight()/hRatio,maxUnit);
   unit=Math.max(unit,130);
   tableFrame.style.width=Math.round(unit*wRatio)+'px';
   tableFrame.style.height=Math.round(unit*hRatio)+'px';
@@ -248,7 +256,13 @@ groupMoveBtn.onclick=()=>{
   const hint=document.querySelector('#hint');hint.textContent=groupMoveMode?'まとめて移動：どこをつかんでも全部一緒に動く':'球をドラッグ。線の端をつかむと伸縮';hint.style.opacity=1;setTimeout(()=>hint.style.opacity=0,1800);
 };
 autoColorBtn.onclick=()=>{activeLineColor='auto';activeLineChoice='auto';usePaletteMode();refreshColorChoice()};lineColorPicker.oninput=()=>{activeLineColor=lineColorPicker.value;activeLineChoice='custom';usePaletteMode();refreshColorChoice()};refreshColorChoice();
-drawBtn.onclick=()=>{if(['line','plain'].includes(mode))paletteLineType=mode;colorPanel.hidden=!colorPanel.hidden;refreshColorChoice()};
+drawBtn.onclick=()=>{
+  const opening=colorPanel.hidden;
+  if(['line','plain'].includes(mode))paletteLineType=mode;
+  colorPanel.hidden=!colorPanel.hidden;
+  if(opening&&!['line','plain'].includes(mode))setMode(paletteLineType,false);
+  refreshColorChoice();
+};
 document.querySelector('#lineColorClose').onclick=()=>{colorPanel.hidden=true};
 document.addEventListener('pointerdown',e=>{if(colorPanel.hidden||colorPanel.contains(e.target)||e.target.closest('#drawBtn'))return;colorPanel.hidden=true});
 
