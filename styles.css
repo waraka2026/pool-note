@@ -85,7 +85,7 @@ body{margin:0;background-color:#0c1013;background-image:radial-gradient(circle a
 #notesLayer{position:absolute;inset:0;z-index:4;pointer-events:none}
 .table-note{position:absolute;max-width:88%;padding:4px 7px;border-radius:5px;background:#07110d;font-size:18px;font-weight:900;line-height:1.35;white-space:pre-wrap;text-align:center;text-shadow:0 2px 3px #000,0 0 5px #000;transform:translate(-50%,-50%);cursor:move;user-select:none;touch-action:pinch-zoom;pointer-events:auto}
 .tools{position:relative;z-index:10;width:min(100%,480px);margin:0 0 12px}
-.tools-row{padding:10px 12px;background:#151b20ed;border-top:1px solid #303940;backdrop-filter:blur(16px);justify-content:space-around}
+.tools-row{padding:10px 12px;background:#087c62ee;border-top:1px solid #0a5a48;backdrop-filter:blur(16px);justify-content:space-around}
 .tools button{border:1px solid transparent;background:none;color:#fff;font-size:10px;min-width:42px;border-radius:10px}
 .tools span{display:block;font-size:22px;margin-bottom:2px}
 .tools button b{font:inherit;font-weight:500;white-space:nowrap}
