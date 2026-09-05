@@ -102,7 +102,7 @@ body{margin:0;background-color:#0c1013;background-image:radial-gradient(circle a
 .auto-color-btn{width:100%;margin:0 0 10px;border:1px solid #63717a;background:#28333a;color:#fff;border-radius:9px;padding:8px 9px;font-weight:700;cursor:pointer}
 .auto-color-btn.active{border-color:#fff;background:#ffffff18;color:#fff}
 .line-color-swatches{display:grid;grid-template-columns:repeat(8,1fr);gap:7px}
-.color-swatch{position:relative;height:32px;border:2px solid #ffffff88;border-radius:8px;color:#050505;font-size:11px;font-weight:900;-webkit-text-stroke:1.4px #fff;paint-order:stroke fill;text-shadow:none;cursor:pointer;box-shadow:inset -3px -3px 5px #0006,inset 2px 2px 4px #fff8}
+.color-swatch{position:relative;transform:none;cursor:pointer}
 .color-swatch.active{outline:2px solid #fff;outline-offset:2px}
 .line-width-control{display:flex;align-items:center;gap:10px;margin-bottom:9px;color:#c7d0d5;font-size:13px}
 .line-width-control input[type=range]{flex:1;accent-color:var(--gold)}
