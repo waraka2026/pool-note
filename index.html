@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#101418" />
   <title>ビリヤード配置図メーカー｜球配置・ショットライン作成</title>
   <meta name="description" content="ビリヤードの球配置とショットラインをブラウザで作成・保存できる無料の配置図メーカー。手球と1〜15番の球に対応。" />
-  <link rel="stylesheet" href="styles.css?v=20" />
+  <link rel="stylesheet" href="styles.css?v=21" />
 </head>
 <body>
   <main class="app">
@@ -129,7 +129,7 @@
       <p class="guide-label">操作ガイド</p>
       <h2>配置の作り方</h2>
       <ol>
-        <li><b>球を置く</b><span>右の2列から球をタップして、台の上でドラッグ。点線の球はイメージボールです</span></li>
+        <li><b>球を置く</b><span>右の2列から球をタップして、台の上でドラッグ。手玉と点線のイメージボールは何個でも置けます</span></li>
         <li><b>矢印・線を描く</b><span>矢印・線ボタンは、描き始めた球と同じ色で描画します。色を変えるときだけ「カラー」を使います</span></li>
         <li><b>色を指定して描く</b><span>「カラー」を開き、矢印か線を選んでから、1〜15番の球色または自由色を選べます</span></li>
         <li><b>移動・追従を外す</b><span>線の中央をドラッグで移動。先端をつかむと球への追従が外れ、その端を自由に動かせます</span></li>
@@ -157,7 +157,7 @@
 
     <nav class="tools" aria-label="編集ツール">
       <button data-mode="move" class="active">
-<span>✋</span>移動</button>
+<span>↔</span>移動</button>
       <button data-mode="line">
 <span>↗</span>矢印</button>
       <button data-mode="plain">
@@ -198,7 +198,7 @@
 <div id="savedList">
 </div>
 </dialog>
-  <script src="app.js?v=20">
+  <script src="app.js?v=21">
 </script>
 </body>
 </html>
