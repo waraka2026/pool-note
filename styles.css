@@ -2,8 +2,8 @@
 *{box-sizing:border-box}
 html{min-height:100%;background:#0c1013;overscroll-behavior-y:none}
 body{margin:0;background-color:#0c1013;background-image:radial-gradient(circle at top,#25313a,#0c1013 55%);background-repeat:no-repeat;color:#f7f3ea;font-family:system-ui,-apple-system,"Noto Sans JP",sans-serif;min-height:100vh;min-height:100dvh;overscroll-behavior-y:none}
-.app{width:min(100%,1040px);margin:auto;min-height:100vh;padding:18px 16px 100px}
-.topbar,.title-row,.tray,.tools,.dialog-head{display:flex;align-items:center}
+.app{width:min(100%,1040px);margin:auto;min-height:100vh;padding:18px 16px 24px}
+.topbar,.title-row,.tray,.tools-row,.dialog-head{display:flex;align-items:center}
 .topbar{justify-content:space-between}
 .eyebrow{font-size:10px;letter-spacing:.25em;color:var(--gold);margin:0 0 2px}
 .topbar h1{font-family:Georgia,"Noto Serif JP",serif;letter-spacing:.03em;margin:0;font-size:23px}
@@ -87,13 +87,14 @@ body{margin:0;background-color:#0c1013;background-image:radial-gradient(circle a
 .line-hit{stroke:transparent;stroke-width:16;pointer-events:stroke;cursor:move}
 #notesLayer{position:absolute;inset:0;z-index:4;pointer-events:none}
 .table-note{position:absolute;max-width:88%;padding:4px 7px;border-radius:5px;background:#07110d;font-size:18px;font-weight:900;line-height:1.35;white-space:pre-wrap;text-align:center;text-shadow:0 2px 3px #000,0 0 5px #000;transform:translate(-50%,-50%);cursor:move;user-select:none;touch-action:pinch-zoom;pointer-events:auto}
-.tools{position:fixed;z-index:10;bottom:0;left:50%;transform:translateX(-50%);width:min(100%,480px);padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:#151b20ed;border-top:1px solid #303940;backdrop-filter:blur(16px);justify-content:space-around}
+.tools{position:relative;z-index:10;width:min(100%,480px);margin:14px auto 0}
+.tools-row{padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:#151b20ed;border-top:1px solid #303940;backdrop-filter:blur(16px);justify-content:space-around}
 .tools button{border:1px solid transparent;background:none;color:#fff;font-size:10px;min-width:42px;border-radius:10px}
 .tools span{display:block;font-size:22px;margin-bottom:2px}
 .tools button b{font:inherit;font-weight:500;white-space:nowrap}
 .tools button.active{color:var(--gold);border-color:var(--gold);background:#d5aa5818}
 .tools .save{background:#fff;color:#151b20;border-radius:13px;padding:7px 10px}
-.line-color-panel{position:fixed;z-index:12;left:50%;bottom:78px;transform:translateX(-50%);width:min(calc(100% - 24px),420px);padding:12px;background:#192026f7;border:1px solid #46525a;border-radius:15px;box-shadow:0 14px 35px #000b;backdrop-filter:blur(14px)}
+.line-color-panel{position:absolute;z-index:12;left:50%;bottom:100%;transform:translateX(-50%);margin-bottom:10px;width:min(calc(100% - 24px),420px);padding:12px;background:#192026f7;border:1px solid #46525a;border-radius:15px;box-shadow:0 14px 35px #000b;backdrop-filter:blur(14px)}
 .color-panel-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
 .color-panel-head b,.color-panel-head small{display:block}
 .color-panel-head small{margin-top:2px;color:#b8c2c8;font-size:11px;font-weight:500}
@@ -164,7 +165,7 @@ dialog form>button{width:100%;border:0;border-radius:12px;padding:13px;backgroun
 .cue-diagram{width:60px;height:60px}
 .tray-balls{grid-template-columns:repeat(2,20px)}
 .tray .mini{width:20px;height:20px}
-.tools{overflow-x:auto;justify-content:flex-start;gap:3px}
+.tools-row{overflow-x:auto;justify-content:flex-start;gap:3px}
 .tools button{flex:0 0 47px}
 }
 @media(max-width:390px){.table-and-tip{gap:6px}.orientation-control{width:38px;flex-basis:38px}.orientation-control span{font-size:9px}.orientation-control button{padding:7px 2px}.side-controls,.tip-point{width:52px;flex-basis:52px}.cue-diagram{width:50px;height:50px}.tip-help{font-size:10px}.tray-balls{grid-template-columns:repeat(2,18px)}.tray .mini{width:18px;height:18px}}

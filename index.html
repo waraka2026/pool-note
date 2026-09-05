@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#101418" />
   <title>ビリヤード配置図メーカー｜球配置・ショットライン作成</title>
   <meta name="description" content="ビリヤードの球配置とショットラインをブラウザで作成・保存できる無料の配置図メーカー。手球と1〜15番の球に対応。" />
-  <link rel="stylesheet" href="styles.css?v=27" />
+  <link rel="stylesheet" href="styles.css?v=28" />
 </head>
 <body>
   <main class="app">
@@ -152,38 +152,39 @@
 
     </div>
 
-    <section id="lineColorPanel" class="line-color-panel" hidden aria-label="矢印と線の設定">
-      <div class="color-panel-head">
-        <div><b>矢印・線</b><small>種類と色を選択。もう一度同じ種類を押すと解除</small></div>
-        <button id="lineColorClose" class="color-panel-close" type="button" aria-label="設定を閉じる">× 閉じる</button>
-      </div>
-      <div class="line-width-control" aria-label="線の太さ">
-        <span>太さ</span>
-        <input id="lineWidthRange" type="range" min="1" max="8" step="1" value="2" />
-        <span id="lineWidthValue" class="line-width-value">2</span>
-      </div>
-      <div class="color-line-types" aria-label="描画の種類">
-        <button id="colorArrowBtn" type="button">↗ 矢印</button>
-        <button id="colorPlainBtn" type="button">╱ 線</button>
-      </div>
-      <button id="autoColorBtn" class="auto-color-btn" type="button">球の色に合わせる（デフォルト）</button>
-      <div id="lineColorSwatches" class="line-color-swatches"></div>
-      <label class="custom-color">その他の色（自由に選ぶ） <input id="lineColorPicker" type="color" value="#ff2f92" /></label>
-    </section>
-
     <nav class="tools" aria-label="編集ツール">
-      <button data-mode="move" class="active">
+      <section id="lineColorPanel" class="line-color-panel" hidden aria-label="矢印と線の設定">
+        <div class="color-panel-head">
+          <div><b>矢印・線</b><small>種類と色を選択。もう一度同じ種類を押すと解除</small></div>
+          <button id="lineColorClose" class="color-panel-close" type="button" aria-label="設定を閉じる">× 閉じる</button>
+        </div>
+        <div class="line-width-control" aria-label="線の太さ">
+          <span>太さ</span>
+          <input id="lineWidthRange" type="range" min="1" max="8" step="1" value="2" />
+          <span id="lineWidthValue" class="line-width-value">2</span>
+        </div>
+        <div class="color-line-types" aria-label="描画の種類">
+          <button id="colorArrowBtn" type="button">↗ 矢印</button>
+          <button id="colorPlainBtn" type="button">╱ 線</button>
+        </div>
+        <button id="autoColorBtn" class="auto-color-btn" type="button">球の色に合わせる（デフォルト）</button>
+        <div id="lineColorSwatches" class="line-color-swatches"></div>
+        <label class="custom-color">その他の色（自由に選ぶ） <input id="lineColorPicker" type="color" value="#ff2f92" /></label>
+      </section>
+      <div class="tools-row">
+        <button data-mode="move" class="active">
 <span>↔</span>移動</button>
-      <button id="groupMoveBtn" type="button" aria-pressed="false">
+        <button id="groupMoveBtn" type="button" aria-pressed="false">
 <span>⛓</span>まとめて移動</button>
-      <button id="drawBtn">
+        <button id="drawBtn">
 <span>↗</span><b>矢印・線</b></button>
-      <button data-mode="erase">
+        <button data-mode="erase">
 <span>⌫</span>消去</button>
-      <button id="memoBtn">
+        <button id="memoBtn">
 <span>✎</span>メモ</button>
-      <button id="saveBtn" class="save">
+        <button id="saveBtn" class="save">
 <span>✓</span>保存</button>
+      </div>
     </nav>
   </main>
 
@@ -259,7 +260,7 @@
 <div id="savedList">
 </div>
 </dialog>
-  <script src="app.js?v=27">
+  <script src="app.js?v=28">
 </script>
 </body>
 </html>
