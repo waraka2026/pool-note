@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#101418" />
   <title>ビリヤード配置図メーカー｜球配置・ショットライン作成</title>
   <meta name="description" content="ビリヤードの球配置とショットラインをブラウザで作成・保存できる無料の配置図メーカー。手球と1〜15番の球に対応。" />
-  <link rel="stylesheet" href="styles.css?v=33" />
+  <link rel="stylesheet" href="styles.css?v=34" />
 </head>
 <body>
   <main class="app">
@@ -20,6 +20,7 @@
     <nav class="primary-menu" aria-label="画面メニュー">
       <button id="guideBtn" type="button">配置の作り方</button>
       <button id="savedBtn" type="button">保存した配置</button>
+      <small class="quick-help">球・線・メモはダブルクリックで削除</small>
     </nav>
 
     <nav class="tools" aria-label="編集ツール">
@@ -45,14 +46,19 @@
       <div class="tools-row">
         <button data-mode="move" class="active">
 <span>↔</span>移動</button>
+        <span class="tool-separator" aria-hidden="true">｜</span>
         <button id="groupMoveBtn" type="button" aria-pressed="false">
 <span>⛓</span>まとめて移動</button>
+        <span class="tool-separator" aria-hidden="true">｜</span>
         <button id="drawBtn">
 <span>↗</span><b>矢印・線</b></button>
+        <span class="tool-separator" aria-hidden="true">｜</span>
         <button data-mode="erase">
 <span>⌫</span>消去</button>
+        <span class="tool-separator" aria-hidden="true">｜</span>
         <button id="memoBtn">
 <span>✎</span>メモ</button>
+        <span class="tool-separator" aria-hidden="true">｜</span>
         <button id="saveBtn" class="save">
 <span>✓</span>保存</button>
       </div>
