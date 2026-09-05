@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#101418" />
   <title>ビリヤード配置図メーカー｜球配置・ショットライン作成</title>
   <meta name="description" content="ビリヤードの球配置とショットラインをブラウザで作成・保存できる無料の配置図メーカー。手球と1〜15番の球に対応。" />
-  <link rel="stylesheet" href="styles.css?v=23" />
+  <link rel="stylesheet" href="styles.css?v=24" />
 </head>
 <body>
   <main class="app">
@@ -18,14 +18,23 @@
       <button id="savedBtn" class="icon-btn" aria-label="保存一覧">☰</button>
     </header>
 
+    <div class="layout-menu-row">
+      <button id="guideBtn" type="button">？ 配置の作り方</button>
+    </div>
+
     <section class="title-row">
       <input id="title" value="今日の配置" aria-label="配置タイトル" />
       <span id="saveState">未保存</span>
     </section>
 
     <div class="workspace">
-    <div class="board-column">
+    <div id="boardColumn" class="board-column portrait">
     <div class="table-and-tip">
+    <div class="orientation-control" aria-label="台の向き">
+      <span>台の向き</span>
+      <button id="portraitBtn" type="button" class="active" aria-pressed="true">縦</button>
+      <button id="landscapeBtn" type="button" aria-pressed="false">横</button>
+    </div>
     <section class="table-wrap" aria-label="ビリヤード台">
       <div id="table" class="table">
         <div class="rail top">
@@ -35,8 +44,24 @@
 </i>
 <i>
 </i>
+<i>
+</i>
+<i>
+</i>
+<i>
+</i>
+<i>
+</i>
 </div>
 <div class="rail bottom">
+<i>
+</i>
+<i>
+</i>
+<i>
+</i>
+<i>
+</i>
 <i>
 </i>
 <i>
@@ -125,20 +150,6 @@
 
     </div>
 
-    <aside class="guide" aria-label="操作ガイド">
-      <p class="guide-label">操作ガイド</p>
-      <h2>配置の作り方</h2>
-      <ol>
-        <li><b>球を置く</b><span>右の2列から球をタップして、台の上でドラッグ。手玉と点線のイメージボールは何個でも置けます</span></li>
-        <li><b>矢印・線を描く</b><span>矢印・線ボタンは、描き始めた球と同じ色で描画します。色を変えるときだけ「カラー」を使います</span></li>
-        <li><b>色を指定して描く</b><span>「カラー」を開き、矢印か線を選んでから、1〜15番の球色または自由色を選べます</span></li>
-        <li><b>移動・追従を外す</b><span>線の中央をドラッグで移動。先端をつかむと球への追従が外れ、その端を自由に動かせます</span></li>
-        <li><b>削除</b><span>消去ボタンを選ばなくても、球・線・配置したメモをダブルクリックすると削除できます</span></li>
-        <li><b>撞点を記録</b><span>台の右にある大きい手玉をタップし、赤い点を好きな位置へドラッグできます</span></li>
-        <li><b>保存済みを開く</b><span>右上の☰ボタンから、保存した配置の一覧を呼び出せます</span></li>
-      </ol>
-      <p class="guide-tip">色パネルは「閉じる」かパネルの外側をクリックすると閉じます。メモは台の上で自由に移動でき、「画像」では画面と同じ台・罫線・穴・球・線・メモ・撞点を保存します。</p>
-    </aside>
     </div>
 
     <section id="lineColorPanel" class="line-color-panel" hidden aria-label="線の色">
@@ -190,6 +201,23 @@
 <button value="ok">完了</button>
 </form>
 </dialog>
+  <dialog id="guideDialog" class="guide-dialog">
+    <div class="dialog-head">
+      <div><p class="guide-label">操作ガイド</p><h2>配置の作り方</h2></div>
+      <button id="guideCloseBtn" type="button" aria-label="閉じる">×</button>
+    </div>
+    <ol>
+      <li><b>台の向きを選ぶ</b><span>台の左にある「縦」「横」で切り替えます。配置した球・線・メモは消えず、向きに合わせて回転します</span></li>
+      <li><b>球を置く</b><span>球の一覧からタップして、台の上でドラッグ。手玉と点線のイメージボールは何個でも置けます</span></li>
+      <li><b>矢印・線を描く</b><span>矢印・線ボタンは、描き始めた球と同じ色で描画します。色を変えるときだけ「カラー」を使います</span></li>
+      <li><b>色を指定して描く</b><span>「カラー」を開き、矢印か線を選んでから、1〜15番の球色または自由色を選べます</span></li>
+      <li><b>移動・追従を外す</b><span>線の中央をドラッグで移動。先端をつかむと球への追従が外れ、その端を自由に動かせます</span></li>
+      <li><b>削除</b><span>消去ボタンを選ばなくても、球・線・配置したメモをダブルクリックすると削除できます</span></li>
+      <li><b>撞点を記録</b><span>大きい手玉をタップし、赤い点を好きな位置へドラッグできます</span></li>
+      <li><b>保存済みを開く</b><span>右上の☰ボタンから、保存した配置の一覧を呼び出せます</span></li>
+    </ol>
+    <p class="guide-tip">色パネルは「閉じる」かパネルの外側をクリックすると閉じます。「画像」では画面と同じ向きの台・罫線・穴・球・線・メモ・撞点を保存します。</p>
+  </dialog>
   <dialog id="savedDialog">
 <div class="dialog-head">
 <h2>保存した配置</h2>
@@ -210,7 +238,7 @@
 <div id="savedList">
 </div>
 </dialog>
-  <script src="app.js?v=23">
+  <script src="app.js?v=24">
 </script>
 </body>
 </html>

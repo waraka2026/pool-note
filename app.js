@@ -6,8 +6,13 @@ const notesLayer=document.querySelector('#notesLayer');
 const svg=document.querySelector('#lines');
 const cueDiagram=document.querySelector('#cueDiagram');
 const tipMark=document.querySelector('#tipMark');
+const boardColumn=document.querySelector('#boardColumn');
+const sideControls=document.querySelector('.side-controls');
+const trayEl=document.querySelector('.tray');
+const portraitBtn=document.querySelector('#portraitBtn');
+const landscapeBtn=document.querySelector('#landscapeBtn');
 
-let mode='move',draggingBall=null,draggingLine=null,lineStart=null,lineDraft=null,lines=[],notes=[],state={},selectedLine=-1,tip=null,tipDragging=false,activeLineColor='auto',activeLineChoice='auto',paletteLineType='line',currentSaveId=null,repeatBallSeq=0;
+let mode='move',draggingBall=null,draggingLine=null,lineStart=null,lineDraft=null,lines=[],notes=[],state={},selectedLine=-1,tip=null,tipDragging=false,activeLineColor='auto',activeLineChoice='auto',paletteLineType='line',currentSaveId=null,repeatBallSeq=0,orientation='portrait';
 let ballPress=null,ballMoved=false,lastBallTap=null,lastLineTap=null,savedView='cards',savedSortOrder='newest';
 const defs=`<defs></defs>`;
 
@@ -18,6 +23,29 @@ function repeatBallId(kind){repeatBallSeq+=1;return `${kind}-${Date.now()}-${rep
 function markUnsaved(){document.querySelector('#saveState').textContent='未保存'}
 function defaultState(){state={};lines=[];notes=[];tip=null;selectedLine=-1;currentSaveId=null;render();markUnsaved()}
 function clearTable(){state={};lines=[];notes=[];tip=null;selectedLine=-1;currentSaveId=null;render();markUnsaved()}
+function rotateCoordinates(next){
+  const rotate=p=>next==='landscape'?{...p,x:100-p.y,y:p.x}:{...p,x:p.y,y:100-p.x};
+  Object.keys(state).forEach(n=>{state[n]=rotate(state[n])});
+  lines.forEach(l=>{const a=rotate({x:l.x1,y:l.y1}),b=rotate({x:l.x2,y:l.y2});l.x1=a.x;l.y1=a.y;l.x2=b.x;l.y2=b.y});
+  notes.forEach(note=>Object.assign(note,rotate(note)));
+}
+function setOrientation(next,rotateContent=true,mark=true){
+  if(!['portrait','landscape'].includes(next))next='portrait';
+  if(next===orientation)return;
+  if(rotateContent)rotateCoordinates(next);
+  orientation=next;
+  boardColumn.classList.toggle('portrait',next==='portrait');
+  boardColumn.classList.toggle('landscape',next==='landscape');
+  portraitBtn.classList.toggle('active',next==='portrait');
+  landscapeBtn.classList.toggle('active',next==='landscape');
+  portraitBtn.setAttribute('aria-pressed',String(next==='portrait'));
+  landscapeBtn.setAttribute('aria-pressed',String(next==='landscape'));
+  if(next==='landscape')boardColumn.append(trayEl);else sideControls.append(trayEl);
+  render();
+  if(mark)markUnsaved();
+}
+portraitBtn.onclick=()=>setOrientation('portrait');
+landscapeBtn.onclick=()=>setOrientation('landscape');
 function ballEl(n,x,y,mini=false){
   const kind=ballKind(n),el=document.createElement('div'),striped=!['cue','ghost'].includes(kind)&&Number(kind)>8;
   el.className=`ball ${mini?'mini':''} ${kind==='cue'?'cue':''} ${kind==='ghost'?'ghost':''} ${striped?'striped':''}`;
@@ -153,6 +181,9 @@ document.querySelector('#lineColorClose').onclick=()=>{colorPanel.hidden=true;co
 document.addEventListener('pointerdown',e=>{if(colorPanel.hidden||colorPanel.contains(e.target)||e.target.closest('#colorBtn'))return;colorPanel.hidden=true;colorBtn.classList.remove('active')});
 
 const memoDialogEl=document.querySelector('#memoDialog'),memoInput=document.querySelector('#memo'),memoColor=document.querySelector('#memoColor');
+const guideDialog=document.querySelector('#guideDialog');
+document.querySelector('#guideBtn').onclick=()=>{if(!guideDialog.open)guideDialog.showModal()};
+document.querySelector('#guideCloseBtn').onclick=()=>guideDialog.close();
 document.querySelector('#memoBtn').onclick=()=>{memoInput.value='';memoDialogEl.showModal()};
 memoDialogEl.addEventListener('close',()=>{const text=memoInput.value.trim();if(memoDialogEl.returnValue==='ok'&&text){const offset=(notes.length%5)*5;notes.push({text,color:memoColor.value,x:50+offset,y:50+offset});renderNotes();markUnsaved()}memoInput.value=''});
 document.querySelector('#resetBtn').onclick=clearTable;
@@ -183,10 +214,12 @@ function drawExportNotes(ctx,clothX,clothY,clothW,clothH){
 function drawSidePockets(ctx,frameRect){
   ctx.fillStyle='#020202';
   for(const selector of ['.p3','.p4']){
-    const el=tableFrame.querySelector(selector),r=el.getBoundingClientRect(),x=r.left-frameRect.left,y=r.top-frameRect.top,w=r.width,h=r.height,left=selector==='.p3';
+    const el=tableFrame.querySelector(selector),r=el.getBoundingClientRect(),x=r.left-frameRect.left,y=r.top-frameRect.top,w=r.width,h=r.height,first=selector==='.p3';
     ctx.beginPath();
-    if(left){ctx.moveTo(x+w,y);ctx.lineTo(x+w,y+h);ctx.lineTo(x+h/2,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h/2);ctx.quadraticCurveTo(x,y,x+h/2,y)}
-    else{ctx.moveTo(x,y);ctx.lineTo(x+w-h/2,y);ctx.quadraticCurveTo(x+w,y,x+w,y+h/2);ctx.quadraticCurveTo(x+w,y+h,x+w-h/2,y+h);ctx.lineTo(x,y+h)}
+    if(orientation==='portrait'&&first){ctx.moveTo(x+w,y);ctx.lineTo(x+w,y+h);ctx.lineTo(x+h/2,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h/2);ctx.quadraticCurveTo(x,y,x+h/2,y)}
+    else if(orientation==='portrait'){ctx.moveTo(x,y);ctx.lineTo(x+w-h/2,y);ctx.quadraticCurveTo(x+w,y,x+w,y+h/2);ctx.quadraticCurveTo(x+w,y+h,x+w-h/2,y+h);ctx.lineTo(x,y+h)}
+    else if(first){ctx.moveTo(x,y+h);ctx.lineTo(x+w,y+h);ctx.lineTo(x+w,y+h/2);ctx.quadraticCurveTo(x+w,y,x+w/2,y);ctx.quadraticCurveTo(x,y,x,y+h/2)}
+    else{ctx.moveTo(x,y);ctx.lineTo(x+w,y);ctx.lineTo(x+w,y+h/2);ctx.quadraticCurveTo(x+w,y+h,x+w/2,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h/2)}
     ctx.closePath();ctx.fill();
   }
 }
@@ -203,8 +236,9 @@ function downloadImage(){
   const cx=clothRect.left-frameRect.left,cy=clothRect.top-frameRect.top,cw=clothRect.width,ch=clothRect.height;
   drawWoodFrame(ctx,frameW,frameH);
   ctx.save();roundedRect(ctx,cx,cy,cw,ch,2);ctx.clip();const clothGrad=ctx.createLinearGradient(cx,0,cx+cw,0);clothGrad.addColorStop(0,'#08ae7d');clothGrad.addColorStop(1,'#08aa7a');ctx.fillStyle=clothGrad;ctx.fillRect(cx,cy,cw,ch);ctx.strokeStyle='rgba(255,255,255,.42)';ctx.lineWidth=.6;ctx.setLineDash([2,2]);
-  for(let i=1;i<4;i++){ctx.beginPath();ctx.moveTo(cx+cw*i/4,cy);ctx.lineTo(cx+cw*i/4,cy+ch);ctx.stroke()}for(let i=1;i<8;i++){ctx.beginPath();ctx.moveTo(cx,cy+ch*i/8);ctx.lineTo(cx+cw,cy+ch*i/8);ctx.stroke()}ctx.setLineDash([]);lines.forEach(l=>drawExportLine(ctx,l,cx,cy,cw,ch));Object.entries(state).forEach(([n,p])=>drawCanvasBall(ctx,n,cx+cw*p.x/100,cy+ch*p.y/100,10));drawExportNotes(ctx,cx,cy,cw,ch);ctx.restore();
-  ctx.fillStyle='#fff';for(let i=1;i<=3;i++)for(const y of [10,frameH-10]){ctx.beginPath();ctx.arc(52+(frameW-104)*(i-.5)/3,y,2,0,Math.PI*2);ctx.fill()}for(let i=1;i<=7;i++)for(const x of [10,frameW-10]){ctx.beginPath();ctx.arc(x,52+(frameH-104)*(i-.5)/7,2,0,Math.PI*2);ctx.fill()}
+  const xDivisions=orientation==='landscape'?8:4,yDivisions=orientation==='landscape'?4:8;
+  for(let i=1;i<xDivisions;i++){ctx.beginPath();ctx.moveTo(cx+cw*i/xDivisions,cy);ctx.lineTo(cx+cw*i/xDivisions,cy+ch);ctx.stroke()}for(let i=1;i<yDivisions;i++){ctx.beginPath();ctx.moveTo(cx,cy+ch*i/yDivisions);ctx.lineTo(cx+cw,cy+ch*i/yDivisions);ctx.stroke()}ctx.setLineDash([]);lines.forEach(l=>drawExportLine(ctx,l,cx,cy,cw,ch));Object.entries(state).forEach(([n,p])=>drawCanvasBall(ctx,n,cx+cw*p.x/100,cy+ch*p.y/100,10));drawExportNotes(ctx,cx,cy,cw,ch);ctx.restore();
+  const horizontalDots=orientation==='landscape'?7:3,verticalDots=orientation==='landscape'?3:7;ctx.fillStyle='#fff';for(let i=1;i<=horizontalDots;i++)for(const y of [10,frameH-10]){ctx.beginPath();ctx.arc(52+(frameW-104)*(i-.5)/horizontalDots,y,2,0,Math.PI*2);ctx.fill()}for(let i=1;i<=verticalDots;i++)for(const x of [10,frameW-10]){ctx.beginPath();ctx.arc(x,52+(frameH-104)*(i-.5)/verticalDots,2,0,Math.PI*2);ctx.fill()}
   ctx.fillStyle='#020202';ctx.strokeStyle='#49180f';ctx.lineWidth=2;for(const [x,y] of [[18,18],[frameW-18,18],[18,frameH-18],[frameW-18,frameH-18]]){ctx.save();ctx.translate(x,y);ctx.rotate(Math.PI/4);roundedRect(ctx,-10,-10,20,20,7);ctx.fill();ctx.stroke();ctx.restore()}drawSidePockets(ctx,frameRect);
   ctx.fillStyle='#151b20';ctx.fillRect(frameW,0,extra,frameH);ctx.fillStyle='#d5aa58';ctx.font='bold 13px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('撞点',frameW+extra/2,24);
   const bx=frameW+extra/2,by=67,br=27;drawCanvasBall(ctx,'cue',bx,by,br);
@@ -214,7 +248,7 @@ function downloadImage(){
 document.querySelector('#imageBtn').onclick=downloadImage;
 function formatSavedTime(value){if(!value)return'';if(/^\d{4}\/\d{1,2}\/\d{1,2}$/.test(String(value)))return `${value}（時刻記録なし）`;const d=new Date(value);if(Number.isNaN(d.getTime()))return String(value);return d.toLocaleString('ja-JP',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})}
 document.querySelector('#saveBtn').onclick=()=>{
-  const saved=JSON.parse(localStorage.getItem('poolNotes')||'[]'),now=new Date().toISOString(),data={title:document.querySelector('#title').value||'名称なし',state:structuredClone(state),lines:structuredClone(lines),notes:structuredClone(notes),tip:tip?{...tip}:null,result:document.querySelector('input[name=result]:checked')?.value||'',updatedAt:now};let label='新規保存済み';
+  const saved=JSON.parse(localStorage.getItem('poolNotes')||'[]'),now=new Date().toISOString(),data={title:document.querySelector('#title').value||'名称なし',state:structuredClone(state),lines:structuredClone(lines),notes:structuredClone(notes),tip:tip?{...tip}:null,orientation,result:document.querySelector('input[name=result]:checked')?.value||'',updatedAt:now};let label='新規保存済み';
   const index=currentSaveId===null?-1:saved.findIndex(s=>String(s.id)===String(currentSaveId));
   if(index>=0){saved[index]={...saved[index],...data,createdAt:saved[index].createdAt||saved[index].date||now};label='上書き保存済み'}
   else{currentSaveId=Date.now();saved.unshift({id:currentSaveId,...data,createdAt:now,date:new Date().toLocaleDateString('ja-JP')})}
@@ -223,7 +257,7 @@ document.querySelector('#saveBtn').onclick=()=>{
 function savedTimestamp(s){const time=Date.parse(s.updatedAt||s.createdAt||s.date||'');return Number.isNaN(time)?Number(s.id)||0:time}
 function readSaved(){return JSON.parse(localStorage.getItem('poolNotes')||'[]')}
 function writeSaved(items){localStorage.setItem('poolNotes',JSON.stringify(items.slice(0,30)))}
-function downloadSavedImage(item){const backup={state,lines,notes,tip,title:document.querySelector('#title').value};state=structuredClone(item.state||{});lines=structuredClone(item.lines||[]);notes=structuredClone(item.notes||[]);tip=item.tip?{...item.tip}:null;document.querySelector('#title').value=item.title||'ビリヤード配置';render();downloadImage();state=backup.state;lines=backup.lines;notes=backup.notes;tip=backup.tip;document.querySelector('#title').value=backup.title;render()}
+function downloadSavedImage(item){const backup={state,lines,notes,tip,orientation,title:document.querySelector('#title').value};state=structuredClone(item.state||{});lines=structuredClone(item.lines||[]);notes=structuredClone(item.notes||[]);tip=item.tip?{...item.tip}:null;setOrientation(item.orientation||'portrait',false,false);document.querySelector('#title').value=item.title||'ビリヤード配置';render();downloadImage();state=backup.state;lines=backup.lines;notes=backup.notes;tip=backup.tip;setOrientation(backup.orientation,false,false);document.querySelector('#title').value=backup.title;render()}
 function renderSavedDialog(){
   const list=document.querySelector('#savedList'),items=readSaved().sort((a,b)=>savedSortOrder==='newest'?savedTimestamp(b)-savedTimestamp(a):savedTimestamp(a)-savedTimestamp(b));list.innerHTML='';list.className=savedView==='list'?'saved-list list-view':'saved-list card-view';document.querySelector('#savedCardView').classList.toggle('active',savedView==='cards');document.querySelector('#savedListView').classList.toggle('active',savedView==='list');document.querySelector('#savedSort').value=savedSortOrder;
   if(!items.length){list.innerHTML='<p>保存した配置はまだありません。</p>';return}
@@ -235,7 +269,7 @@ function renderSavedDialog(){
     expand.onclick=()=>{details.hidden=!details.hidden;expand.textContent=details.hidden?'展開':'閉じる'};
     edit.onclick=()=>{titleText.hidden=true;input.hidden=false;edit.hidden=true;rename.hidden=false;input.focus();input.select()};
     rename.onclick=()=>{const saved=readSaved(),target=saved.find(s=>String(s.id)===String(item.id));if(!target)return;target.title=input.value.trim()||'名称なし';target.updatedAt=new Date().toISOString();writeSaved(saved);if(String(currentSaveId)===String(target.id))document.querySelector('#title').value=target.title;renderSavedDialog()};
-    open.onclick=()=>{const target=readSaved().find(s=>String(s.id)===String(item.id));if(!target)return;state=structuredClone(target.state||{});lines=structuredClone(target.lines||[]);notes=structuredClone(target.notes||[]);if(!notes.length&&target.memo)notes=[{text:target.memo,color:'#ffe15b',x:50,y:50}];tip=target.tip?{...target.tip}:null;selectedLine=-1;currentSaveId=target.id;document.querySelector('#title').value=target.title||'名称なし';render();document.querySelector('#saveState').textContent='保存済み';document.querySelector('#savedDialog').close()};
+    open.onclick=()=>{const target=readSaved().find(s=>String(s.id)===String(item.id));if(!target)return;state=structuredClone(target.state||{});lines=structuredClone(target.lines||[]);notes=structuredClone(target.notes||[]);if(!notes.length&&target.memo)notes=[{text:target.memo,color:'#ffe15b',x:50,y:50}];tip=target.tip?{...target.tip}:null;selectedLine=-1;currentSaveId=target.id;setOrientation(target.orientation||'portrait',false,false);document.querySelector('#title').value=target.title||'名称なし';render();document.querySelector('#saveState').textContent='保存済み';document.querySelector('#savedDialog').close()};
     image.onclick=()=>downloadSavedImage(item);
     del.onclick=()=>{if(!confirm(`「${item.title||'名称なし'}」を削除しますか？`))return;const saved=readSaved().filter(s=>String(s.id)!==String(item.id));writeSaved(saved);if(String(currentSaveId)===String(item.id)){currentSaveId=null;markUnsaved()}renderSavedDialog()};
     actions.append(edit,rename,open,image,del);details.append(input,meta,actions);card.append(summary,details);list.append(card);
