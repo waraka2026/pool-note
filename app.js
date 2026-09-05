@@ -1,3 +1,4 @@
+let currentTitle='';
 const colors=['#f3d400','#1767c8','#e6382e','#6b3ba9','#ef7d15','#248046','#7b201d','#111','#f0d63b','#1767c8','#e6382e','#6b3ba9','#ef7d15','#248046','#7b201d'];
 const table=document.querySelector('.cloth');
 const tableFrame=document.querySelector('.table');
@@ -336,11 +337,11 @@ function downloadImage(){
   ctx.fillStyle='#151b20';ctx.fillRect(frameW,0,extra,frameH);ctx.fillStyle='#d5aa58';ctx.font='bold 13px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('撞点',frameW+extra/2,24);
   const bx=frameW+extra/2,by=67,br=27;drawCanvasBall(ctx,'cue',bx,by,br);
   if(tip){ctx.beginPath();ctx.arc(bx-br+tip.x*br*2,by-br+tip.y*br*2,3.5,0,Math.PI*2);ctx.fillStyle='#e6382e';ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=1;ctx.stroke()}
-  const a=document.createElement('a');a.download=(document.querySelector('#title').value||'ビリヤード配置')+'.png';a.href=c.toDataURL('image/png');a.click();
+  const a=document.createElement('a');a.download=(currentTitle||'ビリヤード配置')+'.png';a.href=c.toDataURL('image/png');a.click();
 }
 function formatSavedTime(value){if(!value)return'';if(/^\d{4}\/\d{1,2}\/\d{1,2}$/.test(String(value)))return `${value}（時刻記録なし）`;const d=new Date(value);if(Number.isNaN(d.getTime()))return String(value);return d.toLocaleString('ja-JP',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})}
 document.querySelector('#saveBtn').onclick=()=>{
-  const saved=JSON.parse(localStorage.getItem('poolNotes')||'[]'),now=new Date().toISOString(),data={title:document.querySelector('#title').value||'名称なし',state:structuredClone(state),lines:structuredClone(lines),notes:structuredClone(notes),tip:tip?{...tip}:null,orientation,result:document.querySelector('input[name=result]:checked')?.value||'',updatedAt:now};let label='新規保存済み';
+  const saved=JSON.parse(localStorage.getItem('poolNotes')||'[]'),now=new Date().toISOString(),data={title:currentTitle||'名称なし',state:structuredClone(state),lines:structuredClone(lines),notes:structuredClone(notes),tip:tip?{...tip}:null,orientation,result:document.querySelector('input[name=result]:checked')?.value||'',updatedAt:now};let label='新規保存済み';
   const index=currentSaveId===null?-1:saved.findIndex(s=>String(s.id)===String(currentSaveId));
   if(index>=0){saved[index]={...saved[index],...data,createdAt:saved[index].createdAt||saved[index].date||now};label='上書き保存済み'}
   else{currentSaveId=Date.now();saved.unshift({id:currentSaveId,...data,createdAt:now,date:new Date().toLocaleDateString('ja-JP')})}
@@ -349,7 +350,7 @@ document.querySelector('#saveBtn').onclick=()=>{
 function savedTimestamp(s){const time=Date.parse(s.updatedAt||s.createdAt||s.date||'');return Number.isNaN(time)?Number(s.id)||0:time}
 function readSaved(){return JSON.parse(localStorage.getItem('poolNotes')||'[]')}
 function writeSaved(items){localStorage.setItem('poolNotes',JSON.stringify(items.slice(0,30)))}
-function downloadSavedImage(item){const backup={state,lines,notes,tip,orientation,title:document.querySelector('#title').value};state=structuredClone(item.state||{});lines=structuredClone(item.lines||[]);notes=structuredClone(item.notes||[]);tip=item.tip?{...item.tip}:null;setOrientation(item.orientation||'portrait',false,false);document.querySelector('#title').value=item.title||'ビリヤード配置';render();downloadImage();state=backup.state;lines=backup.lines;notes=backup.notes;tip=backup.tip;setOrientation(backup.orientation,false,false);document.querySelector('#title').value=backup.title;render()}
+function downloadSavedImage(item){const backup={state,lines,notes,tip,orientation,title:currentTitle};state=structuredClone(item.state||{});lines=structuredClone(item.lines||[]);notes=structuredClone(item.notes||[]);tip=item.tip?{...item.tip}:null;setOrientation(item.orientation||'portrait',false,false);currentTitle=item.title||'ビリヤード配置';render();downloadImage();state=backup.state;lines=backup.lines;notes=backup.notes;tip=backup.tip;setOrientation(backup.orientation,false,false);currentTitle=backup.title;render()}
 function renderSavedDialog(){
   const list=document.querySelector('#savedList'),items=readSaved().sort((a,b)=>savedSortOrder==='newest'?savedTimestamp(b)-savedTimestamp(a):savedTimestamp(a)-savedTimestamp(b));list.innerHTML='';list.className=savedView==='list'?'saved-list list-view':'saved-list card-view';document.querySelector('#savedCardView').classList.toggle('active',savedView==='cards');document.querySelector('#savedListView').classList.toggle('active',savedView==='list');document.querySelector('#savedSort').value=savedSortOrder;
   if(!items.length){list.innerHTML='<p>保存した配置はまだありません。</p>';return}
@@ -360,8 +361,8 @@ function renderSavedDialog(){
     const edit=document.createElement('button');edit.textContent='編集';const rename=document.createElement('button');rename.textContent='タイトルを保存';rename.hidden=true;const open=document.createElement('button');open.textContent='この配置を開く';const image=document.createElement('button');image.textContent='画像を保存';const del=document.createElement('button');del.textContent='削除';del.className='danger';
     expand.onclick=()=>{details.hidden=!details.hidden;expand.textContent=details.hidden?'展開':'閉じる'};
     edit.onclick=()=>{titleText.hidden=true;input.hidden=false;edit.hidden=true;rename.hidden=false;input.focus();input.select()};
-    rename.onclick=()=>{const saved=readSaved(),target=saved.find(s=>String(s.id)===String(item.id));if(!target)return;target.title=input.value.trim()||'名称なし';target.updatedAt=new Date().toISOString();writeSaved(saved);if(String(currentSaveId)===String(target.id))document.querySelector('#title').value=target.title;renderSavedDialog()};
-    open.onclick=()=>{const target=readSaved().find(s=>String(s.id)===String(item.id));if(!target)return;state=structuredClone(target.state||{});lines=structuredClone(target.lines||[]);notes=structuredClone(target.notes||[]);if(!notes.length&&target.memo)notes=[{text:target.memo,color:'#ffe15b',x:50,y:50}];tip=target.tip?{...target.tip}:null;selectedLine=-1;currentSaveId=target.id;setOrientation(target.orientation||'portrait',false,false);document.querySelector('#title').value=target.title||'名称なし';render();document.querySelector('#saveState').textContent='保存済み';document.querySelector('#savedDialog').close()};
+    rename.onclick=()=>{const saved=readSaved(),target=saved.find(s=>String(s.id)===String(item.id));if(!target)return;target.title=input.value.trim()||'名称なし';target.updatedAt=new Date().toISOString();writeSaved(saved);if(String(currentSaveId)===String(target.id))currentTitle=target.title;renderSavedDialog()};
+    open.onclick=()=>{const target=readSaved().find(s=>String(s.id)===String(item.id));if(!target)return;state=structuredClone(target.state||{});lines=structuredClone(target.lines||[]);notes=structuredClone(target.notes||[]);if(!notes.length&&target.memo)notes=[{text:target.memo,color:'#ffe15b',x:50,y:50}];tip=target.tip?{...target.tip}:null;selectedLine=-1;currentSaveId=target.id;setOrientation(target.orientation||'portrait',false,false);currentTitle=target.title||'名称なし';render();document.querySelector('#saveState').textContent='保存済み';document.querySelector('#savedDialog').close()};
     image.onclick=()=>downloadSavedImage(item);
     del.onclick=()=>{if(!confirm(`「${item.title||'名称なし'}」を削除しますか？`))return;const saved=readSaved().filter(s=>String(s.id)!==String(item.id));writeSaved(saved);if(String(currentSaveId)===String(item.id)){currentSaveId=null;markUnsaved()}renderSavedDialog()};
     actions.append(edit,rename,open,image,del);details.append(input,meta,actions);card.append(summary,details);list.append(card);
@@ -373,6 +374,5 @@ savedDialogEl.addEventListener('close',()=>setTopMenu(null));
 document.querySelector('#savedCardView').onclick=()=>{savedView='cards';renderSavedDialog()};
 document.querySelector('#savedListView').onclick=()=>{savedView='list';renderSavedDialog()};
 document.querySelector('#savedSort').onchange=e=>{savedSortOrder=e.target.value;renderSavedDialog()};
-document.querySelector('#title').addEventListener('input',markUnsaved);
 defaultState();
 layoutTable();

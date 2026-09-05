@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#101418" />
   <title>ビリヤード配置図メーカー｜球配置・ショットライン作成</title>
   <meta name="description" content="ビリヤードの球配置とショットラインをブラウザで作成・保存できる無料の配置図メーカー。手球と1〜15番の球に対応。" />
-  <link rel="stylesheet" href="styles.css?v=31" />
+  <link rel="stylesheet" href="styles.css?v=32" />
 </head>
 <body>
   <main class="app">
@@ -23,6 +23,7 @@
     </nav>
 
     <nav class="tools" aria-label="編集ツール">
+      <span id="saveState" hidden>未保存</span>
       <section id="lineColorPanel" class="line-color-panel" hidden aria-label="矢印と線の設定">
         <div class="color-panel-head">
           <div><b>矢印・線</b><small>種類と色を選択。もう一度同じ種類を押すと解除</small></div>
@@ -57,10 +58,6 @@
       </div>
     </nav>
 
-    <section class="title-row">
-      <input id="title" value="" placeholder="タイトル未設定" aria-label="配置タイトル" />
-      <span id="saveState">未保存</span>
-    </section>
 
     <div class="workspace">
     <div id="boardColumn" class="board-column portrait">
@@ -261,7 +258,7 @@
 <div id="savedList">
 </div>
 </dialog>
-  <script src="app.js?v=29">
+  <script src="app.js?v=30">
 </script>
 </body>
 </html>

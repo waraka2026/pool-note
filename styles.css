@@ -3,7 +3,7 @@
 html{min-height:100%;background:#0c1013;overscroll-behavior-y:none}
 body{margin:0;background-color:#0c1013;background-image:radial-gradient(circle at top,#25313a,#0c1013 55%);background-repeat:no-repeat;color:#f7f3ea;font-family:system-ui,-apple-system,"Noto Sans JP",sans-serif;min-height:100vh;min-height:100dvh;overscroll-behavior-y:none}
 .app{width:min(100%,1040px);margin:auto;min-height:100vh;padding:18px 16px 24px}
-.topbar,.title-row,.tray,.tools-row,.dialog-head{display:flex;align-items:center}
+.topbar,.tray,.tools-row,.dialog-head{display:flex;align-items:center}
 .topbar{justify-content:space-between}
 .eyebrow{font-size:10px;letter-spacing:.25em;color:var(--gold);margin:0 0 2px}
 .topbar h1{font-family:Georgia,"Noto Serif JP",serif;letter-spacing:.03em;margin:0;font-size:23px}
@@ -11,9 +11,6 @@ body{margin:0;background-color:#0c1013;background-image:radial-gradient(circle a
 .primary-menu::-webkit-scrollbar{display:none}
 .primary-menu button{flex:0 0 auto;border:0;border-bottom:2px solid transparent;background:none;color:#dbe1e4;padding:9px 12px 8px;font-size:14px;font-weight:800;cursor:pointer;white-space:nowrap}
 .primary-menu button.active,.primary-menu button:hover,.primary-menu button:focus-visible{border-bottom-color:var(--gold);color:var(--gold);outline:0}
-.title-row{margin:16px 0 12px;gap:10px}
-.title-row input{flex:1;min-width:0;background:transparent;border:0;border-bottom:1px solid #39434b;color:#fff;font-size:18px;font-weight:700;padding:6px 2px;outline:0}
-.title-row span{font-size:11px;color:var(--muted)}
 .table-wrap{position:relative;padding:0;display:flex;justify-content:center}
 .table-and-tip{display:flex;justify-content:center;align-items:flex-start;gap:13px;min-width:max-content}
 .side-controls{width:76px;flex:0 0 76px;display:flex;flex-direction:column;align-items:center;gap:10px}
@@ -87,7 +84,7 @@ body{margin:0;background-color:#0c1013;background-image:radial-gradient(circle a
 .line-hit{stroke:transparent;stroke-width:16;pointer-events:stroke;cursor:move}
 #notesLayer{position:absolute;inset:0;z-index:4;pointer-events:none}
 .table-note{position:absolute;max-width:88%;padding:4px 7px;border-radius:5px;background:#07110d;font-size:18px;font-weight:900;line-height:1.35;white-space:pre-wrap;text-align:center;text-shadow:0 2px 3px #000,0 0 5px #000;transform:translate(-50%,-50%);cursor:move;user-select:none;touch-action:pinch-zoom;pointer-events:auto}
-.tools{position:relative;z-index:10;width:min(100%,480px);margin:16px auto 0}
+.tools{position:relative;z-index:10;width:min(100%,480px);margin:16px auto 12px}
 .tools-row{padding:10px 12px;background:#151b20ed;border-top:1px solid #303940;backdrop-filter:blur(16px);justify-content:space-around}
 .tools button{border:1px solid transparent;background:none;color:#fff;font-size:10px;min-width:42px;border-radius:10px}
 .tools span{display:block;font-size:22px;margin-bottom:2px}
@@ -169,3 +166,5 @@ dialog form>button{width:100%;border:0;border-radius:12px;padding:13px;backgroun
 .tools button{flex:0 0 47px}
 }
 @media(max-width:390px){.table-and-tip{gap:6px}.orientation-control{width:38px;flex-basis:38px}.orientation-control span{font-size:9px}.orientation-control button{padding:7px 2px}.side-controls,.tip-point{width:52px;flex-basis:52px}.cue-diagram{width:50px;height:50px}.tip-help{font-size:10px}.tray-balls{grid-template-columns:repeat(2,18px)}.tray .mini{width:18px;height:18px}}
+
+#saveState[hidden]{display:none}
