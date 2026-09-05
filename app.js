@@ -12,7 +12,7 @@ const trayEl=document.querySelector('.tray');
 const portraitBtn=document.querySelector('#portraitBtn');
 const landscapeBtn=document.querySelector('#landscapeBtn');
 
-let mode='move',draggingBall=null,draggingLine=null,lineStart=null,lineDraft=null,lines=[],notes=[],state={},selectedLine=-1,tip=null,tipDragging=false,activeLineColor='auto',activeLineChoice='auto',paletteLineType='line',currentSaveId=null,repeatBallSeq=0,orientation='portrait';
+let mode='move',draggingBall=null,draggingLine=null,lineStart=null,lineDraft=null,lines=[],notes=[],state={},selectedLine=-1,tip=null,tipDragging=false,activeLineColor='auto',activeLineChoice='auto',paletteLineType='line',currentSaveId=null,repeatBallSeq=0,orientation='portrait',activeLineWidth=2,groupMoveMode=false,groupDrag=null;
 let ballPress=null,ballMoved=false,lastBallTap=null,lastLineTap=null,savedView='cards',savedSortOrder='newest';
 const defs=`<defs></defs>`;
 const noteFonts={
@@ -48,10 +48,33 @@ function setOrientation(next,rotateContent=true,mark=true){
   landscapeBtn.setAttribute('aria-pressed',String(next==='landscape'));
   if(next==='landscape')boardColumn.append(trayEl);else sideControls.append(trayEl);
   render();
+  layoutTable();
   if(mark)markUnsaved();
 }
 portraitBtn.onclick=()=>setOrientation('portrait');
 landscapeBtn.onclick=()=>setOrientation('landscape');
+
+const tableAndTip=document.querySelector('.table-and-tip'),orientationControlEl=document.querySelector('.orientation-control'),toolsNav=document.querySelector('.tools');
+function availableTableWidth(){
+  const total=boardColumn.clientWidth,ocW=orientationControlEl.getBoundingClientRect().width,scW=sideControls.getBoundingClientRect().width;
+  return Math.max(140,total-ocW-scW-30);
+}
+function availableTableHeight(){
+  const vh=window.visualViewport?window.visualViewport.height:window.innerHeight,top=tableAndTip.getBoundingClientRect().top,toolsH=toolsNav.getBoundingClientRect().height;
+  let reserve=toolsH+16;
+  if(orientation==='landscape')reserve+=trayEl.getBoundingClientRect().height+12;
+  return Math.max(140,vh-top-reserve);
+}
+function layoutTable(){
+  const wRatio=orientation==='landscape'?2:1,hRatio=orientation==='landscape'?1:2;
+  let unit=Math.min(availableTableWidth()/wRatio,availableTableHeight()/hRatio,310);
+  unit=Math.max(unit,130);
+  tableFrame.style.width=Math.round(unit*wRatio)+'px';
+  tableFrame.style.height=Math.round(unit*hRatio)+'px';
+}
+window.addEventListener('resize',layoutTable);
+window.addEventListener('orientationchange',()=>setTimeout(layoutTable,50));
+if(window.visualViewport)window.visualViewport.addEventListener('resize',layoutTable);
 function ballEl(n,x,y,mini=false){
   const kind=ballKind(n),el=document.createElement('div'),striped=!['cue','ghost'].includes(kind)&&Number(kind)>8;
   el.className=`ball ${mini?'mini':''} ${kind==='cue'?'cue':''} ${kind==='ghost'?'ghost':''} ${striped?'striped':''}`;
@@ -102,9 +125,10 @@ function visibleEnds(l){
 }
 function lineLengthPx(l){const r=table.getBoundingClientRect(),v=visibleEnds(l);return Math.hypot((v.x2-v.x1)*r.width/100,(v.y2-v.y1)*r.height/100)}
 function lineMarkup(l,i,draft=false){
-  const v=visibleEnds(l),len=lineLengthPx(l),isArrow=l.type!=='plain',color=l.color||ballColor(l.startBall),markerId=`arrow-${draft?'draft':i}`,marker=isArrow&&len>14?` marker-end="url(#${markerId})"`:'',selected=!draft&&selectedLine===i?' selected-line':'';
-  const markerDef=isArrow&&len>14?`<defs><marker id="${markerId}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10Z" fill="${color}"/></marker></defs>`:'';
-  const visual=len>3?`${markerDef}<line data-i="${i}" style="--line-color:${color}" class="${isArrow?'shot-line':'plain-line'}${selected}${draft?' draft-line':''}" x1="${v.x1}%" y1="${v.y1}%" x2="${v.x2}%" y2="${v.y2}%"${marker}/>`:'';
+  const v=visibleEnds(l),len=lineLengthPx(l),isArrow=l.type!=='plain',color=l.color||ballColor(l.startBall),width=l.width||2,markerId=`arrow-${draft?'draft':i}`,marker=isArrow&&len>14?` marker-end="url(#${markerId})"`:'',selected=!draft&&selectedLine===i?' selected-line':'';
+  const markerSize=Math.max(5,Math.min(16,Math.round(5+width*1.6)));
+  const markerDef=isArrow&&len>14?`<defs><marker id="${markerId}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="${markerSize}" markerHeight="${markerSize}" orient="auto"><path d="M0 0L10 5L0 10Z" fill="${color}"/></marker></defs>`:'';
+  const visual=len>3?`${markerDef}<line data-i="${i}" style="--line-color:${color};--line-width:${width}" class="${isArrow?'shot-line':'plain-line'}${selected}${draft?' draft-line':''}" x1="${v.x1}%" y1="${v.y1}%" x2="${v.x2}%" y2="${v.y2}%"${marker}/>`:'';
   const hit=draft||len<=3?'':`<line data-i="${i}" class="line-hit" x1="${v.x1}%" y1="${v.y1}%" x2="${v.x2}%" y2="${v.y2}%"/>`;return `<g>${visual}${hit}</g>`;
 }
 function renderLines(){let html=defs+lines.map((l,i)=>lineMarkup(l,i)).join('');if(lineDraft)html+=lineMarkup(lineDraft,-1,true);svg.innerHTML=html}
@@ -113,18 +137,40 @@ function render(){renderBalls();renderLines();renderTray();renderNotes();renderT
 function removeBall(n){delete state[n];lines=lines.filter(l=>String(l.startBall)!==String(n)&&String(l.endBall)!==String(n));selectedLine=-1;render();markUnsaved()}
 function removeLine(i){if(i<0||i>=lines.length)return;lines.splice(i,1);selectedLine=-1;renderLines();markUnsaved()}
 
+function startGroupDrag(e){
+  groupDrag={startX:e.clientX,startY:e.clientY,state:structuredClone(state),lines:structuredClone(lines),notes:structuredClone(notes)};
+  table.setPointerCapture(e.pointerId);
+}
+function moveGroupDrag(e){
+  if(!groupDrag)return;
+  const r=table.getBoundingClientRect();
+  let dx=(e.clientX-groupDrag.startX)/r.width*100,dy=(e.clientY-groupDrag.startY)/r.height*100;
+  const pts=[];Object.values(groupDrag.state).forEach(p=>pts.push(p));groupDrag.lines.forEach(l=>{pts.push({x:l.x1,y:l.y1});pts.push({x:l.x2,y:l.y2})});groupDrag.notes.forEach(n=>pts.push({x:n.x,y:n.y}));
+  if(pts.length){
+    const minX=Math.min(...pts.map(p=>p.x)),maxX=Math.max(...pts.map(p=>p.x)),minY=Math.min(...pts.map(p=>p.y)),maxY=Math.max(...pts.map(p=>p.y));
+    dx=Math.max(-minX,Math.min(100-maxX,dx));dy=Math.max(-minY,Math.min(100-maxY,dy));
+  }
+  Object.keys(groupDrag.state).forEach(n=>{state[n]={x:groupDrag.state[n].x+dx,y:groupDrag.state[n].y+dy}});
+  lines.forEach((l,i)=>{const o=groupDrag.lines[i];if(!o)return;l.x1=o.x1+dx;l.y1=o.y1+dy;l.x2=o.x2+dx;l.y2=o.y2+dy});
+  notes.forEach((n,i)=>{const o=groupDrag.notes[i];if(!o)return;n.x=o.x+dx;n.y=o.y+dy});
+  updateBallPositions();renderLines();renderNotes();
+}
+function endGroupDrag(){if(groupDrag){groupDrag=null;markUnsaved()}}
+
 table.addEventListener('pointerdown',e=>{
   if(e.target.closest('.table-note'))return;
+  if(mode==='move'&&groupMoveMode){startGroupDrag(e);return}
   const ball=e.target.closest('.ball');
   if(mode==='move'&&ball){selectedLine=-1;draggingBall=ball.dataset.n;ballPress={x:e.clientX,y:e.clientY};ballMoved=false;table.setPointerCapture(e.pointerId);renderLines();return}
   if(mode==='erase'&&ball){removeBall(ball.dataset.n);return}
   if(mode==='line'||mode==='plain'){
     const p=point(e),startBall=ball?.dataset.n||nearestBall(p,42),a=startBall?state[startBall]:p;lineStart={...p,ball:startBall};
-    const autoColor=activeLineColor==='auto';lineDraft={x1:a.x,y1:a.y,x2:p.x,y2:p.y,type:mode==='plain'?'plain':'arrow',startBall:startBall||null,endBall:null,color:autoColor?ballColor(startBall):activeLineColor,autoColor};table.setPointerCapture(e.pointerId);renderLines();return;
+    const autoColor=activeLineColor==='auto';lineDraft={x1:a.x,y1:a.y,x2:p.x,y2:p.y,type:mode==='plain'?'plain':'arrow',startBall:startBall||null,endBall:null,color:autoColor?ballColor(startBall):activeLineColor,autoColor,width:activeLineWidth};table.setPointerCapture(e.pointerId);renderLines();return;
   }
   if(mode==='move'){selectedLine=-1;renderLines()}
 });
 table.addEventListener('pointermove',e=>{
+  if(groupDrag){moveGroupDrag(e);return}
   if(draggingBall){if(ballPress&&Math.hypot(e.clientX-ballPress.x,e.clientY-ballPress.y)>5)ballMoved=true;state[draggingBall]=point(e);syncBallLines(draggingBall);updateBallPositions();renderLines();return}
   if(lineStart){const p=point(e),endBall=nearestBall(p,42,lineStart.ball),b=endBall?state[endBall]:p;lineDraft.x2=b.x;lineDraft.y2=b.y;lineDraft.endBall=endBall||null;renderLines();return}
   if(!draggingLine)return;e.preventDefault();const p=point(e),l=lines[draggingLine.i],o=draggingLine.original;
@@ -135,12 +181,15 @@ table.addEventListener('pointermove',e=>{
     l.endBall=null;l.x2=p.x;l.y2=p.y;
   }
   else{
-    const ballIds=draggingLine.ballIds,free=[];if(!o.startBall)free.push({x:o.x1,y:o.y1});if(!o.endBall)free.push({x:o.x2,y:o.y2});const moving=free.concat(ballIds.map(n=>draggingLine.originalBalls[n]));
-    let dx=p.x-draggingLine.start.x,dy=p.y-draggingLine.start.y;dx=Math.max(-Math.min(...moving.map(q=>q.x)),Math.min(100-Math.max(...moving.map(q=>q.x)),dx));dy=Math.max(-Math.min(...moving.map(q=>q.y)),Math.min(100-Math.max(...moving.map(q=>q.y)),dy));
-    ballIds.forEach(n=>{state[n]={x:draggingLine.originalBalls[n].x+dx,y:draggingLine.originalBalls[n].y+dy};syncBallLines(n)});if(!o.startBall){l.x1=o.x1+dx;l.y1=o.y1+dy}if(!o.endBall){l.x2=o.x2+dx;l.y2=o.y2+dy}updateBallPositions();
+    if(o.startBall)l.startBall=null;if(o.endBall)l.endBall=null;
+    const xs=[o.x1,o.x2],ys=[o.y1,o.y2];
+    let dx=p.x-draggingLine.start.x,dy=p.y-draggingLine.start.y;
+    dx=Math.max(-Math.min(...xs),Math.min(100-Math.max(...xs),dx));dy=Math.max(-Math.min(...ys),Math.min(100-Math.max(...ys),dy));
+    l.x1=o.x1+dx;l.y1=o.y1+dy;l.x2=o.x2+dx;l.y2=o.y2+dy;
   }renderLines();
 });
 table.addEventListener('pointerup',()=>{
+  if(groupDrag){endGroupDrag();return}
   if(draggingBall){const n=draggingBall,now=Date.now();draggingBall=null;ballPress=null;if(!ballMoved){if(lastBallTap&&lastBallTap.n===n&&now-lastBallTap.time<650){lastBallTap=null;removeBall(n);return}lastBallTap={n,time:now}}else lastBallTap=null;markUnsaved();return}
   if(lineStart){if(lineDraft&&lineLengthPx(lineDraft)>8){lines.push({...lineDraft});selectedLine=lines.length-1;markUnsaved()}lineStart=null;lineDraft=null;renderLines();return}
   if(draggingLine){
@@ -148,12 +197,13 @@ table.addEventListener('pointerup',()=>{
     draggingLine=null;if(lineLengthPx(l)<5)removeLine(selectedLine);else{renderLines();markUnsaved()}
   }
 });
-table.addEventListener('pointercancel',()=>{draggingBall=null;draggingLine=null;lineStart=null;lineDraft=null;renderLines()});
+table.addEventListener('pointercancel',()=>{draggingBall=null;draggingLine=null;lineStart=null;lineDraft=null;groupDrag=null;renderLines()});
 
 svg.addEventListener('pointerdown',e=>{
   if(e.target.dataset.i===undefined)return;e.stopPropagation();const i=Number(e.target.dataset.i),now=Date.now();if(lastLineTap&&lastLineTap.i===i&&now-lastLineTap.time<650){lastLineTap=null;draggingLine=null;removeLine(i);return}lastLineTap={i,time:now};if(mode==='erase'){removeLine(i);return}if(mode!=='move')return;
+  if(groupMoveMode){startGroupDrag(e);return}
   selectedLine=i;const p=point(e),l=lines[i],v=visibleEnds(l),r=table.getBoundingClientRect(),d1=Math.hypot((p.x-v.x1)*r.width/100,(p.y-v.y1)*r.height/100),d2=Math.hypot((p.x-v.x2)*r.width/100,(p.y-v.y2)*r.height/100),kind=Math.min(d1,d2)<=26?(d1<d2?'start':'end'):'move';
-  const original={...l},ballIds=[...new Set([original.startBall,original.endBall].filter(Boolean))],originalBalls={};ballIds.forEach(n=>originalBalls[n]={...state[n]});draggingLine={i,kind,start:p,original,ballIds,originalBalls};table.setPointerCapture(e.pointerId);renderLines();
+  const original={...l};draggingLine={i,kind,start:p,original};table.setPointerCapture(e.pointerId);renderLines();
 });
 svg.addEventListener('dblclick',e=>{if(e.target.dataset.i===undefined)return;e.preventDefault();e.stopPropagation();removeLine(Number(e.target.dataset.i))});
 table.addEventListener('dblclick',e=>{const ball=e.target.closest('.ball');if(!ball)return;e.preventDefault();e.stopPropagation();removeBall(ball.dataset.n)});
@@ -183,6 +233,14 @@ function usePaletteMode(){setMode(paletteLineType,false);refreshColorChoice()}
 [['cue','白'],...[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15].map(n=>[n,n])].forEach(([n,label])=>{const b=document.createElement('button');b.type='button';b.className='color-swatch';b.dataset.choice=String(n);b.dataset.color=ballColor(n);b.textContent=label;b.title=`${label}の色`;b.style.background=n==='cue'?'#fff':Number(n)>8?`linear-gradient(#fff 0 22%,${ballColor(n)} 22% 76%,#fff 76%)`:ballColor(n);b.onclick=()=>{activeLineColor=b.dataset.color;activeLineChoice=b.dataset.choice;usePaletteMode();refreshColorChoice()};swatches.append(b)});
 function toggleDrawType(next){paletteLineType=next;if(mode===next)setMode('move',false);else setMode(next,false);refreshColorChoice()}
 colorArrowBtn.onclick=()=>toggleDrawType('line');colorPlainBtn.onclick=()=>toggleDrawType('plain');
+const lineWidthRange=document.querySelector('#lineWidthRange'),lineWidthValue=document.querySelector('#lineWidthValue');
+lineWidthRange.oninput=()=>{activeLineWidth=Number(lineWidthRange.value);lineWidthValue.textContent=activeLineWidth};
+const groupMoveBtn=document.querySelector('#groupMoveBtn');
+groupMoveBtn.onclick=()=>{
+  groupMoveMode=!groupMoveMode;groupMoveBtn.classList.toggle('active',groupMoveMode);groupMoveBtn.setAttribute('aria-pressed',String(groupMoveMode));
+  colorPanel.hidden=true;if(mode!=='move')setMode('move',false);
+  const hint=document.querySelector('#hint');hint.textContent=groupMoveMode?'まとめて移動：どこをつかんでも全部一緒に動く':'球をドラッグ。線の端をつかむと伸縮';hint.style.opacity=1;setTimeout(()=>hint.style.opacity=0,1800);
+};
 autoColorBtn.onclick=()=>{activeLineColor='auto';activeLineChoice='auto';usePaletteMode();refreshColorChoice()};lineColorPicker.oninput=()=>{activeLineColor=lineColorPicker.value;activeLineChoice='custom';usePaletteMode();refreshColorChoice()};refreshColorChoice();
 drawBtn.onclick=()=>{if(['line','plain'].includes(mode))paletteLineType=mode;colorPanel.hidden=!colorPanel.hidden;refreshColorChoice()};
 document.querySelector('#lineColorClose').onclick=()=>{colorPanel.hidden=true};
@@ -215,8 +273,8 @@ function drawCanvasBall(ctx,n,x,y,r){
 }
 function drawExportLine(ctx,l,clothX,clothY,clothW,clothH){
   const v=visibleEnds(l),x1=clothX+clothW*v.x1/100,y1=clothY+clothH*v.y1/100,x2=clothX+clothW*v.x2/100,y2=clothY+clothH*v.y2/100,dx=x2-x1,dy=y2-y1,len=Math.hypot(dx,dy);if(len<3)return;
-  const color=l.color||ballColor(l.startBall);ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=2;ctx.setLineDash(l.type==='plain'?[]:[8,5]);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.setLineDash([]);
-  if(l.type!=='plain'&&len>14){const a=Math.atan2(dy,dx);ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-12*Math.cos(a-.48),y2-12*Math.sin(a-.48));ctx.lineTo(x2-12*Math.cos(a+.48),y2-12*Math.sin(a+.48));ctx.closePath();ctx.fill()}
+  const color=l.color||ballColor(l.startBall),width=l.width||2;ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=width;ctx.setLineDash(l.type==='plain'?[]:[8,5]);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.setLineDash([]);
+  if(l.type!=='plain'&&len>14){const a=Math.atan2(dy,dx),legLen=6*width;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-legLen*Math.cos(a-.48),y2-legLen*Math.sin(a-.48));ctx.lineTo(x2-legLen*Math.cos(a+.48),y2-legLen*Math.sin(a+.48));ctx.closePath();ctx.fill()}
 }
 function drawExportNotes(ctx,clothX,clothY,clothW,clothH){
   ctx.textAlign='center';ctx.textBaseline='middle';ctx.lineJoin='round';notes.forEach(note=>{
@@ -261,7 +319,6 @@ function downloadImage(){
   if(tip){ctx.beginPath();ctx.arc(bx-br+tip.x*br*2,by-br+tip.y*br*2,3.5,0,Math.PI*2);ctx.fillStyle='#e6382e';ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=1;ctx.stroke()}
   const a=document.createElement('a');a.download=(document.querySelector('#title').value||'ビリヤード配置')+'.png';a.href=c.toDataURL('image/png');a.click();
 }
-document.querySelector('#imageBtn').onclick=downloadImage;
 function formatSavedTime(value){if(!value)return'';if(/^\d{4}\/\d{1,2}\/\d{1,2}$/.test(String(value)))return `${value}（時刻記録なし）`;const d=new Date(value);if(Number.isNaN(d.getTime()))return String(value);return d.toLocaleString('ja-JP',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})}
 document.querySelector('#saveBtn').onclick=()=>{
   const saved=JSON.parse(localStorage.getItem('poolNotes')||'[]'),now=new Date().toISOString(),data={title:document.querySelector('#title').value||'名称なし',state:structuredClone(state),lines:structuredClone(lines),notes:structuredClone(notes),tip:tip?{...tip}:null,orientation,result:document.querySelector('input[name=result]:checked')?.value||'',updatedAt:now};let label='新規保存済み';
@@ -299,3 +356,4 @@ document.querySelector('#savedListView').onclick=()=>{savedView='list';renderSav
 document.querySelector('#savedSort').onchange=e=>{savedSortOrder=e.target.value;renderSavedDialog()};
 document.querySelector('#title').addEventListener('input',markUnsaved);
 defaultState();
+layoutTable();
