@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#101418" />
   <title>ビリヤード配置図メーカー｜球配置・ショットライン作成</title>
   <meta name="description" content="ビリヤードの球配置とショットラインをブラウザで作成・保存できる無料の配置図メーカー。手球と1〜15番の球に対応。" />
-  <link rel="stylesheet" href="styles.css?v=18" />
+  <link rel="stylesheet" href="styles.css?v=19" />
 </head>
 <body>
   <main class="app">
@@ -130,20 +130,24 @@
       <h2>配置の作り方</h2>
       <ol>
         <li><b>球を置く</b><span>右の2列から球をタップして、台の上でドラッグ。点線の球はイメージボールです</span></li>
-        <li><b>矢印・線を描く</b><span>描き始めた球と同じ色になります。矢印・線ボタンから各球色や自由色も選べます</span></li>
-        <li><b>移動・伸縮</b><span>中央をドラッグで移動、線の端を直接つかむと伸縮できます</span></li>
-        <li><b>削除</b><span>球・線・配置したメモはダブルクリックで削除できます</span></li>
+        <li><b>矢印・線を描く</b><span>色は描き始めた球と同じ色が基本です。必要なときだけ色パネルで球色や自由色に変更できます</span></li>
+        <li><b>移動・追従を外す</b><span>線の中央をドラッグで移動。先端をつかむと球への追従が外れ、その端を自由に動かせます</span></li>
+        <li><b>削除</b><span>消去ボタンを選ばなくても、球・線・配置したメモをダブルクリックすると削除できます</span></li>
         <li><b>撞点を記録</b><span>台の右にある大きい手玉をタップし、赤い点を好きな位置へドラッグできます</span></li>
         <li><b>保存済みを開く</b><span>右上の☰ボタンから、保存した配置の一覧を呼び出せます</span></li>
       </ol>
-      <p class="guide-tip">メモは台の上に表示され、ドラッグで自由に移動できます。「画像」ボタンで台・球・線・メモ・撞点をまとめて保存できます。</p>
+      <p class="guide-tip">色パネルは「閉じる」かパネルの外側をクリックすると閉じます。メモは台の上で自由に移動でき、「画像」では画面と同じ台・罫線・穴・球・線・メモ・撞点を保存します。</p>
     </aside>
     </div>
 
     <section id="lineColorPanel" class="line-color-panel" hidden aria-label="線の色">
-      <div class="color-panel-head"><b>線の色</b><button id="autoColorBtn" type="button">球の色（自動）</button></div>
+      <div class="color-panel-head">
+        <div><b>矢印・線の色</b><small>基本は描き始めた球と同じ色</small></div>
+        <button id="lineColorClose" class="color-panel-close" type="button" aria-label="色パネルを閉じる">× 閉じる</button>
+      </div>
+      <button id="autoColorBtn" class="auto-color-btn" type="button">球の色に合わせる（デフォルト）</button>
       <div id="lineColorSwatches" class="line-color-swatches"></div>
-      <label class="custom-color">自由な色 <input id="lineColorPicker" type="color" value="#ff2f92" /></label>
+      <label class="custom-color">その他の色（自由に選ぶ） <input id="lineColorPicker" type="color" value="#ff2f92" /></label>
     </section>
 
     <nav class="tools" aria-label="編集ツール">
@@ -187,7 +191,7 @@
 <div id="savedList">
 </div>
 </dialog>
-  <script src="app.js?v=18">
+  <script src="app.js?v=19">
 </script>
 </body>
 </html>
