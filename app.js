@@ -8,16 +8,18 @@ const tipMark=document.querySelector('#tipMark');
 
 let mode='move',draggingBall=null,draggingLine=null,lineStart=null,lineDraft=null,lines=[],state={},selectedLine=-1,tip=null;
 let ballPress=null,ballMoved=false,lastBallTap=null;
-const defs=`<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10Z" fill="white"/></marker></defs>`;
+const defs=`<defs></defs>`;
+
+function ballColor(n){return n==='cue'?'#fff':n==='ghost'?'#dce7e3':colors[Number(n)-1]||'#fff'}
 
 function markUnsaved(){document.querySelector('#saveState').textContent='未保存'}
 function defaultState(){state={1:{x:40,y:35},9:{x:62,y:20}};lines=[];tip=null;selectedLine=-1;render();markUnsaved()}
 function clearTable(){state={};lines=[];tip=null;selectedLine=-1;render();markUnsaved()}
 function ballEl(n,x,y,mini=false){
-  const el=document.createElement('div'),striped=n!=='cue'&&Number(n)>8;
-  el.className=`ball ${mini?'mini':''} ${n==='cue'?'cue':''} ${striped?'striped':''}`;
-  if(n!=='cue')el.style.setProperty('--ball',colors[Number(n)-1]);
-  el.dataset.n=n;el.style.left=x+'%';el.style.top=y+'%';el.innerHTML=n==='cue'?'':`<span>${n}</span>`;return el;
+  const el=document.createElement('div'),striped=!['cue','ghost'].includes(n)&&Number(n)>8;
+  el.className=`ball ${mini?'mini':''} ${n==='cue'?'cue':''} ${n==='ghost'?'ghost':''} ${striped?'striped':''}`;
+  if(!['cue','ghost'].includes(n))el.style.setProperty('--ball',colors[Number(n)-1]);
+  el.dataset.n=n;el.style.left=x+'%';el.style.top=y+'%';el.innerHTML=['cue','ghost'].includes(n)?'':`<span>${n}</span>`;el.setAttribute('aria-label',n==='cue'?'手玉':n==='ghost'?'イメージボール':`${n}番ボール`);return el;
 }
 function renderBalls(){layer.innerHTML='';Object.entries(state).forEach(([n,p])=>layer.append(ballEl(n,p.x,p.y)))}
 function updateBallPositions(){Object.entries(state).forEach(([n,p])=>{const el=layer.querySelector(`[data-n="${n}"]`);if(el){el.style.left=p.x+'%';el.style.top=p.y+'%'}})}
@@ -38,7 +40,7 @@ function freeSpot(){
 }
 function renderTray(){
   const tray=document.querySelector('#trayBalls');tray.innerHTML='';
-  ['cue',1,2,3,4,5,6,7,8,9,10,11,12,13,14,15].filter(n=>!state[n]).forEach(n=>{const ball=ballEl(n,0,0,true);ball.onclick=()=>{state[n]=freeSpot();render();markUnsaved()};tray.append(ball)});
+  ['cue','ghost',1,2,3,4,5,6,7,8,9,10,11,12,13,14,15].filter(n=>!state[n]).forEach(n=>{const ball=ballEl(n,0,0,true);ball.onclick=()=>{state[n]=freeSpot();render();markUnsaved()};tray.append(ball)});
 }
 function point(e){const r=table.getBoundingClientRect();return{x:Math.max(2,Math.min(98,(e.clientX-r.left)/r.width*100)),y:Math.max(2,Math.min(98,(e.clientY-r.top)/r.height*100))}}
 function nearestBall(p,maxPx=36,exclude=null){
@@ -52,8 +54,9 @@ function visibleEnds(l){
 }
 function lineLengthPx(l){const r=table.getBoundingClientRect(),v=visibleEnds(l);return Math.hypot((v.x2-v.x1)*r.width/100,(v.y2-v.y1)*r.height/100)}
 function lineMarkup(l,i,draft=false){
-  const v=visibleEnds(l),len=lineLengthPx(l),isArrow=l.type!=='plain',marker=isArrow&&len>14?' marker-end="url(#arrow)"':'',selected=!draft&&selectedLine===i?' selected-line':'';
-  const visual=len>3?`<line class="${isArrow?'shot-line':'plain-line'}${selected}${draft?' draft-line':''}" x1="${v.x1}%" y1="${v.y1}%" x2="${v.x2}%" y2="${v.y2}%"${marker}/>`:'';
+  const v=visibleEnds(l),len=lineLengthPx(l),isArrow=l.type!=='plain',color=l.color||ballColor(l.startBall),markerId=`arrow-${draft?'draft':i}`,marker=isArrow&&len>14?` marker-end="url(#${markerId})"`:'',selected=!draft&&selectedLine===i?' selected-line':'';
+  const markerDef=isArrow&&len>14?`<defs><marker id="${markerId}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10Z" fill="${color}"/></marker></defs>`:'';
+  const visual=len>3?`${markerDef}<line style="--line-color:${color}" class="${isArrow?'shot-line':'plain-line'}${selected}${draft?' draft-line':''}" x1="${v.x1}%" y1="${v.y1}%" x2="${v.x2}%" y2="${v.y2}%"${marker}/>`:'';
   const hit=draft||len<=3?'':`<line data-i="${i}" class="line-hit" x1="${v.x1}%" y1="${v.y1}%" x2="${v.x2}%" y2="${v.y2}%"/>`;return `<g>${visual}${hit}</g>`;
 }
 function renderLines(){let html=defs+lines.map((l,i)=>lineMarkup(l,i)).join('');if(lineDraft)html+=lineMarkup(lineDraft,-1,true);svg.innerHTML=html}
@@ -68,7 +71,7 @@ table.addEventListener('pointerdown',e=>{
   if(mode==='erase'&&ball){removeBall(ball.dataset.n);return}
   if(mode==='line'||mode==='plain'){
     const p=point(e),startBall=nearestBall(p,42),a=startBall?state[startBall]:p;lineStart={...p,ball:startBall};
-    lineDraft={x1:a.x,y1:a.y,x2:p.x,y2:p.y,type:mode==='plain'?'plain':'arrow',startBall:startBall||null,endBall:null};table.setPointerCapture(e.pointerId);renderLines();return;
+    lineDraft={x1:a.x,y1:a.y,x2:p.x,y2:p.y,type:mode==='plain'?'plain':'arrow',startBall:startBall||null,endBall:null,color:ballColor(startBall)};table.setPointerCapture(e.pointerId);renderLines();return;
   }
   if(mode==='move'){selectedLine=-1;renderLines()}
 });
@@ -95,7 +98,7 @@ table.addEventListener('pointerup',()=>{
   if(lineStart){if(lineDraft&&lineLengthPx(lineDraft)>8){lines.push({...lineDraft});selectedLine=lines.length-1;markUnsaved()}lineStart=null;lineDraft=null;setMode('move',false);renderLines();return}
   if(draggingLine){
     const l=lines[draggingLine.i];
-    if(draggingLine.kind==='start'){const n=nearestBall({x:l.x1,y:l.y1},42,l.endBall);if(n){l.startBall=n;l.x1=state[n].x;l.y1=state[n].y}}
+    if(draggingLine.kind==='start'){const n=nearestBall({x:l.x1,y:l.y1},42,l.endBall);if(n){l.startBall=n;l.x1=state[n].x;l.y1=state[n].y;l.color=ballColor(n)}else l.color=ballColor(null)}
     else if(draggingLine.kind==='end'){const n=nearestBall({x:l.x2,y:l.y2},42,l.startBall);if(n){l.endBall=n;l.x2=state[n].x;l.y2=state[n].y}}
     draggingLine=null;if(lineLengthPx(l)<5)removeLine(selectedLine);else{renderLines();markUnsaved()}
   }
@@ -127,6 +130,7 @@ document.querySelector('#resetBtn').onclick=clearTable;
 
 function roundedRect(ctx,x,y,w,h,r){ctx.beginPath();ctx.roundRect(x,y,w,h,r)}
 function drawCanvasBall(ctx,n,x,y,r){
+  if(n==='ghost'){ctx.save();ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.setLineDash([4,3]);ctx.beginPath();ctx.arc(x,y,r-1,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);ctx.restore();return}
   ctx.save();ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.clip();const base=ctx.createRadialGradient(x-r*.38,y-r*.42,r*.04,x,y,r*1.12);
   if(n==='cue'){base.addColorStop(0,'#fff');base.addColorStop(.72,'#fffdf2');base.addColorStop(1,'#b9b28f')}
   else if(Number(n)>8){base.addColorStop(0,'#fff');base.addColorStop(.72,'#fffdf4');base.addColorStop(1,'#aaa58e')}
@@ -138,7 +142,7 @@ function drawCanvasBall(ctx,n,x,y,r){
 }
 function drawExportLine(ctx,l,clothX,clothY,clothW,clothH){
   const v=visibleEnds(l),x1=clothX+clothW*v.x1/100,y1=clothY+clothH*v.y1/100,x2=clothX+clothW*v.x2/100,y2=clothY+clothH*v.y2/100,dx=x2-x1,dy=y2-y1,len=Math.hypot(dx,dy);if(len<3)return;
-  ctx.strokeStyle='#fff';ctx.fillStyle='#fff';ctx.lineWidth=2;ctx.setLineDash(l.type==='plain'?[]:[8,5]);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.setLineDash([]);
+  const color=l.color||ballColor(l.startBall);ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=2;ctx.setLineDash(l.type==='plain'?[]:[8,5]);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.setLineDash([]);
   if(l.type!=='plain'&&len>14){const a=Math.atan2(dy,dx);ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-12*Math.cos(a-.48),y2-12*Math.sin(a-.48));ctx.lineTo(x2-12*Math.cos(a+.48),y2-12*Math.sin(a+.48));ctx.closePath();ctx.fill()}
 }
 function drawWoodFrame(ctx,w,h){
@@ -149,20 +153,17 @@ function drawWoodFrame(ctx,w,h){
   roundedRect(ctx,3.5,3.5,w-7,h-7,13);ctx.strokeStyle='#b9633c';ctx.lineWidth=2;ctx.stroke();ctx.restore();
 }
 function downloadImage(){
-  const frameRect=tableFrame.getBoundingClientRect(),clothRect=table.getBoundingClientRect(),scale=3,width=frameRect.width,frameH=frameRect.height,extra=tip?76:0,height=frameH+extra;
+  const frameRect=tableFrame.getBoundingClientRect(),clothRect=table.getBoundingClientRect(),scale=3,frameW=frameRect.width,frameH=frameRect.height,extra=86,width=frameW+extra,height=frameH;
   const c=document.createElement('canvas'),ctx=c.getContext('2d');c.width=Math.round(width*scale);c.height=Math.round(height*scale);ctx.scale(scale,scale);
   const cx=clothRect.left-frameRect.left,cy=clothRect.top-frameRect.top,cw=clothRect.width,ch=clothRect.height;
-  drawWoodFrame(ctx,width,frameH);
+  drawWoodFrame(ctx,frameW,frameH);
   ctx.save();roundedRect(ctx,cx,cy,cw,ch,2);ctx.clip();const clothGrad=ctx.createLinearGradient(cx,0,cx+cw,0);clothGrad.addColorStop(0,'#08ae7d');clothGrad.addColorStop(1,'#08aa7a');ctx.fillStyle=clothGrad;ctx.fillRect(cx,cy,cw,ch);ctx.strokeStyle='#ffffff52';ctx.lineWidth=.45;ctx.setLineDash([1.5,1.5]);
   for(let i=1;i<4;i++){ctx.beginPath();ctx.moveTo(cx+cw*i/4,cy);ctx.lineTo(cx+cw*i/4,cy+ch);ctx.stroke()}for(let i=1;i<8;i++){ctx.beginPath();ctx.moveTo(cx,cy+ch*i/8);ctx.lineTo(cx+cw,cy+ch*i/8);ctx.stroke()}ctx.setLineDash([]);lines.forEach(l=>drawExportLine(ctx,l,cx,cy,cw,ch));Object.entries(state).forEach(([n,p])=>drawCanvasBall(ctx,n,cx+cw*p.x/100,cy+ch*p.y/100,10));ctx.restore();
-  ctx.fillStyle='#fff';for(let i=1;i<=3;i++)for(const y of [10,frameH-10]){ctx.beginPath();ctx.arc(52+(width-104)*(i-.5)/3,y,2,0,Math.PI*2);ctx.fill()}for(let i=1;i<=7;i++)for(const x of [10,width-10]){ctx.beginPath();ctx.arc(x,52+(frameH-104)*(i-.5)/7,2,0,Math.PI*2);ctx.fill()}
-  ctx.fillStyle='#020202';ctx.strokeStyle='#49180f';ctx.lineWidth=2;for(const [x,y] of [[18,18],[width-18,18],[18,frameH-18],[width-18,frameH-18]]){ctx.save();ctx.translate(x,y);ctx.rotate(Math.PI/4);roundedRect(ctx,-10,-10,20,20,7);ctx.fill();ctx.stroke();ctx.restore()}ctx.beginPath();ctx.ellipse(7.5,frameH/2,7.5,14,0,Math.PI/2,Math.PI*1.5);ctx.fill();ctx.beginPath();ctx.ellipse(width-7.5,frameH/2,7.5,14,0,-Math.PI/2,Math.PI/2);ctx.fill();
-  if(tip){
-    const fy=frameH;ctx.fillStyle='#151b20';roundedRect(ctx,0,fy,width,extra,0);ctx.save();ctx.beginPath();ctx.moveTo(0,fy);ctx.lineTo(width,fy);ctx.lineTo(width,fy+extra-16);ctx.quadraticCurveTo(width,fy+extra,width-16,fy+extra);ctx.lineTo(16,fy+extra);ctx.quadraticCurveTo(0,fy+extra,0,fy+extra-16);ctx.closePath();ctx.fill();ctx.restore();
-    ctx.fillStyle='#d5aa58';ctx.font='bold 13px system-ui';ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText('撞点',14,fy+extra/2);
-    const bx=width-40,by=fy+extra/2,br=19;drawCanvasBall(ctx,'cue',bx,by,br);
-    ctx.beginPath();ctx.arc(bx-br+tip.x*br*2,by-br+tip.y*br*2,2.8,0,Math.PI*2);ctx.fillStyle='#e6382e';ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=1;ctx.stroke();
-  }
+  ctx.fillStyle='#fff';for(let i=1;i<=3;i++)for(const y of [10,frameH-10]){ctx.beginPath();ctx.arc(52+(frameW-104)*(i-.5)/3,y,2,0,Math.PI*2);ctx.fill()}for(let i=1;i<=7;i++)for(const x of [10,frameW-10]){ctx.beginPath();ctx.arc(x,52+(frameH-104)*(i-.5)/7,2,0,Math.PI*2);ctx.fill()}
+  ctx.fillStyle='#020202';ctx.strokeStyle='#49180f';ctx.lineWidth=2;for(const [x,y] of [[18,18],[frameW-18,18],[18,frameH-18],[frameW-18,frameH-18]]){ctx.save();ctx.translate(x,y);ctx.rotate(Math.PI/4);roundedRect(ctx,-10,-10,20,20,7);ctx.fill();ctx.stroke();ctx.restore()}ctx.beginPath();ctx.ellipse(7.5,frameH/2,7.5,14,0,Math.PI/2,Math.PI*1.5);ctx.fill();ctx.beginPath();ctx.ellipse(frameW-7.5,frameH/2,7.5,14,0,-Math.PI/2,Math.PI/2);ctx.fill();
+  ctx.fillStyle='#151b20';ctx.fillRect(frameW,0,extra,frameH);ctx.fillStyle='#d5aa58';ctx.font='bold 13px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('撞点',frameW+extra/2,24);
+  const bx=frameW+extra/2,by=67,br=27;drawCanvasBall(ctx,'cue',bx,by,br);
+  if(tip){ctx.beginPath();ctx.arc(bx-br+tip.x*br*2,by-br+tip.y*br*2,3.5,0,Math.PI*2);ctx.fillStyle='#e6382e';ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=1;ctx.stroke()}
   const a=document.createElement('a');a.download=(document.querySelector('#title').value||'ビリヤード配置')+'.png';a.href=c.toDataURL('image/png');a.click();
 }
 document.querySelector('#imageBtn').onclick=downloadImage;
