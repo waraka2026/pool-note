@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#101418" />
   <title>ビリヤード配置図メーカー｜球配置・ショットライン作成</title>
   <meta name="description" content="ビリヤードの球配置とショットラインをブラウザで作成・保存できる無料の配置図メーカー。手球と1〜15番の球に対応。" />
-  <link rel="stylesheet" href="styles.css?v=19" />
+  <link rel="stylesheet" href="styles.css?v=20" />
 </head>
 <body>
   <main class="app">
@@ -130,7 +130,8 @@
       <h2>配置の作り方</h2>
       <ol>
         <li><b>球を置く</b><span>右の2列から球をタップして、台の上でドラッグ。点線の球はイメージボールです</span></li>
-        <li><b>矢印・線を描く</b><span>色は描き始めた球と同じ色が基本です。必要なときだけ色パネルで球色や自由色に変更できます</span></li>
+        <li><b>矢印・線を描く</b><span>矢印・線ボタンは、描き始めた球と同じ色で描画します。色を変えるときだけ「カラー」を使います</span></li>
+        <li><b>色を指定して描く</b><span>「カラー」を開き、矢印か線を選んでから、1〜15番の球色または自由色を選べます</span></li>
         <li><b>移動・追従を外す</b><span>線の中央をドラッグで移動。先端をつかむと球への追従が外れ、その端を自由に動かせます</span></li>
         <li><b>削除</b><span>消去ボタンを選ばなくても、球・線・配置したメモをダブルクリックすると削除できます</span></li>
         <li><b>撞点を記録</b><span>台の右にある大きい手玉をタップし、赤い点を好きな位置へドラッグできます</span></li>
@@ -145,6 +146,10 @@
         <div><b>矢印・線の色</b><small>基本は描き始めた球と同じ色</small></div>
         <button id="lineColorClose" class="color-panel-close" type="button" aria-label="色パネルを閉じる">× 閉じる</button>
       </div>
+      <div class="color-line-types" aria-label="描画の種類">
+        <button id="colorArrowBtn" type="button">↗ 矢印</button>
+        <button id="colorPlainBtn" type="button">╱ 線</button>
+      </div>
       <button id="autoColorBtn" class="auto-color-btn" type="button">球の色に合わせる（デフォルト）</button>
       <div id="lineColorSwatches" class="line-color-swatches"></div>
       <label class="custom-color">その他の色（自由に選ぶ） <input id="lineColorPicker" type="color" value="#ff2f92" /></label>
@@ -157,6 +162,8 @@
 <span>↗</span>矢印</button>
       <button data-mode="plain">
 <span>╱</span>線</button>
+      <button id="colorBtn">
+<span>●</span>カラー</button>
       <button data-mode="erase">
 <span>⌫</span>消去</button>
       <button id="memoBtn">
@@ -191,7 +198,7 @@
 <div id="savedList">
 </div>
 </dialog>
-  <script src="app.js?v=19">
+  <script src="app.js?v=20">
 </script>
 </body>
 </html>
