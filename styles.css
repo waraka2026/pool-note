@@ -211,6 +211,20 @@ textarea{width:100%;height:130px;border:1px solid #3b4850;border-radius:12px;bac
 /* スマホ横向き専用：メニュー球の上に横一列配置 */
 @media(max-width:640px) and (orientation:landscape){.table-and-tip{position:relative}.editor-sidebar{position:absolute;bottom:100%;right:0;left:auto;top:auto;flex:0 0 auto;width:auto;max-width:calc(100% - 70px);display:flex;flex-direction:row;align-items:center;gap:4px;padding:4px 6px;background:#192026f7;border:1px solid #46525a;border-radius:8px;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;margin-bottom:6px}.editor-sidebar .orientation-control{flex:0 0 auto;width:auto;display:flex;flex-direction:row;gap:2px;padding:0}.editor-sidebar .orientation-control>div{display:flex;flex-direction:row;align-items:center;gap:2px;flex:0 0 auto}.editor-sidebar .orientation-control span{display:none}.editor-sidebar .orientation-control button{padding:4px 5px;font-size:10px;height:28px;width:auto}.editor-sidebar .tools{flex:1;width:auto;margin:0;position:static}.editor-sidebar .tools-row{display:flex;flex-direction:row;gap:2px;border-top:none;border-left:1px solid #39434b;padding:0 0 0 4px;margin:0;flex:1}.editor-row{display:flex;flex-direction:row;align-items:center;justify-content:flex-start;gap:2px;width:auto}.editor-row .tool-help{display:none}.editor-row button{flex:0 0 28px;width:28px;height:28px;padding:3px;font-size:11px}.editor-row button svg{width:15px;height:15px}}
 
+/* 台が横向きの時もメニューを上に配置 */
+.board-column.landscape>.table-and-tip{position:relative}
+.board-column.landscape .editor-sidebar{position:absolute;bottom:100%;right:0;left:auto;top:auto;flex:0 0 auto;width:auto;max-width:calc(100% - 70px);display:flex;flex-direction:row;align-items:center;gap:4px;padding:4px 6px;background:#192026f7;border:1px solid #46525a;border-radius:8px;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;margin-bottom:6px}
+.board-column.landscape .editor-sidebar .orientation-control{flex:0 0 auto;width:auto;display:flex;flex-direction:row;gap:2px;padding:0}
+.board-column.landscape .editor-sidebar .orientation-control>div{display:flex;flex-direction:row;align-items:center;gap:2px;flex:0 0 auto}
+.board-column.landscape .editor-sidebar .orientation-control span{display:none}
+.board-column.landscape .editor-sidebar .orientation-control button{padding:4px 5px;font-size:10px;height:28px;width:auto}
+.board-column.landscape .editor-sidebar .tools{flex:1;width:auto;margin:0;position:static}
+.board-column.landscape .editor-sidebar .tools-row{display:flex;flex-direction:row;gap:2px;border-top:none;border-left:1px solid #39434b;padding:0 0 0 4px;margin:0;flex:1}
+.board-column.landscape .editor-row{display:flex;flex-direction:row;align-items:center;justify-content:flex-start;gap:2px;width:auto}
+.board-column.landscape .editor-row .tool-help{display:none}
+.board-column.landscape .editor-row button{flex:0 0 28px;width:28px;height:28px;padding:3px;font-size:11px}
+.board-column.landscape .editor-row button svg{width:15px;height:15px}
+
 
 /* タブレット以上：デフォルトレイアウト保持 */
 @media(min-width:768px){.table-and-tip{position:static}.editor-sidebar{flex:0 0 116px;width:116px;overflow-y:auto;scrollbar-width:thin;padding:4px 2px 4px 0;position:static}.editor-sidebar .orientation-control{width:100%;padding:0;gap:6px}.editor-sidebar .tools{width:100%;margin:10px 0 0;position:static}.editor-sidebar .tools-row{display:flex;flex-direction:column;gap:6px;border-top:1px solid #39434b;padding:10px 0 0}.editor-row{display:flex;align-items:center;justify-content:flex-end;gap:6px;width:100%}.editor-row .tool-help{flex:1;color:var(--muted);font-size:11px;line-height:1.35;text-align:right;white-space:normal}.editor-row button{display:grid;place-items:center;flex:0 0 38px;width:38px;height:38px;padding:7px;border:1px solid #56636b;border-radius:9px;background:#20282e;color:#fff;cursor:pointer;font-size:15px;font-weight:800}.editor-row button svg{width:22px;height:22px}.editor-row button.active{border-color:var(--gold);color:var(--gold);background:#d5aa5822}.editor-row button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}.editor-row button.save{background:#fff;color:#151b20}}
