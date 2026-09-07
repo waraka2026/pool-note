@@ -284,3 +284,105 @@ textarea{width:100%;height:130px;border:1px solid #3b4850;border-radius:12px;bac
   .editor-sidebar .editor-row button{flex:0 0 42px;width:42px;height:42px}
   .editor-sidebar.menu-collapsed{width:68px!important;display:block!important}
 }
+
+
+/* Keep the default menu beside the table; expanded tools use two columns. */
+.table-and-tip{align-items:flex-start}
+.editor-sidebar,
+.board-column.landscape .editor-sidebar{
+  position:static;
+  inset:auto;
+  transform:none;
+  flex:0 0 clamp(132px,34vw,170px);
+  width:clamp(132px,34vw,170px)!important;
+  max-width:170px;
+  display:block;
+  padding:9px;
+  border-radius:18px;
+  overflow-y:auto;
+  overflow-x:hidden;
+}
+.editor-sidebar .menu-toggle-btn,
+.board-column.landscape .editor-sidebar .menu-toggle-btn{
+  display:flex;
+  width:48px;height:48px;
+  margin:0 auto 8px;
+  border-radius:50%;
+}
+.editor-sidebar:not(.menu-collapsed) .menu-toggle-btn small{display:none}
+.editor-sidebar .orientation-control,
+.board-column.landscape .editor-sidebar .orientation-control{
+  width:100%;
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:6px;
+  padding:0;
+}
+.editor-sidebar .orientation-control>div,
+.board-column.landscape .editor-sidebar .orientation-control>div,
+.editor-sidebar .tools-row,
+.board-column.landscape .editor-sidebar .tools-row{
+  display:contents;
+}
+.editor-sidebar .tools,
+.board-column.landscape .editor-sidebar .tools{
+  width:100%;
+  margin:8px 0 0;
+}
+.editor-sidebar .tools-row,
+.board-column.landscape .editor-sidebar .tools-row{
+  border:0;
+  padding:0;
+}
+.editor-sidebar .tools:after{
+  content:"";
+  display:block;
+}
+.editor-sidebar .tools{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:7px 5px;
+  padding-top:8px;
+  border-top:1px solid #39434b;
+}
+.editor-sidebar .editor-row,
+.board-column.landscape .editor-sidebar .editor-row{
+  width:auto;
+  min-width:0;
+  display:flex;
+  flex-direction:column-reverse;
+  justify-content:flex-end;
+  gap:3px;
+}
+.editor-sidebar .editor-row .tool-help,
+.board-column.landscape .editor-sidebar .editor-row .tool-help{
+  display:block;
+  width:100%;
+  min-height:26px;
+  color:var(--muted);
+  font-size:9px;
+  line-height:1.25;
+  text-align:center;
+}
+.editor-sidebar .editor-row button,
+.board-column.landscape .editor-sidebar .editor-row button{
+  flex:0 0 42px;
+  width:42px;height:42px;
+  margin:auto;
+}
+.editor-sidebar.menu-collapsed,
+.board-column.landscape .editor-sidebar.menu-collapsed{
+  position:static;
+  flex-basis:68px;
+  width:68px!important;
+  height:68px;
+  padding:4px;
+  border-radius:50%;
+}
+.editor-sidebar.menu-collapsed .menu-toggle-btn{margin:0}
+.editor-sidebar.menu-detached{position:fixed!important;inset:auto!important;transform:none!important;z-index:20}
+@media(max-width:420px){
+  .editor-sidebar,.board-column.landscape .editor-sidebar{flex-basis:128px;width:128px!important;padding:7px}
+  .editor-sidebar .editor-row button,.board-column.landscape .editor-sidebar .editor-row button{width:38px;height:38px;flex-basis:38px;padding:6px}
+  .editor-sidebar .editor-row .tool-help,.board-column.landscape .editor-sidebar .editor-row .tool-help{font-size:8px}
+}
