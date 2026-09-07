@@ -225,3 +225,62 @@ textarea{width:100%;height:130px;border:1px solid #3b4850;border-radius:12px;bac
 
 /* タブレット以上：デフォルトレイアウト保持 */
 @media(min-width:768px){.table-and-tip{position:static}.editor-sidebar{flex:0 0 136px;width:136px;overflow-y:auto;scrollbar-width:thin;padding:4px 2px 4px 0;position:static}.editor-sidebar .orientation-control{width:100%;padding:0;gap:6px}.editor-sidebar .tools{width:100%;margin:10px 0 0;position:static}.editor-sidebar .tools-row{display:flex;flex-direction:column;gap:6px;border-top:1px solid #39434b;padding:10px 0 0}.editor-row{display:flex;align-items:center;justify-content:flex-end;gap:6px;width:100%}.editor-row .tool-help{flex:1;color:var(--muted);font-size:11px;line-height:1.35;text-align:right;white-space:normal}.editor-row button{display:grid;place-items:center;flex:0 0 44px;width:44px;height:44px;padding:8px;border:1px solid #56636b;border-radius:9px;background:#20282e;color:#fff;cursor:pointer;font-size:16px;font-weight:800}.editor-row button svg{width:26px;height:26px}.editor-row button.active{border-color:var(--gold);color:var(--gold);background:#d5aa5822}.editor-row button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}.editor-row button.save{background:#fff;color:#151b20}}
+
+
+/* Draggable expandable floating editor menu */
+.editor-sidebar{
+  background:#192026f2;
+  border:1px solid #46525a;
+  border-radius:18px;
+  padding:10px;
+  box-shadow:0 14px 34px #0009;
+  backdrop-filter:blur(12px);
+  overflow:visible;
+  transition:width .2s ease,border-radius .2s ease;
+}
+.menu-toggle-btn{
+  order:99;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:1px;
+  width:58px;
+  height:58px;
+  margin:8px 0 0 auto;
+  padding:5px;
+  border:1px solid #d5aa5888;
+  border-radius:50%;
+  background:#20282e;
+  color:var(--gold);
+  box-shadow:0 8px 20px #0008;
+  cursor:grab;
+}
+.menu-toggle-btn span{font-size:23px;line-height:1}
+.menu-toggle-btn small{font-size:9px;font-weight:800;color:#f7f3ea}
+.editor-sidebar.menu-collapsed{
+  width:68px!important;
+  height:68px;
+  padding:4px;
+  border-radius:50%;
+  overflow:hidden!important;
+}
+.editor-sidebar.menu-collapsed>.orientation-control,
+.editor-sidebar.menu-collapsed>.tools{display:none!important}
+.editor-sidebar.menu-collapsed .menu-toggle-btn{
+  width:58px;height:58px;margin:0;
+}
+.editor-sidebar:not(.menu-collapsed) .menu-toggle-btn span{font-size:27px}
+.editor-sidebar:not(.menu-collapsed) .menu-toggle-btn small{display:none}
+.editor-sidebar:not(.menu-collapsed){max-height:calc(100dvh - 16px);overflow-y:auto}
+@media(max-width:767px){
+  .editor-sidebar{width:128px!important;display:flex!important;flex-direction:column!important;align-items:stretch!important}
+  .editor-sidebar .orientation-control{display:flex;flex-direction:column}
+  .editor-sidebar .orientation-control>div{display:flex}
+  .editor-sidebar .orientation-control span,.editor-sidebar .editor-row .tool-help{display:block}
+  .editor-sidebar .tools{width:100%;margin:8px 0 0}
+  .editor-sidebar .tools-row{display:flex;flex-direction:column;border-left:0;border-top:1px solid #39434b;padding:8px 0 0}
+  .editor-sidebar .editor-row{display:flex;width:100%;justify-content:flex-end}
+  .editor-sidebar .editor-row button{flex:0 0 42px;width:42px;height:42px}
+  .editor-sidebar.menu-collapsed{width:68px!important;display:block!important}
+}
