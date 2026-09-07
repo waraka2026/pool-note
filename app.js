@@ -66,14 +66,14 @@ function setOrientation(next,rotateContent=true,mark=true){
   portraitBtn.setAttribute('aria-pressed',String(next==='portrait'));
   landscapeBtn.setAttribute('aria-pressed',String(next==='landscape'));
   render();
-  layoutTable();
+  layoutTable(true);
   if(mark)markUnsaved();
 }
 portraitBtn.onclick=()=>setOrientation('portrait');
 landscapeBtn.onclick=()=>setOrientation('landscape');
 
-const tableAndTip=document.querySelector('.table-and-tip'),orientationControlEl=document.querySelector('.orientation-control');
-function isNarrowScreen(){return window.innerWidth<=640}
+const tableAndTip=document.querySelector('.table-and-tip'),editorSidebar=document.querySelector('.editor-sidebar'),tableWrap=document.querySelector('.table-wrap');
+let lastLayoutViewport='';
 function updateSideLayout(){
   if(orientation==='landscape'){
     if(trayEl.parentElement!==boardColumn)boardColumn.append(trayEl);
@@ -82,8 +82,8 @@ function updateSideLayout(){
   }
 }
 function availableTableWidth(){
-  const total=boardColumn.clientWidth,ocW=orientationControlEl.getBoundingClientRect().width,scW=sideControls.getBoundingClientRect().width;
-  return Math.max(140,total-ocW-scW-20);
+  const total=boardColumn.clientWidth,ocW=editorSidebar.getBoundingClientRect().width,scW=sideControls.getBoundingClientRect().width,gap=parseFloat(getComputedStyle(tableAndTip).gap)||0;
+  return Math.max(100,total-ocW-scW-gap*2);
 }
 function availableTableHeight(){
   const vh=document.documentElement.clientHeight,top=tableAndTip.getBoundingClientRect().top+window.scrollY;
@@ -91,18 +91,24 @@ function availableTableHeight(){
   if(orientation==='landscape')reserve+=trayEl.getBoundingClientRect().height+12;
   return Math.max(140,vh-top-reserve);
 }
-function layoutTable(){
-  // Pinch zoom changes the visual viewport, not the board geometry.
-  if(window.visualViewport&&Math.abs(window.visualViewport.scale-1)>.01)return;
+function layoutTable(force=false){
+  const viewport=`${document.documentElement.clientWidth}:${document.documentElement.clientHeight}`;
+  // Only a pinch on the same layout viewport is ignored. Rotation must always
+  // update the entire board, even while the page remains zoomed in.
+  if(force!==true&&viewport===lastLayoutViewport&&window.visualViewport&&Math.abs(window.visualViewport.scale-1)>.01)return;
+  lastLayoutViewport=viewport;
   updateSideLayout();
-  const wRatio=orientation==='landscape'?2:1,hRatio=orientation==='landscape'?1:2,maxUnit=isNarrowScreen()?520:310;
-  let unit=Math.min(availableTableWidth()/wRatio,availableTableHeight()/hRatio,maxUnit);
-  unit=Math.max(unit,130);
-  tableFrame.style.width=unit*wRatio+'px';
-  tableFrame.style.height=unit*hRatio+'px';
+  const wRatio=orientation==='landscape'?2:1,hRatio=orientation==='landscape'?1:2;
+  const unit=Math.max(50,Math.min(availableTableWidth()/wRatio,availableTableHeight()/hRatio,310));
   const ratio=unit/310;
-  tableFrame.style.padding=orientation==='landscape'?`${18*ratio}px ${20*ratio}px`:`${20*ratio}px ${18*ratio}px`;
-  tableFrame.style.setProperty('--ball-size',20*ratio+'px');
+  // A single canonical table is scaled as a whole: wood, pockets, diamonds,
+  // cloth, balls, lines and notes retain exactly the desktop proportions.
+  tableFrame.style.width=310*wRatio+'px';
+  tableFrame.style.height=310*hRatio+'px';
+  tableFrame.style.transform=`scale(${ratio})`;
+  tableWrap.style.width=unit*wRatio+'px';
+  tableWrap.style.height=unit*hRatio+'px';
+  editorSidebar.style.maxHeight=Math.max(180,availableTableHeight())+'px';
   renderLines();
 }
 window.addEventListener('resize',layoutTable);
@@ -403,6 +409,10 @@ function drawWoodFrame(ctx,w,h){
   roundedRect(ctx,3.5,3.5,w-7,h-7,13);ctx.strokeStyle='#b9633c';ctx.lineWidth=2;ctx.stroke();ctx.restore();
 }
 function downloadImage(){
+  // Export the same canonical design at full resolution on every device.
+  const displayTransform=tableFrame.style.transform;
+  tableFrame.style.transform='none';
+  try{
   const frameRect=tableFrame.getBoundingClientRect(),clothRect=table.getBoundingClientRect(),scale=3,frameW=frameRect.width,frameH=frameRect.height,extra=86,width=frameW+extra,height=frameH;
   const c=document.createElement('canvas'),ctx=c.getContext('2d');c.width=Math.round(width*scale);c.height=Math.round(height*scale);ctx.scale(scale,scale);
   const cx=clothRect.left-frameRect.left,cy=clothRect.top-frameRect.top,cw=clothRect.width,ch=clothRect.height;
@@ -416,6 +426,7 @@ function downloadImage(){
   const bx=frameW+extra/2,by=67,br=27;drawCanvasBall(ctx,'cue',bx,by,br);
   if(tip){ctx.beginPath();ctx.arc(bx-br+tip.x*br*2,by-br+tip.y*br*2,3.5,0,Math.PI*2);ctx.fillStyle='#e6382e';ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=1;ctx.stroke()}
   const a=document.createElement('a');a.download=(currentTitle||'ビリヤード配置')+'.png';a.href=c.toDataURL('image/png');a.click();
+  }finally{tableFrame.style.transform=displayTransform}
 }
 function formatSavedTime(value){if(!value)return'';if(/^\d{4}\/\d{1,2}\/\d{1,2}$/.test(String(value)))return `${value}（時刻記録なし）`;const d=new Date(value);if(Number.isNaN(d.getTime()))return String(value);return d.toLocaleString('ja-JP',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})}
 document.querySelector('#saveBtn').onclick=()=>{
@@ -423,7 +434,7 @@ document.querySelector('#saveBtn').onclick=()=>{
   const index=currentSaveId===null?-1:saved.findIndex(s=>String(s.id)===String(currentSaveId));
   if(index>=0){saved[index]={...saved[index],...data,createdAt:saved[index].createdAt||saved[index].date||now};label='上書き保存済み'}
   else{currentSaveId=Date.now();saved.unshift({id:currentSaveId,...data,createdAt:now,date:new Date().toLocaleDateString('ja-JP')})}
-  localStorage.setItem('poolNotes',JSON.stringify(saved.slice(0,30)));document.querySelector('#saveState').textContent=label;const btn=document.querySelector('#saveBtn');btn.innerHTML=`<span>✓</span>${label}`;setTimeout(()=>btn.innerHTML='<span>✓</span>保存',1400);
+  localStorage.setItem('poolNotes',JSON.stringify(saved.slice(0,30)));document.querySelector('#saveState').textContent=label;const help=document.querySelector('#saveHelp');help.textContent='保存済み';setTimeout(()=>help.textContent='配置を保存',1400);
 };
 function savedTimestamp(s){const time=Date.parse(s.updatedAt||s.createdAt||s.date||'');return Number.isNaN(time)?Number(s.id)||0:time}
 function readSaved(){return JSON.parse(localStorage.getItem('poolNotes')||'[]')}

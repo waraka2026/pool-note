@@ -162,8 +162,6 @@ textarea{width:100%;height:130px;border:1px solid #3b4850;border-radius:12px;bac
 .topbar h1{font-size:21px}
 .primary-menu{margin-top:10px}
 .primary-menu button{padding-left:9px;padding-right:9px;font-size:13px}
-.table{width:260px;height:520px}
-.board-column.landscape .table{width:520px;height:260px}
 .table-and-tip{gap:8px}
 .orientation-control{width:44px;flex-basis:44px}
 .orientation-control span{font-size:10px}
@@ -190,4 +188,23 @@ textarea{width:100%;height:130px;border:1px solid #3b4850;border-radius:12px;bac
 .tools-row>.save{padding:7px 8px;border-radius:6px}
 .tools .color-swatch{width:32px;min-width:0;height:32px;padding:0;border-radius:50%;justify-self:center;flex:none}
 @media(max-width:390px){.tools-row{gap:0}.tools-row>button{font-size:12px;padding:7px 3px}.tools-row>button>span{font-size:12px}.tools-row>.tool-separator{font-size:10px}.line-color-swatches{gap:7px 3px}.tools .color-swatch{width:28px;height:28px}}
+
+/* Editing controls live beside the board, with explanations to their left. */
+.table-and-tip{min-width:0}
+.table-wrap{flex:none;display:block}
+.table-wrap>.table{position:absolute;left:0;top:0;transform-origin:top left}
+.editor-sidebar{flex:0 0 116px;width:116px;overflow-y:auto;scrollbar-width:thin;padding:4px 2px 4px 0}
+.editor-sidebar .orientation-control{width:100%;padding:0;gap:6px}
+.editor-sidebar .tools{width:100%;margin:10px 0 0;position:static}
+.editor-sidebar .tools-row{display:flex;flex-direction:column;gap:6px;border-top:1px solid #39434b;padding:10px 0 0}
+.editor-row{display:flex;align-items:center;justify-content:flex-end;gap:6px;width:100%}
+.editor-row .tool-help{flex:1;color:var(--muted);font-size:11px;line-height:1.35;text-align:right;white-space:normal}
+.editor-row button{display:grid;place-items:center;flex:0 0 38px;width:38px;height:38px;padding:7px;border:1px solid #56636b;border-radius:9px;background:#20282e;color:#fff;cursor:pointer;font-size:15px;font-weight:800}
+.editor-row button svg{width:22px;height:22px}
+.editor-row button.active{border-color:var(--gold);color:var(--gold);background:#d5aa5822}
+.editor-row button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.editor-row button.save{background:#fff;color:#151b20}
+.line-color-panel{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);margin:0;width:min(calc(100vw - 24px),420px);max-height:calc(100dvh - 24px);overflow-y:auto;z-index:30}
+@media(max-width:640px){.editor-sidebar{flex-basis:104px;width:104px}.editor-row{gap:4px}.editor-row .tool-help{font-size:10px}.editor-row button{flex-basis:36px;width:36px;height:36px}.editor-sidebar .tools-row,.editor-sidebar .orientation-control{gap:5px}}
+@media(max-height:500px){.app{padding-top:8px;padding-bottom:8px}.eyebrow{display:none}.topbar h1{font-size:18px}.primary-menu{margin-top:4px}.primary-menu button{padding-top:6px;padding-bottom:6px}.editor-sidebar{padding-top:1px;padding-bottom:1px}.editor-sidebar .tools{margin-top:2px}.editor-sidebar .tools-row{padding-top:2px;gap:2px}.editor-sidebar .orientation-control{gap:2px}.editor-row button{height:28px;padding:3px}.editor-sidebar .orientation-control button{padding:3px}.editor-row button svg{width:20px;height:20px}}
 

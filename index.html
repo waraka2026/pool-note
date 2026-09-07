@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#101418" />
   <title>ビリヤード配置図メーカー｜球配置・ショットライン作成</title>
   <meta name="description" content="ビリヤードの球配置とショットラインをブラウザで作成・保存できる無料の配置図メーカー。手球と1〜15番の球に対応。" />
-  <link rel="stylesheet" href="styles.css?v=41" />
+  <link rel="stylesheet" href="styles.css?v=42" />
 </head>
 <body>
   <main class="app">
@@ -23,6 +23,17 @@
       <small class="quick-help">球の削除：PCは右クリック／スマホは長押し</small>
     </nav>
 
+
+
+
+    <div class="workspace">
+    <div id="boardColumn" class="board-column portrait">
+    <div class="table-and-tip">
+    <aside class="editor-sidebar" aria-label="台の向きと編集ツール">
+      <div class="orientation-control" aria-label="台の向き">
+        <div class="editor-row"><span class="tool-help">縦向きの台</span><button id="portraitBtn" type="button" class="active" aria-pressed="true" aria-label="縦向き" title="縦向き">縦</button></div>
+        <div class="editor-row"><span class="tool-help">横向きの台</span><button id="landscapeBtn" type="button" aria-pressed="false" aria-label="横向き" title="横向き">横</button></div>
+      </div>
     <nav class="tools" aria-label="編集ツール">
       <span id="saveState" hidden>未保存</span>
       <section id="lineColorPanel" class="line-color-panel" hidden aria-label="矢印と線の設定">
@@ -44,35 +55,15 @@
         <label class="custom-color">その他の色（自由に選ぶ） <input id="lineColorPicker" type="color" value="#ff2f92" /></label>
       </section>
       <div class="tools-row">
-        <button data-mode="move" class="active">
-<span>↔</span>移動</button>
-        <span class="tool-separator" aria-hidden="true">｜</span>
-        <button id="groupMoveBtn" type="button" aria-pressed="false">
-<span>⛓</span>まとめて移動</button>
-        <span class="tool-separator" aria-hidden="true">｜</span>
-        <button id="drawBtn">
-<span>↗</span><b>矢印・線</b></button>
-        <span class="tool-separator" aria-hidden="true">｜</span>
-        <button data-mode="erase">
-<span>⌫</span>消去</button>
-        <span class="tool-separator" aria-hidden="true">｜</span>
-        <button id="memoBtn">
-<span>✎</span>メモ</button>
-        <span class="tool-separator" aria-hidden="true">｜</span>
-        <button id="saveBtn" class="save">
-<span>✓</span>保存</button>
+        <div class="editor-row"><span class="tool-help">球を動かす</span><button type="button" data-mode="move" class="active" title="移動" aria-label="移動"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 12h18M9 6l3-3 3 3M9 18l3 3 3-3M6 9l-3 3 3 3M18 9l3 3-3 3"/></svg></button></div>
+        <div class="editor-row"><span class="tool-help">全部まとめて</span><button type="button" id="groupMoveBtn" aria-pressed="false" title="まとめて移動" aria-label="まとめて移動"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="12" height="12" rx="2"/><rect x="9" y="9" width="12" height="12" rx="2"/></svg></button></div>
+        <div class="editor-row"><span class="tool-help">矢印・線</span><button type="button" id="drawBtn" title="矢印・線" aria-label="矢印・線"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20L20 4M10 4h10v10"/></svg></button></div>
+        <div class="editor-row"><span class="tool-help">線を消す</span><button type="button" data-mode="erase" title="消去" aria-label="消去"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13l9-9 8 8-9 9H9l-5-5zM9 8l8 8M12 21h9"/></svg></button></div>
+        <div class="editor-row"><span class="tool-help">メモを追加</span><button type="button" id="memoBtn" title="メモ" aria-label="メモ"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1-6L16 3l5 5-11 11-6 1zM13 6l5 5"/></svg></button></div>
+        <div class="editor-row"><span class="tool-help" id="saveHelp" aria-live="polite">配置を保存</span><button type="button" id="saveBtn" class="save" title="保存" aria-label="保存"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4L19 6"/></svg></button></div>
       </div>
     </nav>
-
-
-    <div class="workspace">
-    <div id="boardColumn" class="board-column portrait">
-    <div class="table-and-tip">
-    <div class="orientation-control" aria-label="台の向き">
-      <span>台の向き</span>
-      <button id="portraitBtn" type="button" class="active" aria-pressed="true">縦</button>
-      <button id="landscapeBtn" type="button" aria-pressed="false">横</button>
-    </div>
+    </aside>
     <section class="table-wrap" aria-label="ビリヤード台">
       <div id="table" class="table">
         <div class="rail top">
@@ -235,7 +226,8 @@
       <button id="guideCloseBtn" type="button" aria-label="閉じる">×</button>
     </div>
     <ol>
-      <li><b>台の向きを選ぶ</b><span>台の左にある「縦」「横」で切り替えます。配置した球・線・メモは消えず、向きに合わせて回転します</span></li>
+      <li><b>台の向きを選ぶ</b><span>台の左にある「縦」「横」で切り替えます。スマホを横向きにすると、台全体・穴・球・線・メモが一緒に横向きになります。PCでもスマホでも同じ台のデザインを拡大・縮小して表示します</span></li>
+      <li><b>左のアイコンで編集する</b><span>台の左に編集アイコンを縦に並べています。各アイコンの左側に短い説明があります。球の移動、まとめて移動、矢印・線、線の消去、メモ、保存をここから選べます</span></li>
       <li><b>球を置く</b><span>球の一覧をタップすると台に追加できます。一覧から置きたい場所へ直接ドラッグ＆ドロップもできます。球同士を近づけると、ぴったり接触する位置にそろいます。拡大・縮小しても位置関係は変わりません。手玉と点線のイメージボールは何個でも置けます</span></li>
       <li><b>矢印・線を描く</b><span>「矢印・線」を開いて種類と色を選びます。選んだ機能は、同じ種類をもう一度押して解除するまで続けて描けます</span></li>
       <li><b>色と太さを指定して描く</b><span>基本は描き始めた球と同じ色です。1〜15番の球色または自由色、線の太さも変更できます</span></li>
@@ -268,7 +260,7 @@
 <div id="savedList">
 </div>
 </dialog>
-  <script src="app.js?v=36"></script>
+  <script src="app.js?v=37"></script>
 </body>
 </html>
 
