@@ -65,6 +65,7 @@ function setOrientation(next,rotateContent=true,mark=true){
   landscapeBtn.classList.toggle('active',next==='landscape');
   portraitBtn.setAttribute('aria-pressed',String(next==='portrait'));
   landscapeBtn.setAttribute('aria-pressed',String(next==='landscape'));
+  resetMenuToDefault();
   render();
   layoutTable(true);
   if(mark)markUnsaved();
@@ -74,22 +75,30 @@ landscapeBtn.onclick=()=>setOrientation('landscape');
 
 const tableAndTip=document.querySelector('.table-and-tip'),editorSidebar=document.querySelector('.editor-sidebar'),tableWrap=document.querySelector('.table-wrap');
 let lastLayoutViewport='';
+function resetMenuToDefault(){
+  editorSidebar.classList.remove('menu-detached');
+  for(const prop of ['position','left','top','right','bottom','margin','transform','zIndex'])editorSidebar.style[prop]='';
+}
 function updateSideLayout(){
+  const detached=editorSidebar.classList.contains('menu-detached');
   if(orientation==='landscape'){
+    if(!detached&&editorSidebar.parentElement!==boardColumn)boardColumn.append(editorSidebar);
     if(trayEl.parentElement!==boardColumn)boardColumn.append(trayEl);
-  }else if(trayEl.parentElement!==sideControls){
-    sideControls.append(trayEl);
+    if(!detached&&editorSidebar.nextElementSibling!==trayEl)boardColumn.insertBefore(editorSidebar,trayEl);
+  }else{
+    if(!detached&&editorSidebar.parentElement!==tableAndTip)tableAndTip.insertBefore(editorSidebar,tableWrap);
+    if(trayEl.parentElement!==sideControls)sideControls.append(trayEl);
   }
 }
 function availableTableWidth(){
   const total=boardColumn.clientWidth,scW=sideControls.getBoundingClientRect().width,gap=parseFloat(getComputedStyle(tableAndTip).gap)||0;
-  const menuW=editorSidebar.style.position==='fixed'?0:editorSidebar.getBoundingClientRect().width+gap;
+  const menuW=editorSidebar.parentElement===tableAndTip&&editorSidebar.style.position!=='fixed'?editorSidebar.getBoundingClientRect().width+gap:0;
   return Math.max(100,total-scW-gap-menuW);
 }
 function availableTableHeight(){
   const vh=document.documentElement.clientHeight,top=tableAndTip.getBoundingClientRect().top+window.scrollY;
   let reserve=16;
-  if(orientation==='landscape')reserve+=trayEl.getBoundingClientRect().height+12;
+  if(orientation==='landscape')reserve+=trayEl.getBoundingClientRect().height+(editorSidebar.parentElement===boardColumn?editorSidebar.getBoundingClientRect().height+5:0)+12;
   return Math.max(140,vh-top-reserve);
 }
 function layoutTable(force=false){
