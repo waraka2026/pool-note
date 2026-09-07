@@ -83,7 +83,8 @@ function updateSideLayout(){
 }
 function availableTableWidth(){
   const total=boardColumn.clientWidth,scW=sideControls.getBoundingClientRect().width,gap=parseFloat(getComputedStyle(tableAndTip).gap)||0;
-  return Math.max(100,total-scW-gap);
+  const menuW=editorSidebar.style.position==='fixed'?0:editorSidebar.getBoundingClientRect().width+gap;
+  return Math.max(100,total-scW-gap-menuW);
 }
 function availableTableHeight(){
   const vh=document.documentElement.clientHeight,top=tableAndTip.getBoundingClientRect().top+window.scrollY;
@@ -472,7 +473,7 @@ function setMenuExpanded(expanded){
   menuToggleBtn.title=expanded?'編集メニューを閉じる':'編集メニューを開く';
   menuToggleBtn.querySelector('span').textContent=expanded?'×':'☰';
   menuToggleBtn.querySelector('small').textContent=expanded?'閉じる':'メニュー';
-  requestAnimationFrame(clampMenuPosition);
+  requestAnimationFrame(()=>{clampMenuPosition();layoutTable(true)});
 }
 menuToggleBtn.addEventListener('click',()=>setMenuExpanded(editorSidebar.classList.contains('menu-collapsed')));
 let menuDrag=null,suppressMenuClick=false;
@@ -485,22 +486,8 @@ function clampMenuPosition(){
   editorSidebar.style.left=left+'px';editorSidebar.style.top=top+'px';
 }
 function initMenuDrag(){
-  const startRect=editorSidebar.getBoundingClientRect();
-  editorSidebar.style.position='fixed';
-  editorSidebar.style.margin='0';
-  editorSidebar.style.right='auto';
-  editorSidebar.style.bottom='auto';
-  editorSidebar.style.transform='none';
-  editorSidebar.style.zIndex='20';
   editorSidebar.style.touchAction='none';
   editorSidebar.style.cursor='grab';
-  let left=startRect.left,top=startRect.top;
-  if(isPhoneSized()){
-    const help=document.querySelector('.quick-help');
-    if(help){const hRect=help.getBoundingClientRect();left=hRect.right+8;top=hRect.top}
-  }
-  editorSidebar.style.left=left+'px';editorSidebar.style.top=top+'px';
-  clampMenuPosition();
   // ドラッグでメニューを自由に移動（マウス・タッチ・ペン共通）。ボタンの通常クリックは維持し、
   // 一定量動いた場合のみドラッグとして扱い、その際は直後のクリックを無効化する。
   editorSidebar.addEventListener('click',e=>{if(suppressMenuClick){e.preventDefault();e.stopPropagation();suppressMenuClick=false}},true);
@@ -516,7 +503,18 @@ function initMenuDrag(){
       if(Math.hypot(dx,dy)<6)return;
       // ここで初めてポインタを捕捉する：最初から捕捉するとタップ時のクリックが
       // ボタンではなくeditorSidebar自身に再ターゲットされ、通常のボタン操作が効かなくなるため。
-      menuDrag.moved=true;editorSidebar.style.cursor='grabbing';editorSidebar.setPointerCapture(e.pointerId);
+      menuDrag.moved=true;
+      editorSidebar.classList.add('menu-detached');
+      editorSidebar.style.position='fixed';
+      editorSidebar.style.margin='0';
+      editorSidebar.style.right='auto';
+      editorSidebar.style.bottom='auto';
+      editorSidebar.style.transform='none';
+      editorSidebar.style.left=menuDrag.origLeft+'px';
+      editorSidebar.style.top=menuDrag.origTop+'px';
+      editorSidebar.style.cursor='grabbing';
+      editorSidebar.setPointerCapture(e.pointerId);
+      layoutTable(true);
     }
     e.preventDefault();
     editorSidebar.style.left=(menuDrag.origLeft+dx)+'px';
@@ -525,7 +523,7 @@ function initMenuDrag(){
   const endMenuDrag=e=>{
     if(!menuDrag||menuDrag.id!==e.pointerId)return;
     if(editorSidebar.hasPointerCapture(e.pointerId))editorSidebar.releasePointerCapture(e.pointerId);
-    if(menuDrag.moved){suppressMenuClick=true;clampMenuPosition()}
+    if(menuDrag.moved){suppressMenuClick=true;clampMenuPosition();layoutTable(true)}
     editorSidebar.style.cursor='grab';menuDrag=null;
   };
   editorSidebar.addEventListener('pointerup',endMenuDrag);
