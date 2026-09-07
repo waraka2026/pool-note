@@ -96,9 +96,9 @@ function availableTableWidth(){
   return Math.max(100,total-scW-gap-menuW);
 }
 function availableTableHeight(){
-  const vh=document.documentElement.clientHeight,top=tableAndTip.getBoundingClientRect().top+window.scrollY;
+  const vh=window.visualViewport?window.visualViewport.height:document.documentElement.clientHeight,top=Math.max(0,tableAndTip.getBoundingClientRect().top);
   let reserve=16;
-  if(orientation==='landscape')reserve+=trayEl.getBoundingClientRect().height+(editorSidebar.parentElement===boardColumn?editorSidebar.getBoundingClientRect().height+5:0)+12;
+  if(orientation==='landscape')reserve+=trayEl.getBoundingClientRect().height+(editorSidebar.parentElement===boardColumn?editorSidebar.getBoundingClientRect().height+3:0)+6;
   return Math.max(140,vh-top-reserve);
 }
 function layoutTable(force=false){
