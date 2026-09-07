@@ -82,8 +82,8 @@ function updateSideLayout(){
   }
 }
 function availableTableWidth(){
-  const total=boardColumn.clientWidth,ocW=editorSidebar.getBoundingClientRect().width,scW=sideControls.getBoundingClientRect().width,gap=parseFloat(getComputedStyle(tableAndTip).gap)||0;
-  return Math.max(100,total-ocW-scW-gap*2);
+  const total=boardColumn.clientWidth,scW=sideControls.getBoundingClientRect().width,gap=parseFloat(getComputedStyle(tableAndTip).gap)||0;
+  return Math.max(100,total-scW-gap);
 }
 function availableTableHeight(){
   const vh=document.documentElement.clientHeight,top=tableAndTip.getBoundingClientRect().top+window.scrollY;
@@ -110,6 +110,7 @@ function layoutTable(force=false){
   tableWrap.style.height=unit*hRatio+'px';
   editorSidebar.style.maxHeight=Math.max(180,availableTableHeight())+'px';
   renderLines();
+  clampMenuPosition();
 }
 window.addEventListener('resize',layoutTable);
 window.addEventListener('orientationchange',()=>setTimeout(layoutTable,50));
@@ -463,6 +464,63 @@ savedDialogEl.addEventListener('close',()=>setTopMenu(null));
 document.querySelector('#savedCardView').onclick=()=>{savedView='cards';renderSavedDialog()};
 document.querySelector('#savedListView').onclick=()=>{savedView='list';renderSavedDialog()};
 document.querySelector('#savedSort').onchange=e=>{savedSortOrder=e.target.value;renderSavedDialog()};
+let menuDrag=null,suppressMenuClick=false;
+function clampMenuPosition(){
+  if(editorSidebar.style.position!=='fixed')return;
+  const r=editorSidebar.getBoundingClientRect(),vw=window.visualViewport?window.visualViewport.width:document.documentElement.clientWidth,vh=window.visualViewport?window.visualViewport.height:document.documentElement.clientHeight;
+  let left=parseFloat(editorSidebar.style.left)||0,top=parseFloat(editorSidebar.style.top)||0;
+  left=Math.max(4,Math.min(left,vw-r.width-4));
+  top=Math.max(4,Math.min(top,vh-r.height-4));
+  editorSidebar.style.left=left+'px';editorSidebar.style.top=top+'px';
+}
+function initMenuDrag(){
+  const startRect=editorSidebar.getBoundingClientRect();
+  editorSidebar.style.position='fixed';
+  editorSidebar.style.margin='0';
+  editorSidebar.style.right='auto';
+  editorSidebar.style.bottom='auto';
+  editorSidebar.style.transform='none';
+  editorSidebar.style.zIndex='20';
+  editorSidebar.style.touchAction='none';
+  editorSidebar.style.cursor='grab';
+  let left=startRect.left,top=startRect.top;
+  if(isPhoneSized()){
+    const help=document.querySelector('.quick-help');
+    if(help){const hRect=help.getBoundingClientRect();left=hRect.right+8;top=hRect.top}
+  }
+  editorSidebar.style.left=left+'px';editorSidebar.style.top=top+'px';
+  clampMenuPosition();
+  // ドラッグでメニューを自由に移動（マウス・タッチ・ペン共通）。ボタンの通常クリックは維持し、
+  // 一定量動いた場合のみドラッグとして扱い、その際は直後のクリックを無効化する。
+  editorSidebar.addEventListener('click',e=>{if(suppressMenuClick){e.preventDefault();e.stopPropagation();suppressMenuClick=false}},true);
+  editorSidebar.addEventListener('pointerdown',e=>{
+    if(!e.isPrimary||(e.pointerType==='mouse'&&e.button!==0))return;
+    const r=editorSidebar.getBoundingClientRect();
+    menuDrag={id:e.pointerId,startX:e.clientX,startY:e.clientY,origLeft:r.left,origTop:r.top,moved:false};
+  });
+  editorSidebar.addEventListener('pointermove',e=>{
+    if(!menuDrag||menuDrag.id!==e.pointerId)return;
+    const dx=e.clientX-menuDrag.startX,dy=e.clientY-menuDrag.startY;
+    if(!menuDrag.moved){
+      if(Math.hypot(dx,dy)<6)return;
+      // ここで初めてポインタを捕捉する：最初から捕捉するとタップ時のクリックが
+      // ボタンではなくeditorSidebar自身に再ターゲットされ、通常のボタン操作が効かなくなるため。
+      menuDrag.moved=true;editorSidebar.style.cursor='grabbing';editorSidebar.setPointerCapture(e.pointerId);
+    }
+    e.preventDefault();
+    editorSidebar.style.left=(menuDrag.origLeft+dx)+'px';
+    editorSidebar.style.top=(menuDrag.origTop+dy)+'px';
+  });
+  const endMenuDrag=e=>{
+    if(!menuDrag||menuDrag.id!==e.pointerId)return;
+    if(editorSidebar.hasPointerCapture(e.pointerId))editorSidebar.releasePointerCapture(e.pointerId);
+    if(menuDrag.moved){suppressMenuClick=true;clampMenuPosition()}
+    editorSidebar.style.cursor='grab';menuDrag=null;
+  };
+  editorSidebar.addEventListener('pointerup',endMenuDrag);
+  editorSidebar.addEventListener('pointercancel',endMenuDrag);
+}
 defaultState();
+initMenuDrag();
 layoutTable();
 
