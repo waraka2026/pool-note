@@ -464,6 +464,17 @@ savedDialogEl.addEventListener('close',()=>setTopMenu(null));
 document.querySelector('#savedCardView').onclick=()=>{savedView='cards';renderSavedDialog()};
 document.querySelector('#savedListView').onclick=()=>{savedView='list';renderSavedDialog()};
 document.querySelector('#savedSort').onchange=e=>{savedSortOrder=e.target.value;renderSavedDialog()};
+const menuToggleBtn=document.querySelector('#menuToggleBtn');
+function setMenuExpanded(expanded){
+  editorSidebar.classList.toggle('menu-collapsed',!expanded);
+  menuToggleBtn.setAttribute('aria-expanded',String(expanded));
+  menuToggleBtn.setAttribute('aria-label',expanded?'編集メニューを閉じる':'編集メニューを開く');
+  menuToggleBtn.title=expanded?'編集メニューを閉じる':'編集メニューを開く';
+  menuToggleBtn.querySelector('span').textContent=expanded?'×':'☰';
+  menuToggleBtn.querySelector('small').textContent=expanded?'閉じる':'メニュー';
+  requestAnimationFrame(clampMenuPosition);
+}
+menuToggleBtn.addEventListener('click',()=>setMenuExpanded(editorSidebar.classList.contains('menu-collapsed')));
 let menuDrag=null,suppressMenuClick=false;
 function clampMenuPosition(){
   if(editorSidebar.style.position!=='fixed')return;
