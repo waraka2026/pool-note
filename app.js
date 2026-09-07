@@ -68,18 +68,24 @@ function availableTableWidth(){
   return Math.max(140,total-ocW-scW-20);
 }
 function availableTableHeight(){
-  const vh=window.visualViewport?window.visualViewport.height:window.innerHeight,top=tableAndTip.getBoundingClientRect().top;
+  const vh=document.documentElement.clientHeight,top=tableAndTip.getBoundingClientRect().top+window.scrollY;
   let reserve=16;
   if(orientation==='landscape')reserve+=trayEl.getBoundingClientRect().height+12;
   return Math.max(140,vh-top-reserve);
 }
 function layoutTable(){
+  // Pinch zoom changes the visual viewport, not the board geometry.
+  if(window.visualViewport&&Math.abs(window.visualViewport.scale-1)>.01)return;
   updateSideLayout();
   const wRatio=orientation==='landscape'?2:1,hRatio=orientation==='landscape'?1:2,maxUnit=isNarrowScreen()?520:310;
   let unit=Math.min(availableTableWidth()/wRatio,availableTableHeight()/hRatio,maxUnit);
   unit=Math.max(unit,130);
-  tableFrame.style.width=Math.round(unit*wRatio)+'px';
-  tableFrame.style.height=Math.round(unit*hRatio)+'px';
+  tableFrame.style.width=unit*wRatio+'px';
+  tableFrame.style.height=unit*hRatio+'px';
+  const ratio=unit/310;
+  tableFrame.style.padding=orientation==='landscape'?`${18*ratio}px ${20*ratio}px`:`${20*ratio}px ${18*ratio}px`;
+  tableFrame.style.setProperty('--ball-size',20*ratio+'px');
+  renderLines();
 }
 window.addEventListener('resize',layoutTable);
 window.addEventListener('orientationchange',()=>setTimeout(layoutTable,50));
@@ -106,7 +112,7 @@ function ballEl(n,x,y,mini=false){
 function renderBalls(){layer.innerHTML='';Object.entries(state).forEach(([n,p])=>layer.append(ballEl(n,p.x,p.y)))}
 function updateBallPositions(){Object.entries(state).forEach(([n,p])=>{const el=layer.querySelector(`[data-n="${n}"]`);if(el){el.style.left=p.x+'%';el.style.top=p.y+'%'}})}
 function freeSpot(){
-  const r=table.getBoundingClientRect(),minDist=24,existing=Object.values(state);
+  const r=table.getBoundingClientRect(),minDist=ballDiameter()*1.2,existing=Object.values(state);
   const fitsPx=(px,py)=>existing.every(b=>Math.hypot(b.x*r.width/100-px,b.y*r.height/100-py)>=minDist);
   const cx=r.width/2,cy=r.height/2;
   if(fitsPx(cx,cy))return{x:50,y:50};
@@ -122,7 +128,42 @@ function freeSpot(){
 }
 function renderTray(){
   const tray=document.querySelector('#trayBalls');tray.innerHTML='';
-  ['cue','ghost',1,2,3,4,5,6,7,8,9,10,11,12,13,14,15].filter(n=>['cue','ghost'].includes(String(n))||!state[n]).forEach(n=>{const ball=ballEl(n,0,0,true);ball.onclick=()=>{const id=['cue','ghost'].includes(String(n))?repeatBallId(String(n)):n;state[id]=freeSpot();render();markUnsaved()};tray.append(ball)});
+  ['cue','ghost',1,2,3,4,5,6,7,8,9,10,11,12,13,14,15].filter(n=>['cue','ghost'].includes(String(n))||!state[n]).forEach(n=>{
+    const ball=ballEl(n,0,0,true);let gesture=null,suppressClick=false;
+    ball.tabIndex=0;ball.setAttribute('role','button');
+    const place=p=>{const id=['cue','ghost'].includes(String(n))?repeatBallId(String(n)):String(n);state[id]=p;render();markUnsaved()};
+    const cleanup=()=>{gesture?.preview?.remove();gesture=null};
+    ball.onclick=()=>{if(suppressClick){suppressClick=false;return}place(freeSpot())};
+    ball.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();place(freeSpot())}};
+    ball.addEventListener('pointerdown',e=>{if(!e.isPrimary||e.button!==0)return;suppressClick=false;gesture={id:e.pointerId,x:e.clientX,y:e.clientY};ball.setPointerCapture(e.pointerId)});
+    ball.addEventListener('pointermove',e=>{
+      if(!gesture||gesture.id!==e.pointerId)return;
+      if(!gesture.preview&&Math.hypot(e.clientX-gesture.x,e.clientY-gesture.y)<5)return;
+      if(!gesture.preview){gesture.preview=ballEl(n,0,0);gesture.preview.classList.add('tray-drag-preview');document.body.append(gesture.preview)}
+      const preview=gesture.preview;preview.style.left=e.clientX+'px';preview.style.top=e.clientY+'px';preview.style.width=preview.style.height=ballDiameter()+'px';
+    });
+    ball.addEventListener('pointerup',e=>{
+      if(!gesture||gesture.id!==e.pointerId)return;
+      const moved=!!gesture.preview,r=table.getBoundingClientRect();suppressClick=moved;cleanup();
+      if(moved&&e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom)place(ballPoint(point(e)));
+    });
+    ball.addEventListener('pointercancel',()=>{suppressClick=true;cleanup()});
+    ball.addEventListener('lostpointercapture',cleanup);tray.append(ball);
+  });
+}
+function ballDiameter(){const r=table.getBoundingClientRect();return Math.min(r.width,r.height)*20/274}
+function ballPoint(p,exclude=null){
+  const r=table.getBoundingClientRect(),d=ballDiameter(),rx=d/2/r.width*100,ry=d/2/r.height*100;
+  const clamp=q=>({x:Math.max(rx,Math.min(100-rx,q.x)),y:Math.max(ry,Math.min(100-ry,q.y))});
+  p=clamp(p);let best=d*.2,result=p;
+  Object.entries(state).forEach(([n,b])=>{
+    if(String(n)===String(exclude))return;
+    const dx=(p.x-b.x)*r.width/100,dy=(p.y-b.y)*r.height/100,len=Math.hypot(dx,dy),gap=Math.abs(len-d);
+    if(len===0||gap>=best)return;
+    const q={x:b.x+dx/len*d/r.width*100,y:b.y+dy/len*d/r.height*100};
+    if(q.x<rx||q.x>100-rx||q.y<ry||q.y>100-ry)return;
+    best=gap;result=q;
+  });return result;
 }
 function renderNotes(){
   notesLayer.innerHTML='';notes.forEach((note,i)=>{
@@ -140,7 +181,7 @@ function nearestBall(p,maxPx=36,exclude=null){
 }
 function syncBallLines(n){const b=state[n];if(!b)return;lines.forEach(l=>{if(String(l.startBall)===String(n)){l.x1=b.x;l.y1=b.y}if(String(l.endBall)===String(n)){l.x2=b.x;l.y2=b.y}})}
 function visibleEnds(l){
-  const r=table.getBoundingClientRect(),dx=(l.x2-l.x1)*r.width/100,dy=(l.y2-l.y1)*r.height/100,len=Math.hypot(dx,dy)||1,startTrim=l.startBall?11:0,endTrim=l.endBall?11:0;
+  const r=table.getBoundingClientRect(),dx=(l.x2-l.x1)*r.width/100,dy=(l.y2-l.y1)*r.height/100,len=Math.hypot(dx,dy)||1,startTrim=l.startBall?ballDiameter()/2:0,endTrim=l.endBall?ballDiameter()/2:0;
   return{x1:l.x1+(dx/len)*startTrim/r.width*100,y1:l.y1+(dy/len)*startTrim/r.height*100,x2:l.x2-(dx/len)*endTrim/r.width*100,y2:l.y2-(dy/len)*endTrim/r.height*100};
 }
 function lineLengthPx(l){const r=table.getBoundingClientRect(),v=visibleEnds(l);return Math.hypot((v.x2-v.x1)*r.width/100,(v.y2-v.y1)*r.height/100)}
@@ -181,7 +222,7 @@ table.addEventListener('pointerdown',e=>{
   if(e.target.closest('.table-note'))return;
   if(mode==='move'&&groupMoveMode){startGroupDrag(e);return}
   const ball=e.target.closest('.ball');
-  if(mode==='move'&&ball){selectedLine=-1;draggingBall=ball.dataset.n;ballPress={x:e.clientX,y:e.clientY};ballMoved=false;table.setPointerCapture(e.pointerId);renderLines();return}
+  if(mode==='move'&&ball){selectedLine=-1;draggingBall=ball.dataset.n;ballPress={x:e.clientX,y:e.clientY,origin:{...state[draggingBall]}};ballMoved=false;table.setPointerCapture(e.pointerId);renderLines();return}
   if(mode==='erase'&&ball){removeBall(ball.dataset.n);return}
   if(mode==='line'||mode==='plain'){
     const p=point(e),startBall=ball?.dataset.n||nearestBall(p,42),a=startBall?state[startBall]:p;lineStart={...p,ball:startBall};
@@ -191,7 +232,7 @@ table.addEventListener('pointerdown',e=>{
 });
 table.addEventListener('pointermove',e=>{
   if(groupDrag){moveGroupDrag(e);return}
-  if(draggingBall){if(ballPress&&Math.hypot(e.clientX-ballPress.x,e.clientY-ballPress.y)>5)ballMoved=true;state[draggingBall]=point(e);syncBallLines(draggingBall);updateBallPositions();renderLines();return}
+  if(draggingBall){if(ballPress&&Math.hypot(e.clientX-ballPress.x,e.clientY-ballPress.y)>5)ballMoved=true;if(!ballMoved)return;const r=table.getBoundingClientRect();state[draggingBall]=ballPoint({x:ballPress.origin.x+(e.clientX-ballPress.x)/r.width*100,y:ballPress.origin.y+(e.clientY-ballPress.y)/r.height*100},draggingBall);syncBallLines(draggingBall);updateBallPositions();renderLines();return}
   if(lineStart){const p=point(e),endBall=nearestBall(p,42,lineStart.ball),b=endBall?state[endBall]:p;lineDraft.x2=b.x;lineDraft.y2=b.y;lineDraft.endBall=endBall||null;renderLines();return}
   if(!draggingLine)return;e.preventDefault();const p=point(e),l=lines[draggingLine.i],o=draggingLine.original;
   if(draggingLine.kind==='start'){
@@ -342,7 +383,7 @@ function downloadImage(){
   drawWoodFrame(ctx,frameW,frameH);
   ctx.save();roundedRect(ctx,cx,cy,cw,ch,2);ctx.clip();const clothGrad=ctx.createLinearGradient(cx,0,cx+cw,0);clothGrad.addColorStop(0,'#08ae7d');clothGrad.addColorStop(1,'#08aa7a');ctx.fillStyle=clothGrad;ctx.fillRect(cx,cy,cw,ch);ctx.strokeStyle='rgba(255,255,255,.42)';ctx.lineWidth=.6;ctx.setLineDash([2,2]);
   const xDivisions=orientation==='landscape'?8:4,yDivisions=orientation==='landscape'?4:8;
-  for(let i=1;i<xDivisions;i++){ctx.beginPath();ctx.moveTo(cx+cw*i/xDivisions,cy);ctx.lineTo(cx+cw*i/xDivisions,cy+ch);ctx.stroke()}for(let i=1;i<yDivisions;i++){ctx.beginPath();ctx.moveTo(cx,cy+ch*i/yDivisions);ctx.lineTo(cx+cw,cy+ch*i/yDivisions);ctx.stroke()}ctx.setLineDash([]);lines.forEach(l=>drawExportLine(ctx,l,cx,cy,cw,ch));Object.entries(state).forEach(([n,p])=>drawCanvasBall(ctx,n,cx+cw*p.x/100,cy+ch*p.y/100,10));drawExportNotes(ctx,cx,cy,cw,ch);ctx.restore();
+  for(let i=1;i<xDivisions;i++){ctx.beginPath();ctx.moveTo(cx+cw*i/xDivisions,cy);ctx.lineTo(cx+cw*i/xDivisions,cy+ch);ctx.stroke()}for(let i=1;i<yDivisions;i++){ctx.beginPath();ctx.moveTo(cx,cy+ch*i/yDivisions);ctx.lineTo(cx+cw,cy+ch*i/yDivisions);ctx.stroke()}ctx.setLineDash([]);lines.forEach(l=>drawExportLine(ctx,l,cx,cy,cw,ch));Object.entries(state).forEach(([n,p])=>drawCanvasBall(ctx,n,cx+cw*p.x/100,cy+ch*p.y/100,ballDiameter()/2));drawExportNotes(ctx,cx,cy,cw,ch);ctx.restore();
   const horizontalDots=orientation==='landscape'?7:3,verticalDots=orientation==='landscape'?3:7;ctx.fillStyle='#fff';for(let i=1;i<=horizontalDots;i++)for(const y of [10,frameH-10]){ctx.beginPath();ctx.arc(52+(frameW-104)*(i-.5)/horizontalDots,y,2,0,Math.PI*2);ctx.fill()}for(let i=1;i<=verticalDots;i++)for(const x of [10,frameW-10]){ctx.beginPath();ctx.arc(x,52+(frameH-104)*(i-.5)/verticalDots,2,0,Math.PI*2);ctx.fill()}
   ctx.fillStyle='#020202';ctx.strokeStyle='#49180f';ctx.lineWidth=2;for(const [x,y] of [[18,18],[frameW-18,18],[18,frameH-18],[frameW-18,frameH-18]]){ctx.save();ctx.translate(x,y);ctx.rotate(Math.PI/4);roundedRect(ctx,-10,-10,20,20,7);ctx.fill();ctx.stroke();ctx.restore()}drawSidePockets(ctx,frameRect);
   ctx.fillStyle='#151b20';ctx.fillRect(frameW,0,extra,frameH);ctx.fillStyle='#d5aa58';ctx.font='bold 13px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('撞点',frameW+extra/2,24);
@@ -387,3 +428,4 @@ document.querySelector('#savedListView').onclick=()=>{savedView='list';renderSav
 document.querySelector('#savedSort').onchange=e=>{savedSortOrder=e.target.value;renderSavedDialog()};
 defaultState();
 layoutTable();
+
