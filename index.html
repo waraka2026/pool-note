@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#101418" />
   <title>ビリヤード配置図メーカー｜球配置・ショットライン作成</title>
   <meta name="description" content="ビリヤードの球配置とショットラインをブラウザで作成・保存できる無料の配置図メーカー。手球と1〜15番の球に対応。" />
-  <link rel="stylesheet" href="styles.css?v=51" />
+  <link rel="stylesheet" href="styles.css?v=52" />
 </head>
 <body>
   <main class="app">
@@ -20,7 +20,7 @@
     <nav class="primary-menu" aria-label="画面メニュー">
       <button id="guideBtn" type="button">配置の作り方</button>
       <button id="savedBtn" type="button">保存した配置</button>
-      <small class="quick-help">球の削除：PCは右クリック／スマホは長押し</small>
+      <small class="quick-help">球の削除：PCは右クリック／スマホは長押し　｜　メニューは移動可能。展開して使ってください</small>
     </nav>
 
 
@@ -29,8 +29,8 @@
     <div class="workspace">
     <div id="boardColumn" class="board-column portrait">
     <div class="table-and-tip">
-    <aside class="editor-sidebar menu-collapsed" aria-label="台の向きと編集ツール">
-      <button id="menuToggleBtn" class="menu-toggle-btn" type="button" aria-expanded="false" aria-label="編集メニューを開く" title="編集メニューを開く"><span aria-hidden="true">☰</span><small>メニュー</small></button>
+    <aside class="editor-sidebar" aria-label="台の向きと編集ツール">
+      <button id="menuToggleBtn" class="menu-toggle-btn" type="button" aria-expanded="true" aria-label="編集メニューを閉じる" title="編集メニューを閉じる"><span aria-hidden="true">×</span><small>閉じる</small></button>
       <div class="orientation-control" aria-label="台の向き">
         <div class="editor-row"><span class="tool-help">縦向きの台</span><button id="portraitBtn" type="button" class="active" aria-pressed="true" aria-label="縦向き" title="縦向き">縦</button></div>
         <div class="editor-row"><span class="tool-help">横向きの台</span><button id="landscapeBtn" type="button" aria-pressed="false" aria-label="横向き" title="横向き">横</button></div>
@@ -261,7 +261,7 @@
 <div id="savedList">
 </div>
 </dialog>
-  <script src="app.js?v=38"></script>
+  <script src="app.js?v=39"></script>
 </body>
 </html>
 
