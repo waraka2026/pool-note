@@ -73,6 +73,7 @@ body{margin:0;background-color:#0c1013;background-image:radial-gradient(circle a
 #ballsLayer .ball{width:var(--ball-size,20px);height:var(--ball-size,20px);font-size:calc(var(--ball-size,20px)*.4)}
 #ballsLayer .ball span{min-width:55%;height:55%}
 #ballsLayer .ball:before{width:20%;height:10%;left:20%;top:15%}
+#ballsLayer .ball{-webkit-touch-callout:none}
 .tray .mini{touch-action:none}
 .tray .mini:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
 .tray-drag-preview{position:fixed;pointer-events:none;z-index:1000;opacity:.85}

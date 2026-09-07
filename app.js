@@ -14,7 +14,25 @@ const portraitBtn=document.querySelector('#portraitBtn');
 const landscapeBtn=document.querySelector('#landscapeBtn');
 
 let mode='move',draggingBall=null,draggingLine=null,lineStart=null,lineDraft=null,lines=[],notes=[],state={},selectedLine=-1,tip=null,tipDragging=false,activeLineColor='auto',activeLineChoice='auto',paletteLineType='line',currentSaveId=null,repeatBallSeq=0,orientation='portrait',activeLineWidth=2,groupMoveMode=false,groupDrag=null;
-let ballPress=null,ballMoved=false,lastBallTap=null,lastLineTap=null,savedView='cards',savedSortOrder='newest';
+let ballPress=null,ballMoved=false,lastLineTap=null,savedView='cards',savedSortOrder='newest';
+let ballHold=null,lastTouchTime=0;
+function cancelBallHold(){if(ballHold)clearTimeout(ballHold.timer);ballHold=null}
+function startBallHold(e,n){
+  cancelBallHold();
+  if(e.pointerType!=='touch')return;
+  const hold={id:e.pointerId,x:e.clientX,y:e.clientY,n};
+  hold.timer=setTimeout(()=>{
+    if(ballHold!==hold||!state[n])return;
+    cancelBallHold();draggingBall=null;ballPress=null;groupDrag=null;lineStart=null;lineDraft=null;
+    removeBall(n);
+  },600);
+  ballHold=hold;
+}
+document.addEventListener('pointerdown',e=>{if(e.pointerType==='touch')lastTouchTime=Date.now();cancelBallHold()},true);
+document.addEventListener('pointermove',e=>{if(ballHold&&e.pointerId===ballHold.id&&Math.hypot(e.clientX-ballHold.x,e.clientY-ballHold.y)>5)cancelBallHold()},true);
+for(const type of ['pointerup','pointercancel','lostpointercapture'])document.addEventListener(type,e=>{if(ballHold&&e.pointerId===ballHold.id)cancelBallHold()},true);
+window.addEventListener('blur',cancelBallHold);
+document.addEventListener('visibilitychange',()=>{if(document.hidden)cancelBallHold()});
 const defs=`<defs></defs>`;
 const noteFonts={
   gothic:'system-ui,-apple-system,"Noto Sans JP",sans-serif',
@@ -106,7 +124,6 @@ function ballEl(n,x,y,mini=false){
   el.className=`ball ${mini?'mini':''} ${kind==='cue'?'cue':''} ${kind==='ghost'?'ghost':''} ${striped?'striped':''}`;
   if(!['cue','ghost'].includes(kind))el.style.setProperty('--ball',colors[Number(kind)-1]);
   el.dataset.n=n;el.style.left=x+'%';el.style.top=y+'%';el.innerHTML=['cue','ghost'].includes(kind)?'':`<span>${kind}</span>`;el.setAttribute('aria-label',kind==='cue'?'手玉':kind==='ghost'?'イメージボール':`${kind}番ボール`);
-  if(!mini)el.addEventListener('dblclick',e=>{e.preventDefault();e.stopPropagation();removeBall(n)});
   return el;
 }
 function renderBalls(){layer.innerHTML='';Object.entries(state).forEach(([n,p])=>layer.append(ballEl(n,p.x,p.y)))}
@@ -194,7 +211,7 @@ function lineMarkup(l,i,draft=false){
 }
 function renderLines(){let html=defs+lines.map((l,i)=>lineMarkup(l,i)).join('');if(lineDraft)html+=lineMarkup(lineDraft,-1,true);svg.innerHTML=html}
 function renderTip(){if(tip){tipMark.hidden=false;tipMark.style.left=(tip.x*100)+'%';tipMark.style.top=(tip.y*100)+'%'}else{tipMark.hidden=true}}
-function render(){renderBalls();renderLines();renderTray();renderNotes();renderTip()}
+function render(){cancelBallHold();renderBalls();renderLines();renderTray();renderNotes();renderTip()}
 function removeBall(n){delete state[n];lines=lines.filter(l=>String(l.startBall)!==String(n)&&String(l.endBall)!==String(n));selectedLine=-1;render();markUnsaved()}
 function removeLine(i){if(i<0||i>=lines.length)return;lines.splice(i,1);selectedLine=-1;renderLines();markUnsaved()}
 
@@ -219,11 +236,13 @@ function moveGroupDrag(e){
 function endGroupDrag(){if(groupDrag){groupDrag=null;markUnsaved()}}
 
 table.addEventListener('pointerdown',e=>{
+  if(!e.isPrimary||e.button!==0)return;
   if(e.target.closest('.table-note'))return;
-  if(mode==='move'&&groupMoveMode){startGroupDrag(e);return}
   const ball=e.target.closest('.ball');
+  if(ball)startBallHold(e,ball.dataset.n);
+  if(mode==='move'&&groupMoveMode){startGroupDrag(e);return}
   if(mode==='move'&&ball){selectedLine=-1;draggingBall=ball.dataset.n;ballPress={x:e.clientX,y:e.clientY,origin:{...state[draggingBall]}};ballMoved=false;table.setPointerCapture(e.pointerId);renderLines();return}
-  if(mode==='erase'&&ball){removeBall(ball.dataset.n);return}
+  if(mode==='erase'&&ball)return;
   if(mode==='line'||mode==='plain'){
     const p=point(e),startBall=ball?.dataset.n||nearestBall(p,42),a=startBall?state[startBall]:p;lineStart={...p,ball:startBall};
     const autoColor=activeLineColor==='auto',colorBall=startBall||nearestBall(p,Infinity);lineDraft={x1:a.x,y1:a.y,x2:p.x,y2:p.y,type:mode==='plain'?'plain':'arrow',startBall:startBall||null,endBall:null,color:autoColor?ballColor(colorBall):activeLineColor,autoColor,width:activeLineWidth};table.setPointerCapture(e.pointerId);renderLines();return;
@@ -251,7 +270,7 @@ table.addEventListener('pointermove',e=>{
 });
 table.addEventListener('pointerup',()=>{
   if(groupDrag){endGroupDrag();return}
-  if(draggingBall){const n=draggingBall,now=Date.now();draggingBall=null;ballPress=null;if(!ballMoved){if(lastBallTap&&lastBallTap.n===n&&now-lastBallTap.time<650){lastBallTap=null;removeBall(n);return}lastBallTap={n,time:now}}else lastBallTap=null;markUnsaved();return}
+  if(draggingBall){draggingBall=null;ballPress=null;if(ballMoved)markUnsaved();return}
   if(lineStart){if(lineDraft&&lineLengthPx(lineDraft)>8){lines.push({...lineDraft});selectedLine=lines.length-1;markUnsaved()}lineStart=null;lineDraft=null;renderLines();return}
   if(draggingLine){
     const l=lines[draggingLine.i];
@@ -267,7 +286,14 @@ svg.addEventListener('pointerdown',e=>{
   const original={...l};draggingLine={i,kind,start:p,original};table.setPointerCapture(e.pointerId);renderLines();
 });
 svg.addEventListener('dblclick',e=>{if(e.target.dataset.i===undefined)return;e.preventDefault();e.stopPropagation();removeLine(Number(e.target.dataset.i))});
-table.addEventListener('dblclick',e=>{const ball=e.target.closest('.ball');if(!ball)return;e.preventDefault();e.stopPropagation();removeBall(ball.dataset.n)});
+table.addEventListener('contextmenu',e=>{
+  const ball=e.target.closest('.ball');if(!ball)return;
+  e.preventDefault();e.stopPropagation();
+  // Mobile context menus must not bypass the hold duration or movement cancellation.
+  if(e.pointerType==='mouse'||(!e.pointerType&&Date.now()-lastTouchTime>1500)){
+    cancelBallHold();draggingBall=null;ballPress=null;removeBall(ball.dataset.n);
+  }
+});
 
 function updateTip(e){
   const r=cueDiagram.getBoundingClientRect();let x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;
