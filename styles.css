@@ -210,7 +210,7 @@ textarea{width:100%;height:130px;border:1px solid #3b4850;border-radius:12px;bac
 
 /* 台が横向きの時もメニューを上に配置 */
 .board-column.landscape .table-and-tip{position:relative}
-.board-column.landscape .editor-sidebar{position:absolute;top:-38px;left:50%;transform:translateX(-50%);flex:0 0 auto;width:auto;max-width:600px;display:flex;flex-direction:row;align-items:center;gap:4px;padding:4px 6px;background:#192026f7;border:1px solid #46525a;border-radius:8px;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;z-index:25}
+.board-column.landscape .editor-sidebar{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);flex:0 0 auto;width:auto;max-width:600px;display:flex;flex-direction:row;align-items:center;gap:4px;padding:4px 6px;background:#192026f7;border:1px solid #46525a;border-radius:8px;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;margin-bottom:4px;z-index:25}
 .board-column.landscape .editor-sidebar .orientation-control{flex:0 0 auto;width:auto;display:flex;flex-direction:row;gap:2px;padding:0}
 .board-column.landscape .editor-sidebar .orientation-control>div{display:flex;flex-direction:row;align-items:center;gap:2px;flex:0 0 auto}
 .board-column.landscape .editor-sidebar .orientation-control span{display:none}
