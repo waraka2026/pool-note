@@ -403,3 +403,105 @@ textarea{width:100%;height:130px;border:1px solid #3b4850;border-radius:12px;bac
   line-height:1.25;
   text-align:center;
 }
+
+
+/* Portrait: restore the original single-column menu. */
+.board-column.portrait .editor-sidebar:not(.menu-collapsed):not(.menu-detached){
+  position:static;
+  flex:0 0 136px;
+  width:136px!important;
+  max-width:136px;
+  padding:9px;
+}
+.board-column.portrait .editor-sidebar:not(.menu-collapsed) .orientation-control,
+.board-column.portrait .editor-sidebar:not(.menu-collapsed) .tools{
+  display:flex;
+  flex-direction:column;
+}
+.board-column.portrait .editor-sidebar:not(.menu-collapsed) .orientation-control{gap:6px}
+.board-column.portrait .editor-sidebar:not(.menu-collapsed) .tools{
+  gap:6px;
+  padding-top:8px;
+}
+.board-column.portrait .editor-sidebar:not(.menu-collapsed) .orientation-control>div,
+.board-column.portrait .editor-sidebar:not(.menu-collapsed) .tools-row,
+.board-column.portrait .editor-sidebar:not(.menu-collapsed) .editor-row{
+  display:flex;
+}
+.board-column.portrait .editor-sidebar:not(.menu-collapsed) .tools-row{
+  flex-direction:column;
+  gap:6px;
+}
+.board-column.portrait .editor-sidebar:not(.menu-collapsed) .editor-row,
+.board-column.portrait .editor-sidebar:not(.menu-collapsed) .orientation-control>div{
+  flex-direction:row;
+  align-items:center;
+  justify-content:flex-end;
+}
+.board-column.portrait .editor-sidebar:not(.menu-collapsed) .editor-row .tool-help,
+.board-column.portrait .editor-sidebar:not(.menu-collapsed) .orientation-control .tool-help{
+  min-height:0;
+  font-size:11px;
+  text-align:right;
+}
+
+/* Landscape: fixed default row immediately above the ball tray. */
+.board-column.landscape>.editor-sidebar:not(.menu-detached){
+  position:static;
+  width:100%!important;
+  max-width:620px;
+  flex:none;
+  display:flex;
+  flex-direction:row;
+  align-items:center;
+  gap:5px;
+  margin:8px auto 5px!important;
+  padding:6px 8px;
+  border-radius:10px;
+  overflow-x:auto;
+  overflow-y:hidden;
+}
+.board-column.landscape>.editor-sidebar:not(.menu-detached) .menu-toggle-btn{
+  order:0;
+  flex:0 0 38px;
+  width:38px;height:38px;
+  margin:0 3px 0 0;
+}
+.board-column.landscape>.editor-sidebar:not(.menu-detached) .orientation-control,
+.board-column.landscape>.editor-sidebar:not(.menu-detached) .tools,
+.board-column.landscape>.editor-sidebar:not(.menu-detached) .tools-row{
+  display:flex;
+  flex-direction:row;
+  align-items:center;
+  width:auto;
+  margin:0;
+  padding:0;
+  border:0;
+  gap:3px;
+}
+.board-column.landscape>.editor-sidebar:not(.menu-detached) .orientation-control>div,
+.board-column.landscape>.editor-sidebar:not(.menu-detached) .editor-row{
+  display:block;
+  width:auto;
+}
+.board-column.landscape>.editor-sidebar:not(.menu-detached) .tool-help{display:none}
+.board-column.landscape>.editor-sidebar:not(.menu-detached) .editor-row button,
+.board-column.landscape>.editor-sidebar:not(.menu-detached) .orientation-control button{
+  width:36px;height:36px;
+  min-width:36px;
+  padding:5px;
+}
+.board-column.landscape>.editor-sidebar.menu-collapsed:not(.menu-detached){
+  width:68px!important;
+  height:68px;
+  margin:8px auto 5px!important;
+  overflow:hidden;
+}
+/* A detached menu must stay draggable even while collapsed. */
+.editor-sidebar.menu-detached,
+.editor-sidebar.menu-detached.menu-collapsed,
+.board-column.landscape .editor-sidebar.menu-detached,
+.board-column.portrait .editor-sidebar.menu-detached{
+  position:fixed!important;
+  z-index:20;
+}
