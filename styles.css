@@ -906,3 +906,64 @@ body>.editor-sidebar.menu-detached.menu-collapsed>.menu-toggle-btn{
     padding:0!important;
   }
 }
+
+
+/* Center the move grip in the default portrait menu. */
+.board-column.portrait .editor-sidebar:not(.menu-collapsed)>.menu-drag-handle,
+body>.editor-sidebar.menu-detached[data-orientation="portrait"]:not(.menu-collapsed)>.menu-drag-handle{
+  margin-left:auto!important;
+  margin-right:auto!important;
+  align-self:center!important;
+}
+
+/* A detached menu follows the selected table direction, not viewport dimensions. */
+body>.editor-sidebar.menu-detached[data-orientation="portrait"]:not(.menu-collapsed){
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  gap:4px!important;
+  width:58px!important;
+  min-width:58px!important;
+  max-width:58px!important;
+  height:auto!important;
+  max-height:calc(100dvh - 8px)!important;
+  padding:5px!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+}
+body>.editor-sidebar.menu-detached[data-orientation="portrait"]:not(.menu-collapsed)>.menu-drag-handle{
+  order:-1!important;
+  flex:0 0 18px!important;
+  width:38px!important;
+  height:18px!important;
+}
+body>.editor-sidebar.menu-detached[data-orientation="portrait"]:not(.menu-collapsed)>.menu-toggle-btn{
+  order:0!important;
+  flex:0 0 38px!important;
+  width:38px!important;
+  height:38px!important;
+  margin:0!important;
+}
+body>.editor-sidebar.menu-detached[data-orientation="portrait"]:not(.menu-collapsed)>.orientation-control,
+body>.editor-sidebar.menu-detached[data-orientation="portrait"]:not(.menu-collapsed)>.tools,
+body>.editor-sidebar.menu-detached[data-orientation="portrait"]:not(.menu-collapsed)>.tools>.tools-row{
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  flex-wrap:nowrap!important;
+  gap:3px!important;
+  width:100%!important;
+  margin:0!important;
+  padding:0!important;
+}
+body>.editor-sidebar.menu-detached[data-orientation="landscape"]:not(.menu-collapsed){
+  display:flex!important;
+  flex-direction:row!important;
+  align-items:center!important;
+  width:max-content!important;
+  max-width:calc(100vw - 8px)!important;
+  height:auto!important;
+  max-height:54px!important;
+  overflow-x:auto!important;
+  overflow-y:hidden!important;
+}
