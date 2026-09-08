@@ -75,9 +75,24 @@ portraitBtn.onclick=()=>setOrientation('portrait');
 landscapeBtn.onclick=()=>setOrientation('landscape');
 
 const tableAndTip=document.querySelector('.table-and-tip'),editorSidebar=document.querySelector('.editor-sidebar'),tableWrap=document.querySelector('.table-wrap');
+const menuPlaceholder=document.createElement('div');
+menuPlaceholder.className='menu-placeholder';
 let lastLayoutViewport='';
+function reserveDefaultMenuSlot(){
+  if(menuPlaceholder.isConnected||!editorSidebar.parentElement)return;
+  const parent=editorSidebar.parentElement,r=editorSidebar.getBoundingClientRect(),style=getComputedStyle(editorSidebar);
+  menuPlaceholder.dataset.orientation=orientation;
+  if(orientation==='portrait'){
+    menuPlaceholder.style.cssText='display:block;flex:0 0 68px;width:68px;height:1px;pointer-events:none';
+  }else{
+    menuPlaceholder.style.cssText=`display:block;width:${r.width}px;height:${r.height}px;max-width:620px;margin:${style.margin};pointer-events:none`;
+  }
+  parent.insertBefore(menuPlaceholder,editorSidebar);
+}
 function resetMenuToDefault(){
   editorSidebar.classList.remove('menu-detached');
+  menuPlaceholder.remove();
+  menuPlaceholder.style.cssText='';
   for(const prop of ['position','left','top','right','bottom','margin','transform','zIndex'])editorSidebar.style[prop]='';
 }
 function updateSideLayout(){
@@ -93,13 +108,14 @@ function updateSideLayout(){
 }
 function availableTableWidth(){
   const total=boardColumn.clientWidth,scW=sideControls.getBoundingClientRect().width,gap=parseFloat(getComputedStyle(tableAndTip).gap)||0;
-  const menuW=editorSidebar.parentElement===tableAndTip&&editorSidebar.style.position!=='fixed'?editorSidebar.getBoundingClientRect().width+gap:0;
+  const menuSlot=editorSidebar.parentElement===tableAndTip&&editorSidebar.style.position!=='fixed'?editorSidebar:menuPlaceholder.parentElement===tableAndTip?menuPlaceholder:null;
+  const menuW=menuSlot?menuSlot.getBoundingClientRect().width+gap:0;
   return Math.max(100,total-scW-gap-menuW);
 }
 function availableTableHeight(){
   const vh=window.visualViewport?window.visualViewport.height:document.documentElement.clientHeight,top=Math.max(0,tableAndTip.getBoundingClientRect().top);
   let reserve=16;
-  if(orientation==='landscape')reserve+=trayEl.getBoundingClientRect().height+(editorSidebar.parentElement===boardColumn?editorSidebar.getBoundingClientRect().height+3:0)+6;
+  if(orientation==='landscape'){const menuSlot=editorSidebar.parentElement===boardColumn?editorSidebar:menuPlaceholder.parentElement===boardColumn?menuPlaceholder:null;reserve+=trayEl.getBoundingClientRect().height+(menuSlot?menuSlot.getBoundingClientRect().height+3:0)+6}
   return Math.max(140,vh-top-reserve);
 }
 function layoutTable(force=false){
@@ -527,6 +543,7 @@ function initMenuDrag(){
     if(!menuDrag.moved){
       if(Math.hypot(dx,dy)<5)return;
       menuDrag.moved=true;
+      reserveDefaultMenuSlot();
       editorSidebar.classList.add('menu-detached');
       document.body.append(editorSidebar);
       editorSidebar.style.position='fixed';
