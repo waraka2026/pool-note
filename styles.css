@@ -842,3 +842,67 @@ body>.editor-sidebar.menu-detached.menu-collapsed>.menu-toggle-btn{
   visibility:visible!important;
   opacity:1!important;
 }
+
+
+/* Visible grip for moving the menu while it is expanded. */
+.menu-drag-handle{
+  order:-1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex:0 0 24px;
+  width:24px;
+  height:38px;
+  color:#d5aa58;
+  font-size:20px;
+  line-height:1;
+  cursor:grab;
+  touch-action:none;
+  user-select:none;
+  -webkit-user-select:none;
+}
+.menu-drag-handle:active{cursor:grabbing}
+.editor-sidebar.menu-collapsed>.menu-drag-handle{display:none!important}
+
+/* On a portrait phone, a moved/expanded menu stays vertical. */
+@media (orientation:portrait) and (max-width:767px){
+  body>.editor-sidebar.menu-detached:not(.menu-collapsed){
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    gap:4px!important;
+    width:58px!important;
+    min-width:58px!important;
+    max-width:58px!important;
+    height:auto!important;
+    max-height:calc(100dvh - 8px)!important;
+    padding:5px!important;
+    overflow-x:hidden!important;
+    overflow-y:auto!important;
+  }
+  body>.editor-sidebar.menu-detached:not(.menu-collapsed)>.menu-drag-handle{
+    order:-1!important;
+    flex:0 0 18px!important;
+    width:38px!important;
+    height:18px!important;
+  }
+  body>.editor-sidebar.menu-detached:not(.menu-collapsed)>.menu-toggle-btn{
+    order:0!important;
+    flex:0 0 38px!important;
+    width:38px!important;
+    height:38px!important;
+    margin:0!important;
+  }
+  body>.editor-sidebar.menu-detached:not(.menu-collapsed)>.orientation-control,
+  body>.editor-sidebar.menu-detached:not(.menu-collapsed)>.tools,
+  body>.editor-sidebar.menu-detached:not(.menu-collapsed)>.tools>.tools-row{
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    flex-wrap:nowrap!important;
+    gap:3px!important;
+    width:100%!important;
+    margin:0!important;
+    padding:0!important;
+  }
+}
