@@ -770,3 +770,58 @@ textarea{width:100%;height:130px;border:1px solid #3b4850;border-radius:12px;bac
   display:block!important;
   width:auto!important;
 }
+
+
+/* Detached editor: an independent compact popup, regardless of table direction. */
+body>.editor-sidebar.menu-detached:not(.menu-collapsed){
+  display:flex!important;
+  flex-direction:row!important;
+  align-items:center!important;
+  gap:4px!important;
+  width:max-content!important;
+  max-width:calc(100vw - 8px)!important;
+  height:auto!important;
+  max-height:54px!important;
+  margin:0!important;
+  padding:5px 6px!important;
+  border-radius:10px!important;
+  overflow-x:auto!important;
+  overflow-y:hidden!important;
+  transition:none!important;
+}
+body>.editor-sidebar.menu-detached:not(.menu-collapsed)>.menu-toggle-btn{
+  position:static!important;
+  order:0!important;
+  flex:0 0 38px!important;
+  width:38px!important;
+  height:38px!important;
+  margin:0 3px 0 0!important;
+}
+body>.editor-sidebar.menu-detached:not(.menu-collapsed)>.orientation-control,
+body>.editor-sidebar.menu-detached:not(.menu-collapsed)>.tools,
+body>.editor-sidebar.menu-detached:not(.menu-collapsed)>.tools>.tools-row{
+  display:flex!important;
+  flex-direction:row!important;
+  align-items:center!important;
+  flex-wrap:nowrap!important;
+  gap:3px!important;
+  width:auto!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+}
+body>.editor-sidebar.menu-detached:not(.menu-collapsed) .orientation-control>div,
+body>.editor-sidebar.menu-detached:not(.menu-collapsed) .editor-row{
+  display:block!important;
+  flex:0 0 auto!important;
+  width:auto!important;
+  margin:0!important;
+}
+body>.editor-sidebar.menu-detached:not(.menu-collapsed) .editor-row button,
+body>.editor-sidebar.menu-detached:not(.menu-collapsed) .orientation-control button{
+  width:36px!important;
+  height:36px!important;
+  min-width:36px!important;
+  margin:0!important;
+  padding:5px!important;
+}
