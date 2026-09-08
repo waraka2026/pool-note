@@ -515,6 +515,7 @@ function initMenuDrag(){
     if(interactive&&!toggle)return;
     const r=editorSidebar.getBoundingClientRect();
     menuDrag={id:e.pointerId,startX:e.clientX,startY:e.clientY,origLeft:r.left,origTop:r.top,moved:false};
+    editorSidebar.setPointerCapture(e.pointerId);
     e.preventDefault();
   });
 
@@ -549,6 +550,7 @@ function initMenuDrag(){
       // It returns to the default slot only when the table orientation changes.
       layoutTable(true);
     }
+    if(editorSidebar.hasPointerCapture(e.pointerId))editorSidebar.releasePointerCapture(e.pointerId);
     menuToggleBtn.style.cursor='grab';
     menuDrag=null;
   };
