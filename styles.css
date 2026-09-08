@@ -1089,3 +1089,17 @@ body>.editor-sidebar.menu-detached[data-orientation="portrait"]:not(.menu-collap
   max-height:38px!important;
   margin:0 auto!important;
 }
+
+
+/* v66: keep the close/open control at the bottom; only the grip is draggable. */
+.board-column.portrait .editor-sidebar:not(.menu-collapsed)>.menu-toggle-btn,
+body>.editor-sidebar.menu-detached[data-orientation="portrait"]:not(.menu-collapsed)>.menu-toggle-btn{
+  order:99!important;
+  margin:0 auto!important;
+}
+@media (orientation:portrait) and (max-width:767px){
+  .board-column.portrait .editor-sidebar:not(.menu-collapsed)>.menu-toggle-btn,
+  body>.editor-sidebar.menu-detached[data-orientation="portrait"]:not(.menu-collapsed)>.menu-toggle-btn{
+    order:99!important;
+  }
+}
