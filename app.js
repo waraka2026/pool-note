@@ -258,7 +258,7 @@ table.addEventListener('pointerdown',e=>{
   const ball=e.target.closest('.ball');
   if(ball)startBallHold(e,ball.dataset.n);
   if(mode==='move'&&groupMoveMode){startGroupDrag(e);return}
-  if(mode==='move'&&ball){selectedLine=-1;draggingBall=ball.dataset.n;ballPress={x:e.clientX,y:e.clientY,origin:{...state[draggingBall]}};ballMoved=false;table.setPointerCapture(e.pointerId);renderLines();return}
+  if(ball&&['move','line','plain'].includes(mode)){selectedLine=-1;draggingBall=ball.dataset.n;ballPress={x:e.clientX,y:e.clientY,origin:{...state[draggingBall]}};ballMoved=false;table.setPointerCapture(e.pointerId);renderLines();return}
   if(mode==='erase'&&ball)return;
   if(mode==='line'||mode==='plain'){
     const p=point(e),startBall=ball?.dataset.n||nearestBall(p,42),a=startBall?state[startBall]:p;lineStart={...p,ball:startBall};
@@ -297,7 +297,7 @@ table.addEventListener('pointerup',()=>{
 table.addEventListener('pointercancel',()=>{draggingBall=null;draggingLine=null;lineStart=null;lineDraft=null;groupDrag=null;renderLines()});
 
 svg.addEventListener('pointerdown',e=>{
-  if(e.target.dataset.i===undefined)return;e.stopPropagation();const i=Number(e.target.dataset.i),now=Date.now();if(lastLineTap&&lastLineTap.i===i&&now-lastLineTap.time<650){lastLineTap=null;draggingLine=null;removeLine(i);return}lastLineTap={i,time:now};if(mode==='erase'){removeLine(i);return}if(mode!=='move')return;
+  if(e.target.dataset.i===undefined)return;e.stopPropagation();const i=Number(e.target.dataset.i),now=Date.now();if(lastLineTap&&lastLineTap.i===i&&now-lastLineTap.time<650){lastLineTap=null;draggingLine=null;removeLine(i);return}lastLineTap={i,time:now};if(mode==='erase'){removeLine(i);return}if(!['move','line','plain'].includes(mode))return;
   if(groupMoveMode){startGroupDrag(e);return}
   selectedLine=i;const p=point(e),l=lines[i],v=visibleEnds(l),r=table.getBoundingClientRect(),d1=Math.hypot((p.x-v.x1)*r.width/100,(p.y-v.y1)*r.height/100),d2=Math.hypot((p.x-v.x2)*r.width/100,(p.y-v.y2)*r.height/100),kind=Math.min(d1,d2)<=26?(d1<d2?'start':'end'):'move';
   const original={...l};draggingLine={i,kind,start:p,original};table.setPointerCapture(e.pointerId);renderLines();
@@ -478,6 +478,7 @@ document.querySelector('#savedSort').onchange=e=>{savedSortOrder=e.target.value;
 const menuToggleBtn=document.querySelector('#menuToggleBtn');
 function setMenuExpanded(expanded){
   editorSidebar.classList.toggle('menu-collapsed',!expanded);
+  if(!expanded&&editorSidebar.classList.contains('menu-detached'))resetMenuToDefault();
   menuToggleBtn.setAttribute('aria-expanded',String(expanded));
   menuToggleBtn.setAttribute('aria-label',expanded?'編集メニューを閉じる':'編集メニューを開く');
   menuToggleBtn.title=expanded?'編集メニューを閉じる':'編集メニューを開く';
