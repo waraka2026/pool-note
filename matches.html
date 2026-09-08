@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#063426" />
+  <title>対戦記録｜ビリヤード配置図メーカー</title>
+  <style>
+    :root{--green:#07543d;--green2:#0b6b4f;--deep:#06291f;--felt:#0b5a42;--cream:#f7f5ee;--card:#fff;--line:#e7e2d7;--muted:#718078;--win:#d9f5e7;--lose:#ffe0e0;--ink:#17251f;--shadow:0 16px 38px rgba(0,0,0,.2)}
+    *{box-sizing:border-box}body{margin:0;min-height:100dvh;color:var(--ink);font-family:system-ui,-apple-system,"Noto Sans JP","Yu Gothic",sans-serif;background:radial-gradient(circle at 82% 12%,rgba(255,255,255,.18),transparent 22rem),linear-gradient(135deg,#06281e,#0a654b 58%,#041d16)}button,input,select,textarea{font:inherit}button{cursor:pointer}.app{width:min(1120px,calc(100% - 22px));margin:auto;padding:18px 0 28px}.top{display:flex;gap:12px;align-items:center;justify-content:space-between;color:#fff;margin-bottom:14px}.top h1{font-size:clamp(24px,4vw,38px);line-height:1.2;margin:0}.top p{margin:5px 0 0;color:rgba(255,255,255,.72);font-size:13px}.top-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.top a,.top button{border:1px solid rgba(255,255,255,.32);background:rgba(255,255,255,.12);color:#fff;text-decoration:none;border-radius:999px;padding:10px 14px;font-weight:800}.shell{display:grid;grid-template-columns:minmax(320px,470px) 1fr;gap:16px;align-items:start}.panel{background:var(--cream);border-radius:28px;box-shadow:var(--shadow);overflow:hidden;border:1px solid rgba(255,255,255,.28)}.panel-head{background:linear-gradient(135deg,var(--green),var(--green2));color:#fff;padding:18px 20px}.panel-head h2{margin:0;font-size:21px}.panel-head span{display:block;margin-top:4px;color:rgba(255,255,255,.72);font-size:12px}.content{padding:14px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.field,.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px;box-shadow:0 4px 12px rgba(18,36,28,.06)}.label{display:block;color:var(--muted);font-size:11px;font-weight:800;margin-bottom:5px}input,select,textarea{width:100%;border:0;outline:0;background:transparent;color:var(--ink);font-weight:750}textarea{min-height:74px;resize:vertical;line-height:1.6;font-weight:500}.score{margin-top:12px;padding:22px 12px;border-radius:22px;background:radial-gradient(circle at 50% 100%,rgba(255,255,255,.14),transparent 30%),linear-gradient(145deg,#064331,#0a6b4d);color:#fff}.score-row{display:grid;grid-template-columns:1fr 40px 1fr;align-items:center;text-align:center}.player{font-weight:900;color:rgba(255,255,255,.9);margin-bottom:8px}.num{font-size:76px;line-height:1;font-weight:950;letter-spacing:-.05em}.dash{font-size:42px;font-weight:950;color:rgba(255,255,255,.72)}.count-buttons{display:flex;justify-content:center;gap:10px;margin-top:14px}.round{width:54px;height:54px;border:0;border-radius:50%;background:linear-gradient(135deg,#16a56e,#0b6b4f);color:white;font-size:20px;font-weight:950;box-shadow:0 8px 14px rgba(0,0,0,.2)}.round.minus{background:#66706c}.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.btn{border:1px solid var(--line);border-radius:16px;background:#fff;color:#0a513d;padding:13px 10px;font-weight:900}.btn.primary{width:100%;margin-top:12px;background:linear-gradient(135deg,var(--green),var(--green2));color:#fff;border:0;padding:16px;box-shadow:0 10px 18px rgba(8,84,61,.25)}.layout-card{margin-top:12px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:12px}.table-preview{height:170px;border-radius:20px;background:linear-gradient(90deg,rgba(255,255,255,.08) 1px,transparent 1px) 0 0/55px 55px,linear-gradient(180deg,rgba(255,255,255,.08) 1px,transparent 1px) 0 0/55px 55px,#0b684a;border:9px solid #5a331d;position:relative;overflow:hidden}.pocket{position:absolute;width:24px;height:24px;background:#111;border-radius:50%}.p1{left:-10px;top:-10px}.p2{right:-10px;top:-10px}.p3{left:-10px;bottom:-10px}.p4{right:-10px;bottom:-10px}.p5{left:50%;top:-12px}.p6{left:50%;bottom:-12px}.ball{position:absolute;width:24px;height:24px;border-radius:50%;background:#fff;display:grid;place-items:center;font-size:11px;font-weight:900;box-shadow:inset -5px -5px 9px rgba(0,0,0,.2),0 3px 8px rgba(0,0,0,.25)}.arrow{position:absolute;height:4px;background:white;border-radius:4px;transform-origin:left center}.arrow:after{content:"";position:absolute;right:-1px;top:-6px;border-left:13px solid white;border-top:8px solid transparent;border-bottom:8px solid transparent}.linked{display:flex;gap:8px;align-items:center;margin-top:9px;font-size:13px;color:#356252}.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:12px}.summary .card{text-align:center;padding:12px 8px}.summary b{font-size:28px;color:var(--green)}.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}.chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:9px 14px;font-weight:900;color:#315247}.chip.active{background:var(--green);color:white}.list{background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden}.row{display:grid;grid-template-columns:82px 1fr 54px 58px 54px;gap:8px;align-items:center;padding:11px 12px;border-bottom:1px solid #ece7dd;font-size:13px}.row:last-child{border-bottom:0}.head{color:var(--muted);font-weight:900;background:#fbfaf7}.badge{display:inline-block;padding:4px 8px;border-radius:999px;font-weight:900;text-align:center}.win{background:var(--win);color:#087040}.lose{background:var(--lose);color:#c93a3a}.empty{padding:24px;text-align:center;color:var(--muted)}.row button{border:0;background:transparent;color:#0b6b4f;font-weight:900}.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(18px);background:#111;color:#fff;border-radius:999px;padding:12px 18px;opacity:0;transition:.22s;z-index:20}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}.modal{position:fixed;inset:0;display:none;place-items:center;background:rgba(0,0,0,.48);z-index:15;padding:18px}.modal.open{display:grid}.modal-box{width:min(720px,100%);max-height:88dvh;overflow:auto;background:#f7f5ee;border-radius:26px;padding:16px;box-shadow:var(--shadow)}.modal-head{display:flex;justify-content:space-between;align-items:center;gap:12px}.modal-head h3{margin:0}.close{border:0;border-radius:50%;width:40px;height:40px;background:#fff;color:#0a513d;font-weight:950}.layout-list{display:grid;gap:10px;margin-top:12px}.mini-layout{background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px;display:grid;grid-template-columns:92px 1fr;gap:12px;align-items:center}.mini-table{height:58px;border-radius:10px;background:#0b684a;border:5px solid #5a331d;position:relative}.mini-ball{position:absolute;width:10px;height:10px;background:white;border-radius:50%}.mini-layout b{display:block;color:#113a2d;margin-bottom:3px}.mini-layout span{font-size:12px;color:var(--muted);line-height:1.5}.mini-layout button{margin-top:7px;border:0;border-radius:999px;background:var(--green);color:#fff;padding:7px 10px;font-weight:900}.danger{color:#c93a3a!important}@media (max-width:880px){.app{width:min(480px,calc(100% - 16px))}.top{display:block}.top-actions{justify-content:flex-start;margin-top:12px}.shell{grid-template-columns:1fr}.row{grid-template-columns:74px 1fr 46px 48px 50px;font-size:12px;padding-inline:8px}.num{font-size:68px}.grid{gap:8px}.field{padding:10px}}
+  </style>
+</head>
+<body>
+  <main class="app">
+    <div class="top">
+      <div>
+        <h1>対戦記録</h1>
+        <p>スコアをカウントして保存。配置図を選ぶと「どの試合での配置か」まで残せます。</p>
+      </div>
+      <div class="top-actions">
+        <a href="index.html">← 配置図へ戻る</a>
+        <button id="clearDemo" type="button">記録リセット</button>
+      </div>
+    </div>
+
+    <div class="shell">
+      <section class="panel">
+        <div class="panel-head"><h2>スコアをつける</h2><span>平場・セットマッチ・大会メモ用</span></div>
+        <div class="content">
+          <div class="grid">
+            <label class="field"><span class="label">日付</span><input id="date"></label>
+            <label class="field"><span class="label">店名</span><input id="shop" placeholder="快活百合ヶ丘"></label>
+            <label class="field"><span class="label">相手</span><input id="opponent" placeholder="Aさん"></label>
+            <label class="field"><span class="label">種目</span><select id="game"><option>9ボール</option><option>10ボール</option><option>エイトボール</option><option>ローテーション</option></select></label>
+            <label class="field"><span class="label">形式</span><select id="type"><option>平場</option><option>セットマッチ</option><option>大会</option><option>練習</option></select></label>
+            <label class="field"><span class="label">先取</span><select id="race"><option value="3">3先</option><option value="4">4先</option><option value="5">5先</option><option value="7">7先</option><option value="0">自由</option></select></label>
+          </div>
+
+          <div class="score">
+            <div class="score-row">
+              <div><div class="player">自分</div><div id="myScore" class="num">0</div><div class="count-buttons"><button class="round" data-side="me" data-delta="1">+1</button><button class="round minus" data-side="me" data-delta="-1">-1</button></div></div>
+              <div class="dash">-</div>
+              <div><div class="player">相手</div><div id="oppScore" class="num">0</div><div class="count-buttons"><button class="round" data-side="op" data-delta="1">+1</button><button class="round minus" data-side="op" data-delta="-1">-1</button></div></div>
+            </div>
+          </div>
+
+          <div class="layout-card">
+            <label><span class="label">この試合に紐づける配置図</span><select id="layoutSelect"></select></label>
+            <div id="layoutPreview" class="table-preview" aria-label="配置図プレビュー"></div>
+            <div id="linkedText" class="linked">🔗 配置図を選ぶと、この試合の配置として保存されます</div>
+          </div>
+
+          <label class="field" style="margin-top:12px"><span class="label">メモ</span><textarea id="memo" placeholder="例：9番前の出しが薄くなった。次は厚めに残す。"></textarea></label>
+          <div class="actions"><button class="btn" id="resetScore" type="button">スコアだけ戻す</button><button class="btn" id="layoutListBtn" type="button">保存配置を見る</button></div>
+          <button class="btn primary" id="saveMatch" type="button">✓ 試合終了して保存</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head"><h2>スコア表</h2><span>保存するとここに自動反映</span></div>
+        <div class="content">
+          <div class="summary"><div class="card"><span class="label">対戦数</span><b id="totalCount">0</b></div><div class="card"><span class="label">勝ち</span><b id="winCount">0</b></div><div class="card"><span class="label">勝率</span><b id="winRate">0%</b></div></div>
+          <div class="filters"><button class="chip active" data-filter="all">すべて</button><button class="chip" data-filter="win">勝ち</button><button class="chip" data-filter="lose">負け</button><button class="chip" data-filter="layout">配置あり</button></div>
+          <div class="list"><div class="row head"><span>日付</span><span>店名</span><span>相手</span><span>スコア</span><span>結果</span></div><div id="scoreRows"></div></div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <div id="layoutModal" class="modal" role="dialog" aria-modal="true">
+    <div class="modal-box"><div class="modal-head"><h3>保存した配置</h3><button class="close" id="closeModal">×</button></div><div id="layoutList" class="layout-list"></div></div>
+  </div>
+  <div id="toast" class="toast">保存しました</div>
+
+<script>
+const STORAGE_MATCHES='poolMatchRecords';
+const STORAGE_LAYOUTS='poolNotes';
+const BALL_COLORS=['#f3d400','#1767c8','#e6382e','#6b3ba9','#ef7d15','#248046','#7b201d','#111','#f0d63b','#1767c8','#e6382e','#6b3ba9','#ef7d15','#248046','#7b201d'];
+let my=0,op=0,filter='all';
+const $=s=>document.querySelector(s);
+const today=new Date();
+$('#date').value=`${today.getFullYear()}/${today.getMonth()+1}/${today.getDate()}`;
+function readJSON(key,fallback){try{return JSON.parse(localStorage.getItem(key)||'')||fallback}catch{return fallback}}
+function writeJSON(key,value){localStorage.setItem(key,JSON.stringify(value))}
+function readLayouts(){return readJSON(STORAGE_LAYOUTS,[])}
+function readMatches(){return readJSON(STORAGE_MATCHES,[])}
+function writeMatches(items){writeJSON(STORAGE_MATCHES,items.slice(0,200))}
+function scoreText(){return `${my}-${op}`}
+function updateScore(){ $('#myScore').textContent=my; $('#oppScore').textContent=op; }
+document.querySelectorAll('[data-side]').forEach(btn=>btn.onclick=()=>{const d=Number(btn.dataset.delta); if(btn.dataset.side==='me')my=Math.max(0,my+d); else op=Math.max(0,op+d); updateScore(); autoRaceToast();});
+function autoRaceToast(){const race=Number($('#race').value); if(race&& (my>=race||op>=race)) showToast((my>op?'自分':'相手')+'が'+race+'先に到達');}
+$('#resetScore').onclick=()=>{my=0;op=0;updateScore()};
+function resultOf(m,o){return m>o?'勝ち':m<o?'負け':'記録なし'}
+function showToast(text){const t=$('#toast');t.textContent=text;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1600)}
+function formatTime(v){if(!v)return'';const d=new Date(v);return Number.isNaN(d.getTime())?String(v):d.toLocaleDateString('ja-JP')}
+function renderLayoutSelect(){const layouts=readLayouts().sort((a,b)=>(Date.parse(b.updatedAt||b.createdAt||0)||0)-(Date.parse(a.updatedAt||a.createdAt||0)||0));const sel=$('#layoutSelect');sel.innerHTML='<option value="">配置図なしで保存</option>'+layouts.map(l=>`<option value="${l.id}">${escapeHtml(l.title||'名称なし')}｜${formatTime(l.updatedAt||l.createdAt||l.date)}</option>`).join('');renderLayoutPreview();renderLayoutList();}
+function escapeHtml(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function selectedLayout(){const id=$('#layoutSelect').value;return readLayouts().find(l=>String(l.id)===String(id))||null}
+function renderLayoutPreview(){const box=$('#layoutPreview'),item=selectedLayout();box.innerHTML='<i class="pocket p1"></i><i class="pocket p2"></i><i class="pocket p3"></i><i class="pocket p4"></i><i class="pocket p5"></i><i class="pocket p6"></i>';if(!item){$('#linkedText').textContent='🔗 配置図を選ぶと、この試合の配置として保存されます';return}const state=item.state||{};Object.entries(state).slice(0,16).forEach(([n,p])=>{const b=document.createElement('span');b.className='ball';b.style.left=(p.x||50)+'%';b.style.top=(p.y||50)+'%';b.style.transform='translate(-50%,-50%)';const num=String(n).split('-')[0];if(num==='cue'){b.textContent='';b.style.background='#fff'}else if(num==='ghost'){b.style.background='#dce7e3';b.style.border='2px dashed #fff'}else{b.textContent=num;b.style.background=BALL_COLORS[Number(num)-1]||'#fff';if([2,3,4,6,7,10,11,12,14,15].includes(Number(num)))b.style.color='#fff'}box.append(b)});(item.lines||[]).slice(0,8).forEach(l=>{const a=document.createElement('span');a.className='arrow';const x1=l.x1||0,y1=l.y1||0,x2=l.x2||0,y2=l.y2||0;const dx=x2-x1,dy=y2-y1,len=Math.hypot(dx,dy);a.style.left=x1+'%';a.style.top=y1+'%';a.style.width=len+'%';a.style.transform=`rotate(${Math.atan2(dy,dx)}rad)`;a.style.background=l.color||'#fff';box.append(a)});$('#linkedText').textContent=`🔗 「${item.title||'名称なし'}」をこの試合に紐づけ中`;}
+$('#layoutSelect').onchange=renderLayoutPreview;
+$('#saveMatch').onclick=()=>{const layout=selectedLayout();const record={id:Date.now(),date:$('#date').value,shop:$('#shop').value.trim()||'店名未入力',opponent:$('#opponent').value.trim()||'相手未入力',game:$('#game').value,type:$('#type').value,race:$('#race').value,myScore:my,oppScore:op,score:scoreText(),result:resultOf(my,op),memo:$('#memo').value.trim(),layoutId:layout?.id||'',layoutTitle:layout?.title||'',createdAt:new Date().toISOString()};const items=readMatches();items.unshift(record);writeMatches(items);renderScores();showToast('スコア表に自動反映しました');};
+function renderScores(){const rows=$('#scoreRows');let items=readMatches();if(filter==='win')items=items.filter(r=>r.result==='勝ち');if(filter==='lose')items=items.filter(r=>r.result==='負け');if(filter==='layout')items=items.filter(r=>r.layoutId);const all=readMatches(),wins=all.filter(r=>r.result==='勝ち').length;$('#totalCount').textContent=all.length;$('#winCount').textContent=wins;$('#winRate').textContent=all.length?Math.round(wins/all.length*100)+'%':'0%';if(!items.length){rows.innerHTML='<div class="empty">まだ記録がありません。左の画面で保存するとここに出ます。</div>';return}rows.innerHTML=items.map(r=>`<div class="row"><span>${escapeHtml(r.date)}</span><span><b>${escapeHtml(r.shop)}</b>${r.layoutTitle?`<br><button type="button" data-layout="${r.layoutId}">🎱 ${escapeHtml(r.layoutTitle)}</button>`:''}</span><span>${escapeHtml(r.opponent)}</span><span>${escapeHtml(r.score)}</span><span class="badge ${r.result==='勝ち'?'win':'lose'}">${escapeHtml(r.result)}</span></div>`).join('');rows.querySelectorAll('[data-layout]').forEach(b=>b.onclick=()=>{$('#layoutSelect').value=b.dataset.layout;renderLayoutPreview();window.scrollTo({top:0,behavior:'smooth'});showToast('紐づいた配置を表示しました')});}
+document.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{document.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));c.classList.add('active');filter=c.dataset.filter;renderScores()});
+function renderLayoutList(){const list=$('#layoutList'),layouts=readLayouts();if(!layouts.length){list.innerHTML='<p class="empty">保存した配置はまだありません。配置図ページで保存すると選べるようになります。</p>';return}list.innerHTML=layouts.map((l,i)=>`<div class="mini-layout"><div class="mini-table"><i class="mini-ball" style="left:${18+i*7%55}px;top:${20+i*5%25}px"></i><i class="mini-ball" style="left:${54+i*3%25}px;top:${14+i*6%30}px"></i></div><div><b>${escapeHtml(l.title||'名称なし')}</b><span>${formatTime(l.updatedAt||l.createdAt||l.date)}｜この配置を対戦記録に紐づけ可能</span><br><button type="button" data-pick="${l.id}">この配置を選ぶ</button></div></div>`).join('');list.querySelectorAll('[data-pick]').forEach(b=>b.onclick=()=>{$('#layoutSelect').value=b.dataset.pick;renderLayoutPreview();closeModal();showToast('配置図を選びました')});}
+function openModal(){renderLayoutList();$('#layoutModal').classList.add('open')}function closeModal(){$('#layoutModal').classList.remove('open')}$('#layoutListBtn').onclick=openModal;$('#closeModal').onclick=closeModal;$('#layoutModal').addEventListener('click',e=>{if(e.target.id==='layoutModal')closeModal()});
+$('#clearDemo').onclick=()=>{if(confirm('対戦記録だけリセットしますか？配置図データは消しません。')){localStorage.removeItem(STORAGE_MATCHES);renderScores();showToast('対戦記録をリセットしました')}};
+renderLayoutSelect();renderScores();updateScore();
+</script>
+</body>
+</html>
