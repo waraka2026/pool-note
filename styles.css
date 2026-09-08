@@ -448,8 +448,8 @@ textarea{width:100%;height:130px;border:1px solid #3b4850;border-radius:12px;bac
 /* Landscape: fixed default row immediately above the ball tray. */
 .board-column.landscape>.editor-sidebar:not(.menu-detached){
   position:static;
-  width:100%!important;
-  max-width:620px;
+  width:max-content!important;
+  max-width:100%;
   flex:none;
   display:flex;
   flex-direction:row;
@@ -697,7 +697,7 @@ textarea{width:100%;height:130px;border:1px solid #3b4850;border-radius:12px;bac
     flex-direction:row!important;
     align-items:center!important;
     flex-wrap:nowrap!important;
-    width:100%!important;
+    width:max-content!important;
     max-width:620px!important;
     overflow-x:auto!important;
     overflow-y:hidden!important;
@@ -711,4 +711,12 @@ textarea{width:100%;height:130px;border:1px solid #3b4850;border-radius:12px;bac
     flex-wrap:nowrap!important;
     width:auto!important;
   }
+}
+
+
+/* The round open/close control is also the drag handle. */
+.menu-toggle-btn{
+  touch-action:none!important;
+  user-select:none;
+  -webkit-user-select:none;
 }
