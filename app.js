@@ -543,9 +543,9 @@ function initMenuDrag(){
 
   editorSidebar.addEventListener('pointerdown',e=>{
     if(!e.isPrimary||(e.pointerType==='mouse'&&e.button!==0))return;
-    const toggle=e.target.closest('#menuToggleBtn');
-    const interactive=e.target.closest('button,input,select,textarea,a,label,#lineColorPanel');
-    if(interactive&&!toggle)return;
+    // Only the dedicated grip starts a drag. The close/open button must remain
+    // a normal tap target in every browser, especially on touch devices.
+    if(!e.target.closest('.menu-drag-handle'))return;
     const r=editorSidebar.getBoundingClientRect();
     menuDrag={id:e.pointerId,startX:e.clientX,startY:e.clientY,origLeft:r.left,origTop:r.top,moved:false};
     editorSidebar.setPointerCapture(e.pointerId);
