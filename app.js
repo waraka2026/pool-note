@@ -499,21 +499,26 @@ function initMenuDrag(){
   editorSidebar.style.cursor='default';
   menuToggleBtn.style.touchAction='none';
   menuToggleBtn.style.cursor='grab';
-  // ドラッグでメニューを自由に移動（マウス・タッチ・ペン共通）。ボタンの通常クリックは維持し、
-  // 一定量動いた場合のみドラッグとして扱い、その際は直後のクリックを無効化する。
-  editorSidebar.addEventListener('click',e=>{if(suppressMenuClick){e.preventDefault();e.stopPropagation();suppressMenuClick=false}},true);
-  editorSidebar.addEventListener('pointerdown',e=>{
-    if(!e.isPrimary||(e.pointerType==='mouse'&&e.button!==0)||!e.target.closest('#menuToggleBtn'))return;
+
+  editorSidebar.addEventListener('click',e=>{
+    if(!suppressMenuClick)return;
+    e.preventDefault();
+    e.stopPropagation();
+    suppressMenuClick=false;
+  },true);
+
+  menuToggleBtn.addEventListener('pointerdown',e=>{
+    if(!e.isPrimary||(e.pointerType==='mouse'&&e.button!==0))return;
     const r=editorSidebar.getBoundingClientRect();
     menuDrag={id:e.pointerId,startX:e.clientX,startY:e.clientY,origLeft:r.left,origTop:r.top,moved:false};
+    menuToggleBtn.setPointerCapture(e.pointerId);
   });
-  editorSidebar.addEventListener('pointermove',e=>{
+
+  menuToggleBtn.addEventListener('pointermove',e=>{
     if(!menuDrag||menuDrag.id!==e.pointerId)return;
     const dx=e.clientX-menuDrag.startX,dy=e.clientY-menuDrag.startY;
     if(!menuDrag.moved){
-      if(Math.hypot(dx,dy)<6)return;
-      // ここで初めてポインタを捕捉する：最初から捕捉するとタップ時のクリックが
-      // ボタンではなくeditorSidebar自身に再ターゲットされ、通常のボタン操作が効かなくなるため。
+      if(Math.hypot(dx,dy)<5)return;
       menuDrag.moved=true;
       editorSidebar.classList.add('menu-detached');
       editorSidebar.style.position='fixed';
@@ -524,21 +529,33 @@ function initMenuDrag(){
       editorSidebar.style.left=menuDrag.origLeft+'px';
       editorSidebar.style.top=menuDrag.origTop+'px';
       menuToggleBtn.style.cursor='grabbing';
-      editorSidebar.setPointerCapture(e.pointerId);
       layoutTable(true);
     }
     e.preventDefault();
     editorSidebar.style.left=(menuDrag.origLeft+dx)+'px';
     editorSidebar.style.top=(menuDrag.origTop+dy)+'px';
   });
+
   const endMenuDrag=e=>{
     if(!menuDrag||menuDrag.id!==e.pointerId)return;
-    if(editorSidebar.hasPointerCapture(e.pointerId))editorSidebar.releasePointerCapture(e.pointerId);
-    if(menuDrag.moved){suppressMenuClick=true;clampMenuPosition();layoutTable(true)}
-    menuToggleBtn.style.cursor='grab';menuDrag=null;
+    if(menuToggleBtn.hasPointerCapture(e.pointerId))menuToggleBtn.releasePointerCapture(e.pointerId);
+    if(menuDrag.moved){
+      suppressMenuClick=true;
+      clampMenuPosition();
+      const r=editorSidebar.getBoundingClientRect();
+      const defaultLeft=tableAndTip.getBoundingClientRect().left;
+      const dockAtLeft=orientation==='portrait'&&r.left<=defaultLeft+80;
+      if(dockAtLeft){
+        resetMenuToDefault();
+        updateSideLayout();
+      }
+      layoutTable(true);
+    }
+    menuToggleBtn.style.cursor='grab';
+    menuDrag=null;
   };
-  editorSidebar.addEventListener('pointerup',endMenuDrag);
-  editorSidebar.addEventListener('pointercancel',endMenuDrag);
+  menuToggleBtn.addEventListener('pointerup',endMenuDrag);
+  menuToggleBtn.addEventListener('pointercancel',endMenuDrag);
 }
 defaultState();
 initMenuDrag();
