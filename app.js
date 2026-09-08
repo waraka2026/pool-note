@@ -268,7 +268,7 @@ table.addEventListener('pointerdown',e=>{
 });
 table.addEventListener('pointermove',e=>{
   if(groupDrag){moveGroupDrag(e);return}
-  if(draggingBall){if(ballPress&&Math.hypot(e.clientX-ballPress.x,e.clientY-ballPress.y)>5)ballMoved=true;if(!ballMoved)return;const r=table.getBoundingClientRect();state[draggingBall]=ballPoint({x:ballPress.origin.x+(e.clientX-ballPress.x)/r.width*100,y:ballPress.origin.y+(e.clientY-ballPress.y)/r.height*100},draggingBall);syncBallLines(draggingBall);updateBallPositions();renderLines();return}
+  if(draggingBall){e.preventDefault();ballMoved=true;const r=table.getBoundingClientRect();state[draggingBall]=ballPoint({x:ballPress.origin.x+(e.clientX-ballPress.x)/r.width*100,y:ballPress.origin.y+(e.clientY-ballPress.y)/r.height*100},draggingBall);syncBallLines(draggingBall);updateBallPositions();if(lines.length)renderLines();return}
   if(lineStart){const p=point(e),endBall=nearestBall(p,42,lineStart.ball),b=endBall?state[endBall]:p;lineDraft.x2=b.x;lineDraft.y2=b.y;lineDraft.endBall=endBall||null;renderLines();return}
   if(!draggingLine)return;e.preventDefault();const p=point(e),l=lines[draggingLine.i],o=draggingLine.original;
   if(draggingLine.kind==='start'){
@@ -534,7 +534,6 @@ function initMenuDrag(){
       editorSidebar.style.left=menuDrag.origLeft+'px';
       editorSidebar.style.top=menuDrag.origTop+'px';
       menuToggleBtn.style.cursor='grabbing';
-      layoutTable(true);
     }
     e.preventDefault();
     editorSidebar.style.left=(menuDrag.origLeft+dx)+'px';
