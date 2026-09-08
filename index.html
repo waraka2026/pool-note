@@ -20,7 +20,8 @@
     <nav class="primary-menu" aria-label="画面メニュー">
       <button id="guideBtn" type="button">配置の作り方</button>
       <button id="savedBtn" type="button">保存した配置</button>
-      <small class="quick-help"><span>球の削除：PCは右クリック／スマホは長押し</span><span class="menu-help-line">☰ メニュー開閉・ドラッグ移動 / 縦・横：台の向き / ✥ 球を動かす / ▣ 全部まとめて / ↗ 矢印・線 / ◇ 線を消す / ✎ メモを追加 / ✓ 配置を保存</span></small>
+      <button id="matchRecordBtn" type="button" onclick="location.href='matches.html'">対戦記録</button>
+      <small class="quick-help"><span>球の削除：PCは右クリック／スマホは長押し</span><span class="menu-help-line">☰ メニュー開閉・ドラッグ移動 / 縦・横：台の向き / ✥ 球を動かす / ▣ 全部まとめて / ↗ 矢印・線 / ◇ 線を消す / ✎ メモを追加 / ✓ 配置を保存 / 対戦記録：スコア表と配置図の紐づけ</span></small>
     </nav>
 
 
@@ -240,6 +241,7 @@
       <li><b>線・メモを削除する</b><span>線・配置したメモはダブルクリックで削除できます。線は「消去」を選んでタップしても削除できます</span></li>
       <li><b>撞点を記録</b><span>大きい手玉をタップし、赤い点を好きな位置へドラッグできます</span></li>
       <li><b>保存済みを開く</b><span>画面上部の「保存した配置」から、保存した配置の一覧を呼び出せます</span></li>
+      <li><b>対戦記録に紐づける</b><span>画面上部の「対戦記録」から、保存した配置図をプルダウンで選び、どの試合での配置かを記録できます</span></li>
     </ol>
     <p class="guide-tip">色パネルは「閉じる」かパネルの外側をクリックすると閉じます。保存した配置の「画像を保存」では、画面と同じ向きの台・罫線・穴・球・線・メモ・撞点を1枚の画像として保存できます。</p>
   </dialog>
@@ -252,6 +254,7 @@
   <div class="saved-view-buttons" aria-label="表示方法">
     <button id="savedCardView" type="button">カード</button>
     <button id="savedListView" type="button">一覧</button>
+    <button type="button" onclick="location.href='matches.html'">対戦記録で使う</button>
   </div>
   <label>並び順
     <select id="savedSort">
@@ -266,4 +269,3 @@
   <script src="app.js?v=53"></script>
 </body>
 </html>
-
