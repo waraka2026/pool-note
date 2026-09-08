@@ -985,3 +985,21 @@ body>.editor-sidebar.menu-detached[data-orientation="landscape"]:not(.menu-colla
   background:transparent!important;
   box-shadow:none!important;
 }
+
+
+/* Use the pre-expansion 58px width for every portrait menu state. */
+.board-column.portrait .editor-sidebar:not(.menu-detached),
+.board-column.portrait .editor-sidebar:not(.menu-collapsed):not(.menu-detached),
+.board-column.portrait .editor-sidebar.menu-collapsed:not(.menu-detached),
+body>.editor-sidebar.menu-detached[data-orientation="portrait"]{
+  flex-basis:58px!important;
+  width:58px!important;
+  min-width:58px!important;
+  max-width:58px!important;
+}
+.board-column.portrait .menu-placeholder{
+  flex:0 0 58px!important;
+  width:58px!important;
+  min-width:58px!important;
+  max-width:58px!important;
+}
