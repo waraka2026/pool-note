@@ -592,3 +592,30 @@ textarea{width:100%;height:130px;border:1px solid #3b4850;border-radius:12px;bac
   .board-column.landscape>.tray button{padding:4px 6px;font-size:10px}
   .hint{bottom:5px;padding:4px 9px;font-size:9px}
 }
+
+
+/* The floating menu uses icons only; explanations live in the yellow help line. */
+.editor-sidebar .tool-help,
+.board-column.portrait .editor-sidebar:not(.menu-collapsed) .editor-row .tool-help,
+.board-column.portrait .editor-sidebar:not(.menu-collapsed) .orientation-control .tool-help,
+.board-column.landscape .editor-sidebar .tool-help{
+  display:none!important;
+}
+.board-column.portrait .editor-sidebar:not(.menu-collapsed):not(.menu-detached){
+  width:68px!important;
+  max-width:68px;
+  flex-basis:68px;
+  padding:7px;
+}
+.board-column.portrait .editor-sidebar:not(.menu-collapsed) .editor-row,
+.board-column.portrait .editor-sidebar:not(.menu-collapsed) .orientation-control>div{
+  display:flex;
+  justify-content:center;
+  width:100%;
+}
+.board-column.portrait .editor-sidebar:not(.menu-collapsed) .orientation-control,
+.board-column.portrait .editor-sidebar:not(.menu-collapsed) .tools,
+.board-column.portrait .editor-sidebar:not(.menu-collapsed) .tools-row{
+  align-items:center;
+}
+.menu-help-line{white-space:normal}
