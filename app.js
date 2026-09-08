@@ -508,8 +508,11 @@ function initMenuDrag(){
     suppressMenuClick=false;
   },true);
 
-  menuToggleBtn.addEventListener('pointerdown',e=>{
+  editorSidebar.addEventListener('pointerdown',e=>{
     if(!e.isPrimary||(e.pointerType==='mouse'&&e.button!==0))return;
+    const toggle=e.target.closest('#menuToggleBtn');
+    const interactive=e.target.closest('button,input,select,textarea,a,label,#lineColorPanel');
+    if(interactive&&!toggle)return;
     const r=editorSidebar.getBoundingClientRect();
     menuDrag={id:e.pointerId,startX:e.clientX,startY:e.clientY,origLeft:r.left,origTop:r.top,moved:false};
     e.preventDefault();
@@ -542,13 +545,8 @@ function initMenuDrag(){
     if(menuDrag.moved){
       suppressMenuClick=true;
       clampMenuPosition();
-      const r=editorSidebar.getBoundingClientRect();
-      const defaultLeft=tableAndTip.getBoundingClientRect().left;
-      const dockAtLeft=orientation==='portrait'&&r.left<=defaultLeft+80;
-      if(dockAtLeft){
-        resetMenuToDefault();
-        updateSideLayout();
-      }
+      // Keep the menu exactly where the user released it.
+      // It returns to the default slot only when the table orientation changes.
       layoutTable(true);
     }
     menuToggleBtn.style.cursor='grab';
