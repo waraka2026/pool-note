@@ -82,8 +82,12 @@ function clearMenuSizeLock(){
 }
 function lockCurrentMenuSize(){
   const r=editorSidebar.getBoundingClientRect();
+  // Dragging must never freeze the expanded menu's old tall box. Keep only
+  // its width; content determines the height so no empty area remains below.
   for(const prop of ['width','min-width','max-width'])editorSidebar.style.setProperty(prop,r.width+'px','important');
-  for(const prop of ['height','min-height','max-height'])editorSidebar.style.setProperty(prop,r.height+'px','important');
+  editorSidebar.style.removeProperty('min-height');
+  editorSidebar.style.setProperty('height','fit-content','important');
+  editorSidebar.style.setProperty('max-height','calc(100dvh - 8px)','important');
   editorSidebar.style.setProperty('flex-basis',r.width+'px','important');
 }
 let lastLayoutViewport='';
