@@ -720,3 +720,53 @@ textarea{width:100%;height:130px;border:1px solid #3b4850;border-radius:12px;bac
   user-select:none;
   -webkit-user-select:none;
 }
+
+
+/* Direct touch movement for balls on the table. */
+#ballsLayer .ball{touch-action:none;cursor:grab}
+#ballsLayer .ball:active{cursor:grabbing}
+
+/* A closed menu is only the round button; no second outer frame. */
+.editor-sidebar.menu-collapsed,
+.board-column.landscape .editor-sidebar.menu-collapsed,
+.board-column.portrait .editor-sidebar.menu-collapsed{
+  width:58px!important;
+  height:58px!important;
+  min-width:58px!important;
+  min-height:58px!important;
+  flex:0 0 58px!important;
+  padding:0!important;
+  border:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  backdrop-filter:none!important;
+}
+
+/* Keep the horizontal menu's size and internal layout while it is dragged. */
+.board-column.landscape .editor-sidebar.menu-detached:not(.menu-collapsed){
+  display:flex!important;
+  flex-direction:row!important;
+  align-items:center!important;
+  width:max-content!important;
+  max-width:calc(100vw - 8px)!important;
+  overflow-x:auto!important;
+  overflow-y:hidden!important;
+  transition:none!important;
+}
+.board-column.landscape .editor-sidebar.menu-detached:not(.menu-collapsed) .orientation-control,
+.board-column.landscape .editor-sidebar.menu-detached:not(.menu-collapsed) .tools,
+.board-column.landscape .editor-sidebar.menu-detached:not(.menu-collapsed) .tools-row{
+  display:flex!important;
+  flex-direction:row!important;
+  align-items:center!important;
+  flex-wrap:nowrap!important;
+  width:auto!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+}
+.board-column.landscape .editor-sidebar.menu-detached:not(.menu-collapsed) .orientation-control>div,
+.board-column.landscape .editor-sidebar.menu-detached:not(.menu-collapsed) .editor-row{
+  display:block!important;
+  width:auto!important;
+}
