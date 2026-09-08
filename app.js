@@ -83,7 +83,7 @@ function reserveDefaultMenuSlot(){
   const parent=editorSidebar.parentElement,r=editorSidebar.getBoundingClientRect(),style=getComputedStyle(editorSidebar);
   menuPlaceholder.dataset.orientation=orientation;
   if(orientation==='portrait'){
-    menuPlaceholder.style.cssText='display:block;flex:0 0 68px;width:68px;height:1px;pointer-events:none';
+    menuPlaceholder.style.cssText='display:block;flex:0 0 58px;width:58px;height:1px;pointer-events:none';
   }else{
     menuPlaceholder.style.cssText=`display:block;width:${r.width}px;height:${r.height}px;max-width:620px;margin:${style.margin};pointer-events:none`;
   }
