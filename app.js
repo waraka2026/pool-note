@@ -495,13 +495,15 @@ function clampMenuPosition(){
   editorSidebar.style.left=left+'px';editorSidebar.style.top=top+'px';
 }
 function initMenuDrag(){
-  editorSidebar.style.touchAction='none';
-  editorSidebar.style.cursor='grab';
+  editorSidebar.style.touchAction='auto';
+  editorSidebar.style.cursor='default';
+  menuToggleBtn.style.touchAction='none';
+  menuToggleBtn.style.cursor='grab';
   // ドラッグでメニューを自由に移動（マウス・タッチ・ペン共通）。ボタンの通常クリックは維持し、
   // 一定量動いた場合のみドラッグとして扱い、その際は直後のクリックを無効化する。
   editorSidebar.addEventListener('click',e=>{if(suppressMenuClick){e.preventDefault();e.stopPropagation();suppressMenuClick=false}},true);
   editorSidebar.addEventListener('pointerdown',e=>{
-    if(!e.isPrimary||(e.pointerType==='mouse'&&e.button!==0))return;
+    if(!e.isPrimary||(e.pointerType==='mouse'&&e.button!==0)||!e.target.closest('#menuToggleBtn'))return;
     const r=editorSidebar.getBoundingClientRect();
     menuDrag={id:e.pointerId,startX:e.clientX,startY:e.clientY,origLeft:r.left,origTop:r.top,moved:false};
   });
@@ -521,7 +523,7 @@ function initMenuDrag(){
       editorSidebar.style.transform='none';
       editorSidebar.style.left=menuDrag.origLeft+'px';
       editorSidebar.style.top=menuDrag.origTop+'px';
-      editorSidebar.style.cursor='grabbing';
+      menuToggleBtn.style.cursor='grabbing';
       editorSidebar.setPointerCapture(e.pointerId);
       layoutTable(true);
     }
@@ -533,7 +535,7 @@ function initMenuDrag(){
     if(!menuDrag||menuDrag.id!==e.pointerId)return;
     if(editorSidebar.hasPointerCapture(e.pointerId))editorSidebar.releasePointerCapture(e.pointerId);
     if(menuDrag.moved){suppressMenuClick=true;clampMenuPosition();layoutTable(true)}
-    editorSidebar.style.cursor='grab';menuDrag=null;
+    menuToggleBtn.style.cursor='grab';menuDrag=null;
   };
   editorSidebar.addEventListener('pointerup',endMenuDrag);
   editorSidebar.addEventListener('pointercancel',endMenuDrag);
