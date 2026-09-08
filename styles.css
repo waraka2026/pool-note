@@ -380,7 +380,7 @@ textarea{width:100%;height:130px;border:1px solid #3b4850;border-radius:12px;bac
   border-radius:50%;
 }
 .editor-sidebar.menu-collapsed .menu-toggle-btn{margin:0}
-.editor-sidebar.menu-detached{position:fixed!important;inset:auto!important;transform:none!important;z-index:20}
+.editor-sidebar.menu-detached{position:fixed!important;transform:none!important;z-index:5000}
 @media(max-width:420px){
   .editor-sidebar,.board-column.landscape .editor-sidebar{flex-basis:128px;width:128px!important;padding:7px}
   .editor-sidebar .editor-row button,.board-column.landscape .editor-sidebar .editor-row button{width:38px;height:38px;flex-basis:38px;padding:6px}
@@ -824,4 +824,21 @@ body>.editor-sidebar.menu-detached:not(.menu-collapsed) .orientation-control but
   min-width:36px!important;
   margin:0!important;
   padding:5px!important;
+}
+
+
+/* Detached menu always remains visible at its dragged viewport position. */
+body>.editor-sidebar.menu-detached,
+body>.editor-sidebar.menu-detached.menu-collapsed{
+  position:fixed!important;
+  right:auto!important;
+  bottom:auto!important;
+  z-index:5000!important;
+  pointer-events:auto!important;
+}
+body>.editor-sidebar.menu-detached.menu-collapsed>.menu-toggle-btn{
+  position:static!important;
+  z-index:5001!important;
+  visibility:visible!important;
+  opacity:1!important;
 }
