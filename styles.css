@@ -619,3 +619,41 @@ textarea{width:100%;height:130px;border:1px solid #3b4850;border-radius:12px;bac
   align-items:center;
 }
 .menu-help-line{white-space:normal}
+
+
+/* Mobile portrait: keep the board fixed and scroll only inside the tall menu. */
+.editor-sidebar .menu-toggle-btn{
+  position:sticky;
+  top:0;
+  z-index:2;
+  flex-shrink:0;
+}
+@media (orientation:portrait) and (max-width:767px){
+  html,body{
+    width:100%;
+    height:100dvh;
+    min-height:0;
+    overflow:hidden;
+    overscroll-behavior:none;
+  }
+  .app{
+    height:100dvh;
+    min-height:0;
+    overflow:hidden;
+  }
+  .workspace,.board-column{
+    overflow:hidden;
+    overscroll-behavior:none;
+  }
+  .board-column.portrait .editor-sidebar:not(.menu-detached){
+    position:static;
+    align-self:flex-start;
+    overflow-x:hidden!important;
+    overflow-y:auto!important;
+    overscroll-behavior:contain;
+    -webkit-overflow-scrolling:touch;
+  }
+  .board-column.portrait .editor-sidebar.menu-collapsed:not(.menu-detached){
+    overflow:hidden!important;
+  }
+}
