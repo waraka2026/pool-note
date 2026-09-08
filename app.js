@@ -77,6 +77,15 @@ landscapeBtn.onclick=()=>setOrientation('landscape');
 const tableAndTip=document.querySelector('.table-and-tip'),editorSidebar=document.querySelector('.editor-sidebar'),tableWrap=document.querySelector('.table-wrap');
 const menuPlaceholder=document.createElement('div');
 menuPlaceholder.className='menu-placeholder';
+function clearMenuSizeLock(){
+  for(const prop of ['width','min-width','max-width','height','min-height','max-height','flex-basis'])editorSidebar.style.removeProperty(prop);
+}
+function lockCurrentMenuSize(){
+  const r=editorSidebar.getBoundingClientRect();
+  for(const prop of ['width','min-width','max-width'])editorSidebar.style.setProperty(prop,r.width+'px','important');
+  for(const prop of ['height','min-height','max-height'])editorSidebar.style.setProperty(prop,r.height+'px','important');
+  editorSidebar.style.setProperty('flex-basis',r.width+'px','important');
+}
 let lastLayoutViewport='';
 function reserveDefaultMenuSlot(){
   if(menuPlaceholder.isConnected||!editorSidebar.parentElement)return;
@@ -93,6 +102,7 @@ function resetMenuToDefault(){
   editorSidebar.classList.remove('menu-detached');
   menuPlaceholder.remove();
   menuPlaceholder.style.cssText='';
+  clearMenuSizeLock();
   for(const prop of ['position','left','top','right','bottom','margin','transform','zIndex'])editorSidebar.style[prop]='';
 }
 function updateSideLayout(){
@@ -495,6 +505,7 @@ document.querySelector('#savedSort').onchange=e=>{savedSortOrder=e.target.value;
 const menuToggleBtn=document.querySelector('#menuToggleBtn');
 function setMenuExpanded(expanded){
   editorSidebar.classList.toggle('menu-collapsed',!expanded);
+  if(expanded&&editorSidebar.classList.contains('menu-detached'))clearMenuSizeLock();
   if(!expanded&&editorSidebar.classList.contains('menu-detached'))resetMenuToDefault();
   menuToggleBtn.setAttribute('aria-expanded',String(expanded));
   menuToggleBtn.setAttribute('aria-label',expanded?'編集メニューを閉じる':'編集メニューを開く');
@@ -543,6 +554,7 @@ function initMenuDrag(){
     if(!menuDrag.moved){
       if(Math.hypot(dx,dy)<5)return;
       menuDrag.moved=true;
+      lockCurrentMenuSize();
       reserveDefaultMenuSlot();
       editorSidebar.classList.add('menu-detached');
       document.body.append(editorSidebar);
