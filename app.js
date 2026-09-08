@@ -526,6 +526,7 @@ function initMenuDrag(){
       if(Math.hypot(dx,dy)<5)return;
       menuDrag.moved=true;
       editorSidebar.classList.add('menu-detached');
+      document.body.append(editorSidebar);
       editorSidebar.style.position='fixed';
       editorSidebar.style.margin='0';
       editorSidebar.style.right='auto';
