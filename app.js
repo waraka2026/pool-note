@@ -518,7 +518,24 @@ function setMenuExpanded(expanded){
   menuToggleBtn.querySelector('small').textContent=expanded?'閉じる':'メニュー';
   requestAnimationFrame(()=>{clampMenuPosition();layoutTable(true)});
 }
-menuToggleBtn.addEventListener('click',()=>setMenuExpanded(editorSidebar.classList.contains('menu-collapsed')));
+let toggleTouch=null,ignoreTouchClickUntil=0;
+menuToggleBtn.addEventListener('pointerdown',e=>{
+  if(e.pointerType!=='touch'){ignoreTouchClickUntil=0;return}
+  if(e.isPrimary)toggleTouch={id:e.pointerId,x:e.clientX,y:e.clientY,moved:false};
+});
+document.addEventListener('pointermove',e=>{
+  if(toggleTouch&&e.pointerId===toggleTouch.id&&Math.hypot(e.clientX-toggleTouch.x,e.clientY-toggleTouch.y)>5)toggleTouch.moved=true;
+});
+document.addEventListener('pointerup',e=>{
+  if(!toggleTouch||e.pointerId!==toggleTouch.id)return;
+  const tap=!toggleTouch.moved;toggleTouch=null;ignoreTouchClickUntil=Date.now()+750;
+  if(tap)setMenuExpanded(editorSidebar.classList.contains('menu-collapsed'));
+});
+document.addEventListener('pointercancel',()=>{toggleTouch=null});
+menuToggleBtn.addEventListener('click',e=>{
+  if(e.detail!==0&&Date.now()<ignoreTouchClickUntil)return;
+  setMenuExpanded(editorSidebar.classList.contains('menu-collapsed'));
+});
 let menuDrag=null,suppressMenuClick=false;
 function clampMenuPosition(){
   if(editorSidebar.style.position!=='fixed')return;
@@ -543,13 +560,14 @@ function initMenuDrag(){
 
   editorSidebar.addEventListener('pointerdown',e=>{
     if(!e.isPrimary||(e.pointerType==='mouse'&&e.button!==0))return;
-    // Only the dedicated grip starts a drag. The close/open button must remain
-    // a normal tap target in every browser, especially on touch devices.
-    if(!e.target.closest('.menu-drag-handle'))return;
+    suppressMenuClick=false;
+    // Expanded: drag the grip. Collapsed: drag the remaining menu button.
+    // A short tap still opens the menu; only an actual drag suppresses its click.
+    const collapsedButton=editorSidebar.classList.contains('menu-collapsed')&&e.target.closest('#menuToggleBtn');
+    if(!e.target.closest('.menu-drag-handle')&&!collapsedButton)return;
     const r=editorSidebar.getBoundingClientRect();
     menuDrag={id:e.pointerId,startX:e.clientX,startY:e.clientY,origLeft:r.left,origTop:r.top,moved:false};
-    editorSidebar.setPointerCapture(e.pointerId);
-    e.preventDefault();
+    if(!collapsedButton){editorSidebar.setPointerCapture(e.pointerId);e.preventDefault()}
   });
 
   document.addEventListener('pointermove',e=>{
@@ -562,6 +580,7 @@ function initMenuDrag(){
       reserveDefaultMenuSlot();
       editorSidebar.classList.add('menu-detached');
       document.body.append(editorSidebar);
+      editorSidebar.setPointerCapture(e.pointerId);
       editorSidebar.style.position='fixed';
       editorSidebar.style.margin='0';
       editorSidebar.style.right='auto';
