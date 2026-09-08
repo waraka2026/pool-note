@@ -59,6 +59,7 @@ function setOrientation(next,rotateContent=true,mark=true){
   if(next===orientation)return;
   if(rotateContent)rotateCoordinates(next);
   orientation=next;
+  editorSidebar.dataset.orientation=next;
   boardColumn.classList.toggle('portrait',next==='portrait');
   boardColumn.classList.toggle('landscape',next==='landscape');
   portraitBtn.classList.toggle('active',next==='portrait');
