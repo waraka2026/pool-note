@@ -967,3 +967,21 @@ body>.editor-sidebar.menu-detached[data-orientation="landscape"]:not(.menu-colla
   overflow-x:auto!important;
   overflow-y:hidden!important;
 }
+
+
+/* Keep the original expanded-menu slot reserved while the menu floats. */
+.menu-placeholder{visibility:hidden;pointer-events:none}
+.board-column.portrait .editor-sidebar.menu-collapsed:not(.menu-detached){
+  display:flex!important;
+  align-items:flex-start!important;
+  justify-content:center!important;
+  flex:0 0 68px!important;
+  width:68px!important;
+  min-width:68px!important;
+  max-width:68px!important;
+  height:58px!important;
+  padding:0 5px!important;
+  border:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
