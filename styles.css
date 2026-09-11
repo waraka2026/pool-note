@@ -66,7 +66,7 @@ body{margin:0;background-color:#0c1013;background-image:radial-gradient(circle a
 .ball{position:absolute;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-size:8px;font-weight:900;color:#111;background:radial-gradient(circle at 30% 24%,#fff 0 5%,#ffffffa6 7%,transparent 22%),radial-gradient(circle at 68% 72%,#0008 0,transparent 48%),var(--ball);border:1px solid #ffffffbd;box-shadow:-2px -3px 5px #fff6 inset,2px 3px 4px #0009;transform:translate(-50%,-50%);user-select:none;touch-action:pinch-zoom;z-index:3}
 .ball:before{content:"";position:absolute;width:4px;height:2px;border-radius:50%;background:#fff9;left:4px;top:3px;transform:rotate(-28deg)}
 .ball.cue{background:radial-gradient(circle at 30% 24%,#fff 0 9%,transparent 24%),radial-gradient(circle at 65% 70%,#d8d1a7 0,#fffdf2 48%,#fff 72%)}
-.ball.ghost{background:#ffffff18;border:2px dashed #fff;box-shadow:0 1px 4px #0006;opacity:.9}
+.ball.ghost{background:#ff404018;border:2px dotted #ff4040;box-shadow:0 1px 4px #0006;opacity:.9}
 .ball.ghost:before{display:none}
 .ball.striped{background:linear-gradient(#fff 0 22%,var(--ball) 22% 76%,#fff 76%)}
 .ball span{background:#fff;border-radius:50%;min-width:11px;height:11px;display:grid;place-items:center;position:relative;z-index:2}
@@ -1105,5 +1105,7 @@ body>.editor-sidebar.menu-detached[data-orientation="portrait"]:not(.menu-collap
 }
 
 
-#ballsLayer .linked-ghost{opacity:.6;cursor:pointer;z-index:2}
+#ballsLayer .linked-ghost{opacity:.9;cursor:pointer;z-index:2}
 #ghostToggle[aria-pressed="true"]{border-color:var(--gold);color:var(--gold)}
+
+.save-toast{position:fixed;left:50%;bottom:max(28px,env(safe-area-inset-bottom));transform:translateX(-50%);z-index:10000;background:#163e2f;color:#fff;border:1px solid #8bdbad;border-radius:12px;padding:14px 20px;box-shadow:0 4px 20px #0006;font-size:15px;font-weight:700;text-align:center;max-width:calc(100vw - 32px);width:max-content;pointer-events:none}

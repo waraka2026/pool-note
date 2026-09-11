@@ -459,7 +459,7 @@ document.querySelector('#resetBtn').onclick=clearTable;
 function roundedRect(ctx,x,y,w,h,r){ctx.beginPath();ctx.roundRect(x,y,w,h,r)}
 function drawCanvasBall(ctx,n,x,y,r){
   const kind=ballKind(n);
-  if(kind==='ghost'){ctx.save();ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.setLineDash([4,3]);ctx.beginPath();ctx.arc(x,y,r-1,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);ctx.restore();return}
+  if(kind==='ghost'){ctx.save();ctx.strokeStyle='#ff4040';ctx.lineWidth=2;ctx.lineCap='round';ctx.setLineDash([1,3]);ctx.beginPath();ctx.arc(x,y,r-1,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);ctx.restore();return}
   ctx.save();ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.clip();const base=ctx.createRadialGradient(x-r*.38,y-r*.42,r*.04,x,y,r*1.12);
   if(kind==='cue'){base.addColorStop(0,'#fff');base.addColorStop(.72,'#fffdf2');base.addColorStop(1,'#b9b28f')}
   else if(Number(kind)>8){base.addColorStop(0,'#fff');base.addColorStop(.72,'#fffdf4');base.addColorStop(1,'#aaa58e')}
@@ -519,16 +519,23 @@ function downloadImage(){
   ctx.fillStyle='#151b20';ctx.fillRect(frameW,0,extra,frameH);ctx.fillStyle='#d5aa58';ctx.font='bold 13px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('撞点',frameW+extra/2,24);
   const bx=frameW+extra/2,by=67,br=27;drawCanvasBall(ctx,'cue',bx,by,br);
   if(tip){ctx.beginPath();ctx.arc(bx-br+tip.x*br*2,by-br+tip.y*br*2,3.5,0,Math.PI*2);ctx.fillStyle='#e6382e';ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=1;ctx.stroke()}
-  const a=document.createElement('a');a.download=(currentTitle||'ビリヤード配置')+'.png';a.href=c.toDataURL('image/png');a.click();
+  const a=document.createElement('a');a.download=(currentTitle||'ビリヤード配置')+'.png';a.href=c.toDataURL('image/png');a.click();showSaveToast('画像のダウンロードを開始しました');
   }finally{tableFrame.style.transform=displayTransform}
 }
 function formatSavedTime(value){if(!value)return'';if(/^\d{4}\/\d{1,2}\/\d{1,2}$/.test(String(value)))return `${value}（時刻記録なし）`;const d=new Date(value);if(Number.isNaN(d.getTime()))return String(value);return d.toLocaleString('ja-JP',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})}
+let saveToastTimer;
+function showSaveToast(message){
+  let toast=document.querySelector('#saveToast');
+  if(!toast){toast=document.createElement('div');toast.id='saveToast';toast.className='save-toast';toast.setAttribute('role','status');toast.setAttribute('aria-live','polite');document.body.append(toast)}
+  clearTimeout(saveToastTimer);toast.hidden=false;toast.textContent=message;
+  saveToastTimer=setTimeout(()=>{toast.hidden=true},3500);
+}
 document.querySelector('#saveBtn').onclick=()=>{
   const saved=JSON.parse(localStorage.getItem('poolNotes')||'[]'),now=new Date().toISOString(),data={title:currentTitle||'名称なし',state:structuredClone(state),lines:structuredClone(lines),notes:structuredClone(notes),tip:tip?{...tip}:null,orientation,result:document.querySelector('input[name=result]:checked')?.value||'',updatedAt:now};let label='新規保存済み';
   const index=currentSaveId===null?-1:saved.findIndex(s=>String(s.id)===String(currentSaveId));
   if(index>=0){saved[index]={...saved[index],...data,createdAt:saved[index].createdAt||saved[index].date||now};label='上書き保存済み'}
   else{currentSaveId=Date.now();saved.unshift({id:currentSaveId,...data,createdAt:now,date:new Date().toLocaleDateString('ja-JP')})}
-  localStorage.setItem('poolNotes',JSON.stringify(saved.slice(0,30)));document.querySelector('#saveState').textContent=label;const help=document.querySelector('#saveHelp');help.textContent='保存済み';setTimeout(()=>help.textContent='配置を保存',1400);
+  try{localStorage.setItem('poolNotes',JSON.stringify(saved.slice(0,30)))}catch(error){showSaveToast('保存できませんでした。空き容量やブラウザの設定をご確認ください');return}showSaveToast('配置を保存しました');document.querySelector('#saveState').textContent=label;const help=document.querySelector('#saveHelp');help.textContent='保存済み';setTimeout(()=>help.textContent='配置を保存',1400);
 };
 function savedTimestamp(s){const time=Date.parse(s.updatedAt||s.createdAt||s.date||'');return Number.isNaN(time)?Number(s.id)||0:time}
 function readSaved(){return JSON.parse(localStorage.getItem('poolNotes')||'[]')}
