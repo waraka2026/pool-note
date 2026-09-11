@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#101418" />
   <title>ビリヤード配置図メーカー｜球配置・ショットライン作成</title>
   <meta name="description" content="ビリヤードの球配置とショットラインをブラウザで作成・保存できる無料の配置図メーカー。手球と1〜15番の球に対応。" />
-  <link rel="stylesheet" href="styles.css?v=68" />
+  <link rel="stylesheet" href="styles.css?v=69" />
 </head>
 <body>
   <main class="app">
@@ -21,7 +21,7 @@
       <button id="guideBtn" type="button">配置の作り方</button>
       <button id="savedBtn" type="button">保存した配置</button>
       <button id="matchRecordBtn" type="button" onclick="location.href='matches.html'">対戦記録</button>
-      <small class="quick-help"><span>球の削除：PCは右クリック／スマホは長押し</span><span class="menu-help-line">☰ メニュー開閉・ドラッグ移動 / 縦・横：台の向き / ✥ 球を動かす / ▣ 全部まとめて / ↗ 矢印・線 / ◇ 線を消す / ✎ メモを追加 / ✓ 配置を保存 / 対戦記録：スコア表と配置図の紐づけ</span></small>
+      <small class="quick-help"><span>球の削除：PCは右クリック／スマホは長押し</span><span class="menu-help-line">☰ メニュー開閉・ドラッグ移動 / 縦・横：台の向き / ✥ 球を動かす / ▣ 全部まとめて / ↗ 矢印・線 / ◇ 線を消す / ✎ メモを追加 / 💾 配置を保存 / 対戦記録：スコア表と配置図の紐づけ</span></small>
     </nav>
 
 
@@ -65,7 +65,7 @@
         <div class="editor-row"><span class="tool-help">矢印・線</span><button type="button" id="drawBtn" title="矢印・線" aria-label="矢印・線"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20L20 4M10 4h10v10"/></svg></button></div>
         <div class="editor-row"><span class="tool-help">線を消す</span><button type="button" data-mode="erase" title="消去" aria-label="消去"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13l9-9 8 8-9 9H9l-5-5zM9 8l8 8M12 21h9"/></svg></button></div>
         <div class="editor-row"><span class="tool-help">メモを追加</span><button type="button" id="memoBtn" title="メモ" aria-label="メモ"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1-6L16 3l5 5-11 11-6 1zM13 6l5 5"/></svg></button></div>
-        <div class="editor-row"><span class="tool-help" id="saveHelp" aria-live="polite">配置を保存</span><button type="button" id="saveBtn" class="save" title="配置を保存" aria-label="配置を保存">保存</button></div>
+        <div class="editor-row"><span class="tool-help" id="saveHelp" aria-live="polite">配置を保存</span><button type="button" id="saveBtn" class="save" title="配置を保存" aria-label="配置を保存"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h12l4 4v14H3V3h2Z"/><path d="M7 3v6h10V3M7 21v-8h10v8M14 5v2"/></svg></button></div>
       </div>
     </nav>
     </aside>
@@ -268,6 +268,6 @@
 <div id="savedList">
 </div>
 </dialog>
-  <script src="app.js?v=56"></script>
+  <script src="app.js?v=57"></script>
 </body>
 </html>

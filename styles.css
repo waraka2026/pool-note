@@ -1109,3 +1109,36 @@ body>.editor-sidebar.menu-detached[data-orientation="portrait"]:not(.menu-collap
 #ghostToggle[aria-pressed="true"]{border-color:var(--gold);color:var(--gold)}
 
 .save-toast{position:fixed;left:50%;bottom:max(28px,env(safe-area-inset-bottom));transform:translateX(-50%);z-index:10000;background:#163e2f;color:#fff;border:1px solid #8bdbad;border-radius:12px;padding:14px 20px;box-shadow:0 4px 20px #0006;font-size:15px;font-weight:700;text-align:center;max-width:calc(100vw - 32px);width:max-content;pointer-events:none}
+
+/* Save feedback sits over the cloth without changing table layout. */
+.save-toast{bottom:auto;transform:translate(-50%,-50%);padding:12px 14px;overflow-wrap:anywhere;font-size:14px;line-height:1.5}
+/* Phone-only sizing: retain the board, side tray and icon menu positions. */
+@media (max-width:767px), (pointer:coarse) and (max-height:600px){
+  html,body{height:auto;min-height:100dvh;overflow-x:clip;overflow-y:auto;overscroll-behavior-y:auto}
+  .app{height:auto;min-height:100dvh;overflow:visible;padding-left:max(8px,env(safe-area-inset-left));padding-right:max(8px,env(safe-area-inset-right));padding-bottom:max(12px,env(safe-area-inset-bottom))}
+  .workspace,.board-column{height:auto;min-width:0;max-width:100%;overflow:visible}
+  .topbar{height:auto;min-width:0}.topbar h1{font-size:clamp(15px,4.5vw,22px);line-height:1.35;overflow-wrap:anywhere}
+  .primary-menu{flex-wrap:wrap;min-width:0;max-width:100%}
+  .primary-menu button{flex:1 1 auto;min-width:0;padding:8px 5px;font-size:clamp(11px,3.3vw,13px);white-space:normal}
+  .quick-help{flex:1 1 100%;min-width:0;padding:4px 0;white-space:normal;overflow-wrap:anywhere;font-size:10px;line-height:1.45}
+  .quick-help span{max-width:100%;white-space:normal}
+  .side-controls,.tip-point{min-width:0}.tip-help,.tip-label,.tip-clear{white-space:normal;overflow-wrap:anywhere;max-width:100%}
+  .board-column.landscape>.editor-sidebar:not(.menu-detached):not(.menu-collapsed){max-width:100%!important;box-sizing:border-box}
+  .board-column.landscape>.tray{max-width:100%;flex-wrap:wrap}
+  .board-column.landscape>.tray .tray-balls{max-width:100%;flex-wrap:wrap}
+  #lineColorPanel{padding:10px!important;overflow-x:hidden}
+  .color-panel-head>div{min-width:0}.color-panel-head small{overflow-wrap:anywhere}
+  .color-panel-close{flex-shrink:0}
+  .line-width-control{min-width:0}.line-width-control input{min-width:0;flex:1;width:100%}
+  .line-color-swatches{grid-template-columns:repeat(8,minmax(0,1fr));gap:7px 3px}
+  #lineColorPanel .color-swatch{width:min(32px,100%);height:auto;aspect-ratio:1}
+  .custom-color{flex-wrap:wrap;overflow-wrap:anywhere}
+  dialog{max-height:calc(100dvh - 24px);overflow:auto;padding:16px;overflow-wrap:anywhere}
+  .saved-controls,.saved-actions,.memo-actions{flex-wrap:wrap}
+  .saved-title-input,.memo-style-grid select{min-width:0;max-width:100%}
+  .memo-style-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .memo-style-grid label{min-width:0;flex-wrap:wrap}
+  .hint{max-width:calc(100% - 12px);white-space:normal;text-align:center}
+}
+
+@media(max-width:767px){.tray button{font-size:12px;padding:8px 3px;white-space:nowrap}}

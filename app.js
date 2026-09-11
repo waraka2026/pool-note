@@ -524,11 +524,19 @@ function downloadImage(){
 }
 function formatSavedTime(value){if(!value)return'';if(/^\d{4}\/\d{1,2}\/\d{1,2}$/.test(String(value)))return `${value}（時刻記録なし）`;const d=new Date(value);if(Number.isNaN(d.getTime()))return String(value);return d.toLocaleString('ja-JP',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})}
 let saveToastTimer;
+function positionSaveToast(){
+  const toast=document.querySelector('#saveToast');if(!toast||toast.hidden)return;
+  const r=table.getBoundingClientRect();
+  toast.style.left=(r.left+r.width/2)+'px';toast.style.top=(r.top+r.height/2)+'px';
+  toast.style.maxWidth=Math.max(80,r.width-12)+'px';
+}
+window.addEventListener('resize',positionSaveToast);
+window.addEventListener('scroll',positionSaveToast,true);
 function showSaveToast(message){
   let toast=document.querySelector('#saveToast');
   if(!toast){toast=document.createElement('div');toast.id='saveToast';toast.className='save-toast';toast.setAttribute('role','status');toast.setAttribute('aria-live','polite');document.body.append(toast)}
-  clearTimeout(saveToastTimer);toast.hidden=false;toast.textContent=message;
-  saveToastTimer=setTimeout(()=>{toast.hidden=true},3500);
+  clearTimeout(saveToastTimer);toast.hidden=false;toast.textContent=message;positionSaveToast();
+  saveToastTimer=setTimeout(()=>{toast.hidden=true},2200);
 }
 document.querySelector('#saveBtn').onclick=()=>{
   const saved=JSON.parse(localStorage.getItem('poolNotes')||'[]'),now=new Date().toISOString(),data={title:currentTitle||'名称なし',state:structuredClone(state),lines:structuredClone(lines),notes:structuredClone(notes),tip:tip?{...tip}:null,orientation,result:document.querySelector('input[name=result]:checked')?.value||'',updatedAt:now};let label='新規保存済み';
