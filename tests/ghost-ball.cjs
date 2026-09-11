@@ -17,6 +17,12 @@ const assert=require('node:assert/strict');
    assert(Math.abs(result.distance-result.diameter)<.01);assert(Math.abs(result.visual-result.diameter)<.1);
   }
   await page.evaluate(()=>{lines[0].x2=20;renderLines()});assert.equal(await page.locator('.linked-ghost').count(),1);
+  const before=await page.locator('.linked-ghost').boundingBox(),gx=before.x+before.width/2,gy=before.y+before.height/2;
+  if(mobile){const cdp=await page.context().newCDPSession(page);await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:gx,y:gy,id:1}]});await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:gx+25,y:gy+30,id:1}]});await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]})}
+  else{await page.mouse.move(gx,gy);await page.mouse.down();await page.mouse.move(gx+25,gy+30,{steps:5});await page.mouse.up()}
+  const after=await page.locator('.linked-ghost').boundingBox();assert(Math.abs(after.x-before.x-25)<1);assert(Math.abs(after.y-before.y-30)<1);
+  const tracking=await page.evaluate(()=>{const l=lines[0],offset=JSON.stringify(l.ghostOffset),p=ghostPosition(l);l.x2=70;l.y2=15;renderLines();const q=ghostPosition(l);lines=JSON.parse(JSON.stringify(lines));render();return {offset,restored:JSON.stringify(lines[0].ghostOffset),moved:Math.hypot(p.x-q.x,p.y-q.y)}});
+  assert.equal(tracking.offset,tracking.restored);assert(tracking.moved>1);
   if(mobile){const b=await page.locator('.linked-ghost').boundingBox(),cdp=await page.context().newCDPSession(page);await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:b.x+b.width/2,y:b.y+b.height/2,id:1}]});await page.waitForTimeout(700);await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]})}
   else await page.locator('.linked-ghost').dblclick();
   assert.equal(await page.locator('.linked-ghost').count(),0);assert.equal(await page.evaluate(()=>lines.length),1);

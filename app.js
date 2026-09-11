@@ -17,6 +17,7 @@ let mode='move',draggingBall=null,draggingLine=null,lineStart=null,lineDraft=nul
 let ballPress=null,ballMoved=false,lastLineTap=null,savedView='cards',savedSortOrder='newest';
 let ballHold=null,lastTouchTime=0;
 let ghostEnabled=false;
+let ghostDrag=null;
 function cancelBallHold(){if(ballHold)clearTimeout(ballHold.timer);ballHold=null}
 function startBallHold(e,n){
   cancelBallHold();
@@ -265,17 +266,19 @@ function ghostPosition(l){
   if(!l.ghostEnabled||l.ghostDismissed||l.type==='plain'||!state[l.startBall]||!/^([1-9]|1[0-5])$/.test(String(l.startBall)))return null;
   const r=table.getBoundingClientRect(),dx=(l.x2-l.x1)*r.width/100,dy=(l.y2-l.y1)*r.height/100,len=Math.hypot(dx,dy);
   if(len<1)return null;
-  return {x:l.x1-dx/len*ballDiameter()/r.width*100,y:l.y1-dy/len*ballDiameter()/r.height*100};
+  const along=l.ghostOffset?.along??-1,side=l.ghostOffset?.side??0,d=ballDiameter();
+  return {x:l.x1+(dx/len*along-dy/len*side)*d/r.width*100,y:l.y1+(dy/len*along+dx/len*side)*d/r.height*100};
 }
 function renderGhosts(){
   layer.querySelectorAll('.linked-ghost').forEach(el=>el.remove());
   [...lines,...(lineDraft?[lineDraft]:[])].forEach(l=>{
     const p=ghostPosition(l);if(!p)return;
     const el=ballEl('ghost',p.x,p.y);el.classList.add('linked-ghost');el.removeAttribute('data-n');
-    const dismiss=()=>{l.ghostDismissed=true;renderLines();markUnsaved()};
+    const dismiss=()=>{ghostDrag=null;l.ghostDismissed=true;renderLines();markUnsaved()};
     el.addEventListener('dblclick',e=>{e.preventDefault();e.stopPropagation();dismiss()});
     el.addEventListener('pointerdown',e=>{
       e.stopPropagation();if(!e.isPrimary||e.button!==0)return;
+      ghostDrag={l,id:e.pointerId,x:e.clientX,y:e.clientY,p,moved:false};
       if(e.pointerType==='touch'){
         const hold={id:e.pointerId,x:e.clientX,y:e.clientY};
         hold.timer=setTimeout(()=>{if(ballHold===hold){cancelBallHold();dismiss()}},600);ballHold=hold;
@@ -284,6 +287,22 @@ function renderGhosts(){
     el.addEventListener('contextmenu',e=>e.preventDefault());layer.append(el);
   });
 }
+document.addEventListener('pointermove',e=>{
+  const g=ghostDrag;if(!g||g.id!==e.pointerId)return;
+  const mx=e.clientX-g.x,my=e.clientY-g.y;
+  if(!g.moved&&Math.hypot(mx,my)<=5)return;
+  g.moved=true;cancelBallHold();table.setPointerCapture(e.pointerId);e.preventDefault();
+  const r=table.getBoundingClientRect(),l=g.l,d=ballDiameter();
+  const dx=(l.x2-l.x1)*r.width/100,dy=(l.y2-l.y1)*r.height/100,len=Math.hypot(dx,dy);
+  if(len<1)return;
+  const x=Math.max(d/2,Math.min(r.width-d/2,g.p.x*r.width/100+mx))-l.x1*r.width/100;
+  const y=Math.max(d/2,Math.min(r.height-d/2,g.p.y*r.height/100+my))-l.y1*r.height/100;
+  l.ghostOffset={along:(x*dx+y*dy)/len/d,side:(-x*dy+y*dx)/len/d};
+  renderGhosts();
+},{passive:false});
+function finishGhostDrag(e){if(ghostDrag&&(!e||ghostDrag.id===e.pointerId)){if(ghostDrag.moved)markUnsaved();ghostDrag=null;cancelBallHold()}}
+for(const type of ['pointerup','pointercancel','lostpointercapture'])document.addEventListener(type,finishGhostDrag);
+window.addEventListener('blur',()=>finishGhostDrag());
 const ghostToggle=document.querySelector('#ghostToggle');
 ghostToggle.onclick=()=>{
   ghostEnabled=!ghostEnabled;ghostToggle.textContent='イメージボール '+(ghostEnabled?'ON':'OFF');
