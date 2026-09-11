@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#101418" />
   <title>ビリヤード配置図メーカー｜球配置・ショットライン作成</title>
   <meta name="description" content="ビリヤードの球配置とショットラインをブラウザで作成・保存できる無料の配置図メーカー。手球と1〜15番の球に対応。" />
-  <link rel="stylesheet" href="styles.css?v=66" />
+  <link rel="stylesheet" href="styles.css?v=67" />
 </head>
 <body>
   <main class="app">
@@ -49,6 +49,8 @@
           <input id="lineWidthRange" type="range" min="1" max="8" step="1" value="2" />
           <span id="lineWidthValue" class="line-width-value">2</span>
         </div>
+        <button id="ghostToggle" class="auto-color-btn" type="button" aria-pressed="false">イメージボール OFF</button>
+        <small>ONで先玉の反対側に表示。補助球はダブルクリック・長押しで削除。</small>
         <div class="color-line-types" aria-label="描画の種類">
           <button id="colorArrowBtn" type="button">↗ 矢印</button>
           <button id="colorPlainBtn" type="button">╱ 線</button>
@@ -266,6 +268,6 @@
 <div id="savedList">
 </div>
 </dialog>
-  <script src="app.js?v=53"></script>
+  <script src="app.js?v=54"></script>
 </body>
 </html>
