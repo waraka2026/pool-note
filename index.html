@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#101418" />
   <title>ビリヤード配置図メーカー｜球配置・ショットライン作成</title>
   <meta name="description" content="ビリヤードの球配置とショットラインをブラウザで作成・保存できる無料の配置図メーカー。手球と1〜15番の球に対応。" />
-  <link rel="stylesheet" href="styles.css?v=70" />
+  <link rel="stylesheet" href="styles.css?v=71" />
 </head>
 <body>
   <main class="app">
@@ -60,6 +60,7 @@
         <label class="custom-color">その他の色（自由に選ぶ） <input id="lineColorPicker" type="color" value="#ff2f92" /></label>
       </section>
       <div class="tools-row">
+        <div class="editor-row"><span class="tool-help" id="gridHelp">罫線を表示</span><button type="button" id="gridToggleBtn" class="active" aria-pressed="true" title="罫線の表示・非表示" aria-label="罫線の表示・非表示"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16v16H4zM4 9h16M4 15h16M9 4v16M15 4v16"/></svg></button></div>
         <div class="editor-row"><span class="tool-help">球を動かす</span><button type="button" data-mode="move" class="active" title="移動" aria-label="移動"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 12h18M9 6l3-3 3 3M9 18l3 3 3-3M6 9l-3 3 3 3M18 9l3 3-3 3"/></svg></button></div>
         <div class="editor-row"><span class="tool-help">全部まとめて</span><button type="button" id="groupMoveBtn" aria-pressed="false" title="まとめて移動" aria-label="まとめて移動"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="12" height="12" rx="2"/><rect x="9" y="9" width="12" height="12" rx="2"/></svg></button></div>
         <div class="editor-row"><span class="tool-help">矢印・線</span><button type="button" id="drawBtn" title="矢印・線" aria-label="矢印・線"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20L20 4M10 4h10v10"/></svg></button></div>
@@ -142,6 +143,7 @@
 </div>
 <div class="spot foot-spot">
 </div>
+<div id="targetGuide" class="target-guide" hidden></div>
 <svg id="lines">
 </svg>
 <div id="ballsLayer">
@@ -269,6 +271,6 @@
 <div id="savedList">
 </div>
 </dialog>
-  <script src="app.js?v=58"></script>
+  <script src="app.js?v=59"></script>
 </body>
 </html>
