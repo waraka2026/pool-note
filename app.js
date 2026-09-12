@@ -12,12 +12,14 @@ const sideControls=document.querySelector('.side-controls');
 const trayEl=document.querySelector('.tray');
 const portraitBtn=document.querySelector('#portraitBtn');
 const landscapeBtn=document.querySelector('#landscapeBtn');
+const targetGuide=document.querySelector('#targetGuide');
 
 let mode='move',draggingBall=null,draggingLine=null,lineStart=null,lineDraft=null,lines=[],notes=[],state={},selectedLine=-1,tip=null,tipDragging=false,activeLineColor='auto',activeLineChoice='auto',paletteLineType='line',currentSaveId=null,repeatBallSeq=0,orientation='portrait',activeLineWidth=2,groupMoveMode=false,groupDrag=null;
 let ballPress=null,ballMoved=false,savedView='cards',savedSortOrder='newest';
 let ballHold=null,lastTouchTime=0;
 let ghostEnabled=false;
 let ghostDrag=null;
+let gridVisible=true;
 let fitScale=1,tableZoom=1,tablePan={x:0,y:0},pinchGesture=null;
 const tableTouches=new Map();
 function cancelBallHold(){if(ballHold)clearTimeout(ballHold.timer);ballHold=null}
@@ -50,8 +52,10 @@ function ballColor(n){const kind=ballKind(n);return kind==='cue'?'#fff':kind==='
 function repeatBallId(kind){repeatBallSeq+=1;return `${kind}-${Date.now()}-${repeatBallSeq}`}
 
 function markUnsaved(){document.querySelector('#saveState').textContent='未保存'}
+function showTargetGuide(p){targetGuide.hidden=false;targetGuide.style.setProperty('--guide-x',p.x+'%');targetGuide.style.setProperty('--guide-y',p.y+'%')}
+function hideTargetGuide(){targetGuide.hidden=true}
 function defaultState(){state={};lines=[];notes=[];tip=null;selectedLine=-1;currentSaveId=null;render();markUnsaved()}
-function clearTable(){state={};lines=[];notes=[];tip=null;selectedLine=-1;currentSaveId=null;render();markUnsaved()}
+function clearTable(){state={};lines=[];notes=[];tip=null;selectedLine=-1;currentSaveId=null;hideTargetGuide();render();markUnsaved()}
 function rotateCoordinates(next){
   const rotate=p=>next==='landscape'?{...p,x:100-p.y,y:p.x}:{...p,x:p.y,y:100-p.x};
   Object.keys(state).forEach(n=>{state[n]=rotate(state[n])});
@@ -173,7 +177,7 @@ tableWrap.addEventListener('pointerdown',e=>{
   if(tableTouches.size===2){
     const p=pinchInfo();
     pinchGesture={distance:p.distance,center:p.center,zoom:tableZoom,pan:{...tablePan}};
-    draggingBall=null;draggingLine=null;lineStart=null;lineDraft=null;groupDrag=null;ballPress=null;cancelBallHold();
+    draggingBall=null;draggingLine=null;lineStart=null;lineDraft=null;groupDrag=null;ballPress=null;cancelBallHold();hideTargetGuide();
     e.preventDefault();e.stopPropagation();
   }
 },{capture:true,passive:false});
@@ -245,14 +249,15 @@ function renderTray(){
       if(!gesture||gesture.id!==e.pointerId)return;
       if(!gesture.preview&&Math.hypot(e.clientX-gesture.x,e.clientY-gesture.y)<5)return;
       if(!gesture.preview){gesture.preview=ballEl(n,0,0);gesture.preview.classList.add('tray-drag-preview');document.body.append(gesture.preview)}
-      const preview=gesture.preview;preview.style.left=e.clientX+'px';preview.style.top=e.clientY+'px';preview.style.width=preview.style.height=ballDiameter()+'px';
+      const lift=e.pointerType==='touch'?28:0,preview=gesture.preview;preview.style.left=e.clientX+'px';preview.style.top=(e.clientY-lift)+'px';preview.style.width=preview.style.height=ballDiameter()+'px';
+      const r=table.getBoundingClientRect();if(e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom)showTargetGuide(ballPoint(point({clientX:e.clientX,clientY:e.clientY-lift})));else hideTargetGuide();
     });
     ball.addEventListener('pointerup',e=>{
       if(!gesture||gesture.id!==e.pointerId)return;
       const moved=!!gesture.preview,r=table.getBoundingClientRect();suppressClick=moved;cleanup();
-      if(moved&&e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom)place(ballPoint(point(e)));
+      hideTargetGuide();if(moved&&e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom){const lift=e.pointerType==='touch'?28:0;place(ballPoint(point({clientX:e.clientX,clientY:e.clientY-lift})))}
     });
-    ball.addEventListener('pointercancel',()=>{suppressClick=true;cleanup()});
+    ball.addEventListener('pointercancel',()=>{suppressClick=true;hideTargetGuide();cleanup()});
     ball.addEventListener('lostpointercapture',cleanup);tray.append(ball);
   });
 }
@@ -376,19 +381,19 @@ table.addEventListener('pointerdown',e=>{
   const ball=e.target.closest('.ball')||(mode==='move'?layer.querySelector(`[data-n="${nearestBall(point(e),22)}"]`):null);
   if(ball)startBallHold(e,ball.dataset.n);
   if(mode==='move'&&groupMoveMode){startGroupDrag(e);return}
-  if(ball&&mode==='move'){selectedLine=-1;draggingBall=ball.dataset.n;ballPress={x:e.clientX,y:e.clientY,origin:{...state[draggingBall]}};ballMoved=false;table.setPointerCapture(e.pointerId);renderLines();return}
+  if(ball&&mode==='move'){selectedLine=-1;draggingBall=ball.dataset.n;ballPress={x:e.clientX,y:e.clientY,origin:{...state[draggingBall]},touch:e.pointerType==='touch'};ballMoved=false;table.setPointerCapture(e.pointerId);renderLines();return}
   if(mode==='erase'&&ball)return;
   if(mode==='line'||mode==='plain'){
-    const p=point(e),startBall=ball?.dataset.n||nearestBall(p,42),a=startBall?state[startBall]:p;lineStart={...p,ball:startBall};
+    const p=point(e),startBall=ball?.dataset.n||nearestBall(p,42),a=startBall?state[startBall]:p;lineStart={...p,ball:startBall};showTargetGuide(p);
     const autoColor=activeLineColor==='auto',colorBall=startBall||nearestBall(p,Infinity);lineDraft={x1:a.x,y1:a.y,x2:p.x,y2:p.y,type:mode==='plain'?'plain':'arrow',startBall:startBall||null,endBall:null,color:autoColor?ballColor(colorBall):activeLineColor,autoColor,width:activeLineWidth,ghostEnabled:mode==='line'&&ghostEnabled};table.setPointerCapture(e.pointerId);renderLines();return;
   }
   if(mode==='move'){selectedLine=-1;renderLines()}
 });
 table.addEventListener('pointermove',e=>{
   if(groupDrag){moveGroupDrag(e);return}
-  if(draggingBall){e.preventDefault();ballMoved=true;const r=table.getBoundingClientRect();state[draggingBall]=ballPoint({x:ballPress.origin.x+(e.clientX-ballPress.x)/r.width*100,y:ballPress.origin.y+(e.clientY-ballPress.y)/r.height*100},draggingBall);syncBallLines(draggingBall);updateBallPositions();if(lines.length)renderLines();return}
-  if(lineStart){const p=point(e),endBall=nearestBall(p,42,lineStart.ball),b=endBall?state[endBall]:p;lineDraft.x2=b.x;lineDraft.y2=b.y;lineDraft.endBall=endBall||null;renderLines();return}
-  if(!draggingLine)return;e.preventDefault();const p=point(e),l=lines[draggingLine.i],o=draggingLine.original;
+  if(draggingBall){e.preventDefault();ballMoved=true;const r=table.getBoundingClientRect();state[draggingBall]=ballPoint({x:ballPress.origin.x+(e.clientX-ballPress.x)/r.width*100,y:ballPress.origin.y+(e.clientY-ballPress.y-(ballPress.touch?28:0))/r.height*100},draggingBall);showTargetGuide(state[draggingBall]);syncBallLines(draggingBall);updateBallPositions();if(lines.length)renderLines();return}
+  if(lineStart){const p=point(e),endBall=nearestBall(p,42,lineStart.ball),b=endBall?state[endBall]:p;lineDraft.x2=b.x;lineDraft.y2=b.y;lineDraft.endBall=endBall||null;showTargetGuide(b);renderLines();return}
+  if(!draggingLine)return;e.preventDefault();const p=point(e),l=lines[draggingLine.i],o=draggingLine.original;showTargetGuide(p);
   if(draggingLine.kind==='start'){
     l.startBall=null;l.x1=p.x;l.y1=p.y;
   }
@@ -405,14 +410,14 @@ table.addEventListener('pointermove',e=>{
 });
 table.addEventListener('pointerup',()=>{
   if(groupDrag){endGroupDrag();return}
-  if(draggingBall){draggingBall=null;ballPress=null;if(ballMoved)markUnsaved();return}
-  if(lineStart){if(lineDraft&&lineLengthPx(lineDraft)>8){lines.push({...lineDraft});selectedLine=lines.length-1;markUnsaved()}lineStart=null;lineDraft=null;renderLines();return}
+  if(draggingBall){draggingBall=null;ballPress=null;hideTargetGuide();if(ballMoved)markUnsaved();return}
+  if(lineStart){if(lineDraft&&lineLengthPx(lineDraft)>8){lines.push({...lineDraft});selectedLine=lines.length-1;markUnsaved()}lineStart=null;lineDraft=null;hideTargetGuide();renderLines();return}
   if(draggingLine){
     const l=lines[draggingLine.i];
-    draggingLine=null;if(lineLengthPx(l)<5)removeLine(selectedLine);else{renderLines();markUnsaved()}
+    draggingLine=null;hideTargetGuide();if(lineLengthPx(l)<5)removeLine(selectedLine);else{renderLines();markUnsaved()}
   }
 });
-table.addEventListener('pointercancel',()=>{draggingBall=null;draggingLine=null;lineStart=null;lineDraft=null;groupDrag=null;renderLines()});
+table.addEventListener('pointercancel',()=>{draggingBall=null;draggingLine=null;lineStart=null;lineDraft=null;groupDrag=null;hideTargetGuide();renderLines()});
 
 svg.addEventListener('pointerdown',e=>{
   if(e.target.dataset.i===undefined)return;e.stopPropagation();const i=Number(e.target.dataset.i);if(mode==='erase'){removeLine(i);return}if(!['move','line','plain'].includes(mode))return;
@@ -491,6 +496,8 @@ memoTransparent.onchange=()=>{memoBackground.disabled=memoTransparent.checked};
 memoDialogEl.addEventListener('close',()=>{const text=memoInput.value.trim();if(memoDialogEl.returnValue==='ok'&&text){const offset=(notes.length%5)*5;notes.push({text,color:memoColor.value,background:memoTransparent.checked?'transparent':memoBackground.value,font:memoFont.value,size:Number(memoSize.value),x:50+offset,y:50+offset});renderNotes();markUnsaved()}memoInput.value=''});
 document.querySelector('#resetBtn').onclick=clearTable;
 document.querySelector('#zoomResetBtn').onclick=resetTableZoom;
+const gridToggleBtn=document.querySelector('#gridToggleBtn'),gridHelp=document.querySelector('#gridHelp');
+gridToggleBtn.onclick=()=>{gridVisible=!gridVisible;table.classList.toggle('grid-hidden',!gridVisible);gridToggleBtn.classList.toggle('active',gridVisible);gridToggleBtn.setAttribute('aria-pressed',String(gridVisible));gridHelp.textContent=gridVisible?'罫線を表示':'罫線を非表示'};
 
 function roundedRect(ctx,x,y,w,h,r){ctx.beginPath();ctx.roundRect(x,y,w,h,r)}
 function drawCanvasBall(ctx,n,x,y,r){
