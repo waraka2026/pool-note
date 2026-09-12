@@ -2,11 +2,11 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
   <meta name="theme-color" content="#101418" />
   <title>ビリヤード配置図メーカー｜球配置・ショットライン作成</title>
   <meta name="description" content="ビリヤードの球配置とショットラインをブラウザで作成・保存できる無料の配置図メーカー。手球と1〜15番の球に対応。" />
-  <link rel="stylesheet" href="styles.css?v=69" />
+  <link rel="stylesheet" href="styles.css?v=70" />
 </head>
 <body>
   <main class="app">
@@ -50,7 +50,7 @@
           <span id="lineWidthValue" class="line-width-value">2</span>
         </div>
         <button id="ghostToggle" class="auto-color-btn" type="button" aria-pressed="false">イメージボール OFF</button>
-        <small>ONで先玉の反対側に表示。補助球はドラッグで調整でき、調整後も追従します。ダブルクリック・長押しで削除。</small>
+        <small>ONで先玉の反対側に表示。補助球はドラッグで調整でき、調整後も追従します。スマホでは長押しで削除。</small>
         <div class="color-line-types" aria-label="描画の種類">
           <button id="colorArrowBtn" type="button">↗ 矢印</button>
           <button id="colorPlainBtn" type="button">╱ 線</button>
@@ -177,6 +177,7 @@
 
     <section class="tray">
       <div id="trayBalls" class="tray-balls"></div>
+      <button id="zoomResetBtn" type="button" title="台の拡大を元に戻す">拡大リセット</button>
       <button id="resetBtn">リセット</button>
     </section>
     </div>
@@ -268,6 +269,6 @@
 <div id="savedList">
 </div>
 </dialog>
-  <script src="app.js?v=57"></script>
+  <script src="app.js?v=58"></script>
 </body>
 </html>
