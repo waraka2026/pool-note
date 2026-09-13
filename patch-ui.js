@@ -5,7 +5,7 @@
   style.textContent=`
     .board-column{overflow-x:hidden!important}
 
-    /* Portrait menu: keep the menu in place and scroll its contents vertically. */
+    /* Portrait menu: vertical scrolling only. */
     .editor-sidebar[data-orientation="portrait"]:not(.menu-collapsed){
       overflow-y:auto!important;
       overflow-x:hidden!important;
@@ -14,16 +14,17 @@
       touch-action:pan-y;
     }
 
-    /* Landscape menu: always stay in one row and scroll sideways. */
+    /* Landscape menu: ALWAYS one horizontal row, for default and detached states. */
     .board-column.landscape>.editor-sidebar:not(.menu-collapsed),
-    .editor-sidebar.menu-detached[data-orientation="landscape"]:not(.menu-collapsed){
+    .editor-sidebar[data-orientation="landscape"]:not(.menu-collapsed){
       display:flex!important;
       flex-direction:row!important;
       flex-wrap:nowrap!important;
       align-items:center!important;
       gap:5px!important;
-      width:max-content!important;
-      max-width:calc(100vw - 8px)!important;
+      width:calc(100vw - 12px)!important;
+      min-width:0!important;
+      max-width:calc(100vw - 12px)!important;
       height:auto!important;
       min-height:0!important;
       padding:6px 8px!important;
@@ -35,34 +36,67 @@
       touch-action:pan-x;
       scrollbar-width:thin;
     }
-    .editor-sidebar.menu-detached[data-orientation="landscape"]:not(.menu-collapsed) .menu-toggle-btn{
-      order:0!important;flex:0 0 38px!important;width:38px!important;height:38px!important;margin:0 3px 0 0!important;
+    .board-column.landscape>.editor-sidebar:not(.menu-collapsed) .menu-toggle-btn,
+    .editor-sidebar[data-orientation="landscape"]:not(.menu-collapsed) .menu-toggle-btn{
+      order:0!important;
+      flex:0 0 38px!important;
+      width:38px!important;
+      height:38px!important;
+      margin:0 3px 0 0!important;
     }
-    .editor-sidebar.menu-detached[data-orientation="landscape"]:not(.menu-collapsed) .orientation-control,
-    .editor-sidebar.menu-detached[data-orientation="landscape"]:not(.menu-collapsed) .tools,
-    .editor-sidebar.menu-detached[data-orientation="landscape"]:not(.menu-collapsed) .tools-row{
-      display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;align-items:center!important;width:auto!important;
-      margin:0!important;padding:0!important;border:0!important;gap:3px!important;
+    .board-column.landscape>.editor-sidebar:not(.menu-collapsed) .orientation-control,
+    .board-column.landscape>.editor-sidebar:not(.menu-collapsed) .tools,
+    .board-column.landscape>.editor-sidebar:not(.menu-collapsed) .tools-row,
+    .editor-sidebar[data-orientation="landscape"]:not(.menu-collapsed) .orientation-control,
+    .editor-sidebar[data-orientation="landscape"]:not(.menu-collapsed) .tools,
+    .editor-sidebar[data-orientation="landscape"]:not(.menu-collapsed) .tools-row{
+      display:flex!important;
+      flex-direction:row!important;
+      flex-wrap:nowrap!important;
+      align-items:center!important;
+      width:max-content!important;
+      min-width:max-content!important;
+      max-width:none!important;
+      margin:0!important;
+      padding:0!important;
+      border:0!important;
+      gap:3px!important;
+      overflow:visible!important;
     }
-    .editor-sidebar.menu-detached[data-orientation="landscape"]:not(.menu-collapsed) .orientation-control>div,
-    .editor-sidebar.menu-detached[data-orientation="landscape"]:not(.menu-collapsed) .editor-row{
-      display:block!important;width:auto!important;min-width:0!important;flex:0 0 auto!important;
+    .board-column.landscape>.editor-sidebar:not(.menu-collapsed) .orientation-control>div,
+    .board-column.landscape>.editor-sidebar:not(.menu-collapsed) .editor-row,
+    .editor-sidebar[data-orientation="landscape"]:not(.menu-collapsed) .orientation-control>div,
+    .editor-sidebar[data-orientation="landscape"]:not(.menu-collapsed) .editor-row{
+      display:block!important;
+      width:auto!important;
+      min-width:0!important;
+      flex:0 0 auto!important;
     }
-    .editor-sidebar.menu-detached[data-orientation="landscape"]:not(.menu-collapsed) .tool-help{display:none!important}
-    .editor-sidebar.menu-detached[data-orientation="landscape"]:not(.menu-collapsed) .editor-row button,
-    .editor-sidebar.menu-detached[data-orientation="landscape"]:not(.menu-collapsed) .orientation-control button{
-      width:36px!important;height:36px!important;min-width:36px!important;flex:0 0 36px!important;padding:5px!important;
+    .board-column.landscape>.editor-sidebar:not(.menu-collapsed) .tool-help,
+    .editor-sidebar[data-orientation="landscape"]:not(.menu-collapsed) .tool-help{display:none!important}
+    .board-column.landscape>.editor-sidebar:not(.menu-collapsed) .editor-row button,
+    .board-column.landscape>.editor-sidebar:not(.menu-collapsed) .orientation-control button,
+    .editor-sidebar[data-orientation="landscape"]:not(.menu-collapsed) .editor-row button,
+    .editor-sidebar[data-orientation="landscape"]:not(.menu-collapsed) .orientation-control button{
+      width:36px!important;
+      height:36px!important;
+      min-width:36px!important;
+      flex:0 0 36px!important;
+      padding:5px!important;
     }
 
-    /* Collapsed floating menu must always be fully visible. */
+    /* Floating menu must never disappear outside the viewport. */
+    .editor-sidebar.menu-detached{z-index:5000!important}
     .editor-sidebar.menu-detached.menu-collapsed{
-      width:68px!important;min-width:68px!important;max-width:68px!important;
-      height:68px!important;min-height:68px!important;max-height:68px!important;
+      width:68px!important;
+      min-width:68px!important;
+      max-width:68px!important;
+      height:68px!important;
+      min-height:68px!important;
+      max-height:68px!important;
       overflow:hidden!important;
-      z-index:5000!important;
     }
 
-    /* New controls use the same shape as the existing editor icons. */
     .history-row button,.menu-reset-row button{
       border:1px solid #56636b!important;
       background:#20282e!important;
@@ -71,14 +105,16 @@
       box-shadow:none!important;
     }
     .history-row button svg,.menu-reset-row button svg{
-      width:26px!important;height:26px!important;
-      fill:none!important;stroke:currentColor!important;stroke-width:1.8!important;
-      stroke-linecap:round!important;stroke-linejoin:round!important;
+      width:26px!important;
+      height:26px!important;
+      fill:none!important;
+      stroke:currentColor!important;
+      stroke-width:1.8!important;
+      stroke-linecap:round!important;
+      stroke-linejoin:round!important;
     }
-
-    /* Undo / redo are identifiable in gold, but NOT shown as selected. */
-    .history-row button,
-    .history-row button:disabled{
+    .history-row button,.history-row button:disabled,
+    .history-row button.active,.history-row button:disabled.active{
       color:var(--gold)!important;
       border-color:#56636b!important;
       background:#20282e!important;
@@ -86,27 +122,44 @@
       box-shadow:none!important;
     }
     .history-row button:disabled{cursor:default!important}
-    .history-row button.active,
-    .history-row button:disabled.active{
-      color:var(--gold)!important;
-      border-color:#56636b!important;
-      background:#20282e!important;
-      box-shadow:none!important;
-    }
     .menu-reset-row button{color:#fff!important}
     .menu-reset-row button:active,.menu-reset-row button:focus-visible,
     .history-row button:not(:disabled):active,.history-row button:not(:disabled):focus-visible{
-      border-color:var(--gold)!important;color:var(--gold)!important;background:#d5aa5822!important;
+      border-color:var(--gold)!important;
+      color:var(--gold)!important;
+      background:#d5aa5822!important;
     }
   `;
   document.head.append(style);
 
   function viewportSize(){
     return {
-      width:window.visualViewport?window.visualViewport.width:document.documentElement.clientWidth,
+      width:document.documentElement.clientWidth,
       height:window.visualViewport?window.visualViewport.height:document.documentElement.clientHeight
     };
   }
+
+  function clampDetachedMenu(){
+    if(!editorSidebar.classList.contains('menu-detached'))return;
+    const vp=viewportSize();
+    const r=editorSidebar.getBoundingClientRect();
+    const margin=6;
+    let left=parseFloat(editorSidebar.style.left);
+    let top=parseFloat(editorSidebar.style.top);
+    if(!Number.isFinite(left))left=r.left;
+    if(!Number.isFinite(top))top=r.top;
+    const maxLeft=Math.max(margin,vp.width-r.width-margin);
+    const maxTop=Math.max(margin,vp.height-r.height-margin);
+    left=Math.max(margin,Math.min(left,maxLeft));
+    top=Math.max(margin,Math.min(top,maxTop));
+    editorSidebar.style.left=left+'px';
+    editorSidebar.style.top=top+'px';
+    editorSidebar.style.right='auto';
+    editorSidebar.style.bottom='auto';
+  }
+
+  /* Replace the original clamp so dragging/open-close cannot bury the menu off-screen. */
+  clampMenuPosition=function(){clampDetachedMenu()};
 
   function fitMenuScroll(){
     if(editorSidebar.classList.contains('menu-collapsed'))return;
@@ -115,20 +168,22 @@
     if(orientation==='portrait'){
       const top=Math.max(4,r.top);
       editorSidebar.style.setProperty('max-height',Math.max(150,vp.height-top-8)+'px','important');
-      editorSidebar.style.removeProperty('max-width');
+      editorSidebar.style.setProperty('overflow-y','auto','important');
+      editorSidebar.style.setProperty('overflow-x','hidden','important');
     }else{
-      editorSidebar.style.setProperty('max-width',Math.max(180,vp.width-8)+'px','important');
+      editorSidebar.style.setProperty('width','calc(100vw - 12px)','important');
+      editorSidebar.style.setProperty('max-width','calc(100vw - 12px)','important');
+      editorSidebar.style.setProperty('overflow-x','auto','important');
+      editorSidebar.style.setProperty('overflow-y','hidden','important');
       editorSidebar.style.removeProperty('max-height');
     }
   }
 
   const originalLockCurrentMenuSize=lockCurrentMenuSize;
   lockCurrentMenuSize=function(){
-    const r=editorSidebar.getBoundingClientRect();
     if(orientation==='landscape'){
-      editorSidebar.style.setProperty('width',Math.min(r.width,window.innerWidth-8)+'px','important');
-      editorSidebar.style.removeProperty('min-width');
-      editorSidebar.style.setProperty('max-width','calc(100vw - 8px)','important');
+      editorSidebar.style.setProperty('width','calc(100vw - 12px)','important');
+      editorSidebar.style.setProperty('max-width','calc(100vw - 12px)','important');
       editorSidebar.style.setProperty('height','auto','important');
       editorSidebar.style.removeProperty('min-height');
       editorSidebar.style.removeProperty('max-height');
@@ -155,8 +210,8 @@
       editorSidebar.style.bottom='auto';
       editorSidebar.style.transform='none';
       if(expanded&&orientation==='landscape'){
-        editorSidebar.style.setProperty('width','max-content','important');
-        editorSidebar.style.setProperty('max-width','calc(100vw - 8px)','important');
+        editorSidebar.style.setProperty('width','calc(100vw - 12px)','important');
+        editorSidebar.style.setProperty('max-width','calc(100vw - 12px)','important');
       }
     }
 
@@ -169,18 +224,16 @@
     requestAnimationFrame(()=>{
       fitMenuScroll();
       if(detached){
-        const vp=viewportSize();
         const after=editorSidebar.getBoundingClientRect();
-        let left=center.x-after.width/2;
-        let top=center.y-after.height/2;
-        left=Math.max(6,Math.min(left,vp.width-after.width-6));
-        top=Math.max(6,Math.min(top,vp.height-after.height-6));
-        editorSidebar.style.left=left+'px';
-        editorSidebar.style.top=top+'px';
+        editorSidebar.style.left=(center.x-after.width/2)+'px';
+        editorSidebar.style.top=(center.y-after.height/2)+'px';
+        clampDetachedMenu();
       }
-      clampMenuPosition();
       layoutTable(true);
-      requestAnimationFrame(()=>{fitMenuScroll();if(detached)clampMenuPosition()});
+      requestAnimationFrame(()=>{
+        fitMenuScroll();
+        clampDetachedMenu();
+      });
     });
   };
 
@@ -194,15 +247,41 @@
     removeBall(ball.dataset.n);
   },true);
 
+  /* Keep table anchored while zooming. */
   applyTableTransform=function(){
     tableFrame.style.transformOrigin='0 0';
     tableFrame.style.transform=`scale(${fitScale*tableZoom})`;
   };
   resetTableZoom=function(){
-    tableZoom=1;tablePan={x:0,y:0};pinchGesture=null;tableTouches.clear();applyTableTransform();renderLines();
+    tableZoom=1;
+    tablePan={x:0,y:0};
+    pinchGesture=null;
+    tableTouches.clear();
+    applyTableTransform();
+    renderLines();
   };
   tablePan={x:0,y:0};
   applyTableTransform();
+
+  /* Line geometry must be based on the UNTRANSFORMED cloth size.
+     Using getBoundingClientRect() while pinch-zoomed made line trimming drift away from balls. */
+  visibleEnds=function(l){
+    const w=table.clientWidth||1,h=table.clientHeight||1;
+    const dx=(l.x2-l.x1)*w/100,dy=(l.y2-l.y1)*h/100,len=Math.hypot(dx,dy)||1;
+    const logicalBall=Math.min(w,h)*16/274;
+    const startTrim=l.startBall?logicalBall/2:0;
+    const endTrim=l.endBall?logicalBall/2:0;
+    return {
+      x1:l.x1+(dx/len)*startTrim/w*100,
+      y1:l.y1+(dy/len)*startTrim/h*100,
+      x2:l.x2-(dx/len)*endTrim/w*100,
+      y2:l.y2-(dy/len)*endTrim/h*100
+    };
+  };
+  lineLengthPx=function(l){
+    const w=table.clientWidth||1,h=table.clientHeight||1,v=visibleEnds(l);
+    return Math.hypot((v.x2-v.x1)*w/100,(v.y2-v.y1)*h/100);
+  };
 
   const toolsRow=document.querySelector('.tools-row');
   const drawRow=document.querySelector('#drawBtn')?.closest('.editor-row');
@@ -269,16 +348,16 @@
     gridHelp.textContent=gridVisible?'罫線を表示':'罫線を非表示';
     selectedLine=-1;draggingBall=null;draggingLine=null;lineStart=null;lineDraft=null;groupDrag=null;
     render();layoutTable(true);oldMarkUnsaved();
-    applyingHistory=false;refreshHistoryButtons();fitMenuScroll();
+    applyingHistory=false;refreshHistoryButtons();fitMenuScroll();clampDetachedMenu();
   }
   undo.btn.onclick=()=>{if(historyTimer)pushHistoryNow();if(historyIndex<=0)return;historyIndex--;applyHistory(history[historyIndex])};
   redo.btn.onclick=()=>{if(historyTimer)pushHistoryNow();if(historyIndex>=history.length-1)return;historyIndex++;applyHistory(history[historyIndex])};
   gridToggleBtn.addEventListener('click',()=>{if(!applyingHistory)scheduleHistory()});
 
-  window.addEventListener('resize',()=>requestAnimationFrame(fitMenuScroll));
-  if(window.visualViewport)window.visualViewport.addEventListener('resize',()=>requestAnimationFrame(fitMenuScroll));
+  window.addEventListener('resize',()=>requestAnimationFrame(()=>{fitMenuScroll();clampDetachedMenu()}));
+  if(window.visualViewport)window.visualViewport.addEventListener('resize',()=>requestAnimationFrame(()=>{fitMenuScroll();clampDetachedMenu()}));
 
   pushHistoryNow();
   layoutTable(true);
-  requestAnimationFrame(fitMenuScroll);
+  requestAnimationFrame(()=>{fitMenuScroll();clampDetachedMenu();renderLines()});
 })();
