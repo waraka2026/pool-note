@@ -4,10 +4,36 @@
   const style=document.createElement('style');
   style.textContent=`
     .board-column{overflow-x:hidden!important}
+
+    /* Portrait menu: keep the menu in place and scroll its contents vertically. */
+    .editor-sidebar[data-orientation="portrait"]:not(.menu-collapsed){
+      overflow-y:auto!important;
+      overflow-x:hidden!important;
+      overscroll-behavior:contain!important;
+      -webkit-overflow-scrolling:touch;
+      touch-action:pan-y;
+    }
+
+    /* Landscape menu: always stay in one row and scroll sideways. */
+    .board-column.landscape>.editor-sidebar:not(.menu-collapsed),
     .editor-sidebar.menu-detached[data-orientation="landscape"]:not(.menu-collapsed){
-      display:flex!important;flex-direction:row!important;align-items:center!important;gap:5px!important;
-      width:max-content!important;max-width:calc(100vw - 8px)!important;height:auto!important;min-height:0!important;
-      padding:6px 8px!important;border-radius:10px!important;overflow-x:auto!important;overflow-y:hidden!important;
+      display:flex!important;
+      flex-direction:row!important;
+      flex-wrap:nowrap!important;
+      align-items:center!important;
+      gap:5px!important;
+      width:max-content!important;
+      max-width:calc(100vw - 8px)!important;
+      height:auto!important;
+      min-height:0!important;
+      padding:6px 8px!important;
+      border-radius:10px!important;
+      overflow-x:auto!important;
+      overflow-y:hidden!important;
+      overscroll-behavior-x:contain!important;
+      -webkit-overflow-scrolling:touch;
+      touch-action:pan-x;
+      scrollbar-width:thin;
     }
     .editor-sidebar.menu-detached[data-orientation="landscape"]:not(.menu-collapsed) .menu-toggle-btn{
       order:0!important;flex:0 0 38px!important;width:38px!important;height:38px!important;margin:0 3px 0 0!important;
@@ -15,21 +41,28 @@
     .editor-sidebar.menu-detached[data-orientation="landscape"]:not(.menu-collapsed) .orientation-control,
     .editor-sidebar.menu-detached[data-orientation="landscape"]:not(.menu-collapsed) .tools,
     .editor-sidebar.menu-detached[data-orientation="landscape"]:not(.menu-collapsed) .tools-row{
-      display:flex!important;flex-direction:row!important;align-items:center!important;width:auto!important;
+      display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;align-items:center!important;width:auto!important;
       margin:0!important;padding:0!important;border:0!important;gap:3px!important;
     }
     .editor-sidebar.menu-detached[data-orientation="landscape"]:not(.menu-collapsed) .orientation-control>div,
     .editor-sidebar.menu-detached[data-orientation="landscape"]:not(.menu-collapsed) .editor-row{
-      display:block!important;width:auto!important;min-width:0!important;
+      display:block!important;width:auto!important;min-width:0!important;flex:0 0 auto!important;
     }
     .editor-sidebar.menu-detached[data-orientation="landscape"]:not(.menu-collapsed) .tool-help{display:none!important}
     .editor-sidebar.menu-detached[data-orientation="landscape"]:not(.menu-collapsed) .editor-row button,
     .editor-sidebar.menu-detached[data-orientation="landscape"]:not(.menu-collapsed) .orientation-control button{
       width:36px!important;height:36px!important;min-width:36px!important;flex:0 0 36px!important;padding:5px!important;
     }
-    .editor-sidebar.menu-detached.menu-collapsed{width:68px!important;min-width:68px!important;max-width:68px!important;height:68px!important;min-height:68px!important;max-height:68px!important}
 
-    /* New controls use the exact same visual language as the existing editor icons. */
+    /* Collapsed floating menu must always be fully visible. */
+    .editor-sidebar.menu-detached.menu-collapsed{
+      width:68px!important;min-width:68px!important;max-width:68px!important;
+      height:68px!important;min-height:68px!important;max-height:68px!important;
+      overflow:hidden!important;
+      z-index:5000!important;
+    }
+
+    /* New controls use the same shape as the existing editor icons. */
     .history-row button,.menu-reset-row button{
       border:1px solid #56636b!important;
       background:#20282e!important;
@@ -42,14 +75,24 @@
       fill:none!important;stroke:currentColor!important;stroke-width:1.8!important;
       stroke-linecap:round!important;stroke-linejoin:round!important;
     }
-    /* Undo/redo stay visibly gold even before anything has been placed. */
-    .history-row button,.history-row button:disabled{
+
+    /* Undo / redo are identifiable in gold, but NOT shown as selected. */
+    .history-row button,
+    .history-row button:disabled{
       color:var(--gold)!important;
-      border-color:#d5aa5888!important;
-      background:#d5aa5816!important;
+      border-color:#56636b!important;
+      background:#20282e!important;
       opacity:1!important;
+      box-shadow:none!important;
     }
     .history-row button:disabled{cursor:default!important}
+    .history-row button.active,
+    .history-row button:disabled.active{
+      color:var(--gold)!important;
+      border-color:#56636b!important;
+      background:#20282e!important;
+      box-shadow:none!important;
+    }
     .menu-reset-row button{color:#fff!important}
     .menu-reset-row button:active,.menu-reset-row button:focus-visible,
     .history-row button:not(:disabled):active,.history-row button:not(:disabled):focus-visible{
@@ -57,6 +100,27 @@
     }
   `;
   document.head.append(style);
+
+  function viewportSize(){
+    return {
+      width:window.visualViewport?window.visualViewport.width:document.documentElement.clientWidth,
+      height:window.visualViewport?window.visualViewport.height:document.documentElement.clientHeight
+    };
+  }
+
+  function fitMenuScroll(){
+    if(editorSidebar.classList.contains('menu-collapsed'))return;
+    const vp=viewportSize();
+    const r=editorSidebar.getBoundingClientRect();
+    if(orientation==='portrait'){
+      const top=Math.max(4,r.top);
+      editorSidebar.style.setProperty('max-height',Math.max(150,vp.height-top-8)+'px','important');
+      editorSidebar.style.removeProperty('max-width');
+    }else{
+      editorSidebar.style.setProperty('max-width',Math.max(180,vp.width-8)+'px','important');
+      editorSidebar.style.removeProperty('max-height');
+    }
+  }
 
   const originalLockCurrentMenuSize=lockCurrentMenuSize;
   lockCurrentMenuSize=function(){
@@ -67,17 +131,21 @@
       editorSidebar.style.setProperty('max-width','calc(100vw - 8px)','important');
       editorSidebar.style.setProperty('height','auto','important');
       editorSidebar.style.removeProperty('min-height');
-      editorSidebar.style.setProperty('max-height','calc(100dvh - 8px)','important');
+      editorSidebar.style.removeProperty('max-height');
       editorSidebar.style.removeProperty('flex-basis');
       return;
     }
     originalLockCurrentMenuSize();
+    fitMenuScroll();
   };
 
   setMenuExpanded=function(expanded){
     const detached=editorSidebar.classList.contains('menu-detached');
     const before=editorSidebar.getBoundingClientRect();
+    const center={x:before.left+before.width/2,y:before.top+before.height/2};
+
     editorSidebar.classList.toggle('menu-collapsed',!expanded);
+
     if(detached){
       clearMenuSizeLock();
       editorSidebar.classList.add('menu-detached');
@@ -86,22 +154,33 @@
       editorSidebar.style.right='auto';
       editorSidebar.style.bottom='auto';
       editorSidebar.style.transform='none';
-      editorSidebar.style.left=before.left+'px';
-      editorSidebar.style.top=before.top+'px';
       if(expanded&&orientation==='landscape'){
         editorSidebar.style.setProperty('width','max-content','important');
         editorSidebar.style.setProperty('max-width','calc(100vw - 8px)','important');
       }
     }
+
     menuToggleBtn.setAttribute('aria-expanded',String(expanded));
     menuToggleBtn.setAttribute('aria-label',expanded?'編集メニューを閉じる':'編集メニューを開く');
     menuToggleBtn.title=expanded?'編集メニューを閉じる':'編集メニューを開く';
     menuToggleBtn.querySelector('span').textContent=expanded?'×':'☰';
     menuToggleBtn.querySelector('small').textContent=expanded?'閉じる':'メニュー';
+
     requestAnimationFrame(()=>{
+      fitMenuScroll();
+      if(detached){
+        const vp=viewportSize();
+        const after=editorSidebar.getBoundingClientRect();
+        let left=center.x-after.width/2;
+        let top=center.y-after.height/2;
+        left=Math.max(6,Math.min(left,vp.width-after.width-6));
+        top=Math.max(6,Math.min(top,vp.height-after.height-6));
+        editorSidebar.style.left=left+'px';
+        editorSidebar.style.top=top+'px';
+      }
       clampMenuPosition();
       layoutTable(true);
-      if(detached)requestAnimationFrame(clampMenuPosition);
+      requestAnimationFrame(()=>{fitMenuScroll();if(detached)clampMenuPosition()});
     });
   };
 
@@ -164,6 +243,8 @@
   function refreshHistoryButtons(){
     undo.btn.disabled=historyIndex<=0;
     redo.btn.disabled=historyIndex<0||historyIndex>=history.length-1;
+    undo.btn.classList.remove('active');
+    redo.btn.classList.remove('active');
   }
   function pushHistoryNow(){
     clearTimeout(historyTimer);historyTimer=null;
@@ -188,12 +269,16 @@
     gridHelp.textContent=gridVisible?'罫線を表示':'罫線を非表示';
     selectedLine=-1;draggingBall=null;draggingLine=null;lineStart=null;lineDraft=null;groupDrag=null;
     render();layoutTable(true);oldMarkUnsaved();
-    applyingHistory=false;refreshHistoryButtons();
+    applyingHistory=false;refreshHistoryButtons();fitMenuScroll();
   }
   undo.btn.onclick=()=>{if(historyTimer)pushHistoryNow();if(historyIndex<=0)return;historyIndex--;applyHistory(history[historyIndex])};
   redo.btn.onclick=()=>{if(historyTimer)pushHistoryNow();if(historyIndex>=history.length-1)return;historyIndex++;applyHistory(history[historyIndex])};
   gridToggleBtn.addEventListener('click',()=>{if(!applyingHistory)scheduleHistory()});
-  pushHistoryNow();
 
+  window.addEventListener('resize',()=>requestAnimationFrame(fitMenuScroll));
+  if(window.visualViewport)window.visualViewport.addEventListener('resize',()=>requestAnimationFrame(fitMenuScroll));
+
+  pushHistoryNow();
   layoutTable(true);
+  requestAnimationFrame(fitMenuScroll);
 })();
