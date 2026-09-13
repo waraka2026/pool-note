@@ -1,7 +1,6 @@
 (()=>{
   'use strict';
 
-  /* ---- floating menu: keep the same layout even after detaching ---- */
   const style=document.createElement('style');
   style.textContent=`
     .board-column{overflow-x:hidden!important}
@@ -29,8 +28,33 @@
       width:36px!important;height:36px!important;min-width:36px!important;flex:0 0 36px!important;padding:5px!important;
     }
     .editor-sidebar.menu-detached.menu-collapsed{width:68px!important;min-width:68px!important;max-width:68px!important;height:68px!important;min-height:68px!important;max-height:68px!important}
-    .history-row button:disabled{opacity:.3;cursor:default}
-    .menu-reset-icon{font-size:20px;line-height:1;font-weight:900}
+
+    /* New controls use the exact same visual language as the existing editor icons. */
+    .history-row button,.menu-reset-row button{
+      border:1px solid #56636b!important;
+      background:#20282e!important;
+      color:#fff!important;
+      border-radius:9px!important;
+      box-shadow:none!important;
+    }
+    .history-row button svg,.menu-reset-row button svg{
+      width:26px!important;height:26px!important;
+      fill:none!important;stroke:currentColor!important;stroke-width:1.8!important;
+      stroke-linecap:round!important;stroke-linejoin:round!important;
+    }
+    /* Undo/redo stay visibly gold even before anything has been placed. */
+    .history-row button,.history-row button:disabled{
+      color:var(--gold)!important;
+      border-color:#d5aa5888!important;
+      background:#d5aa5816!important;
+      opacity:1!important;
+    }
+    .history-row button:disabled{cursor:default!important}
+    .menu-reset-row button{color:#fff!important}
+    .menu-reset-row button:active,.menu-reset-row button:focus-visible,
+    .history-row button:not(:disabled):active,.history-row button:not(:disabled):focus-visible{
+      border-color:var(--gold)!important;color:var(--gold)!important;background:#d5aa5822!important;
+    }
   `;
   document.head.append(style);
 
@@ -81,7 +105,6 @@
     });
   };
 
-  /* ---- eraser: balls also delete on tap ---- */
   table.addEventListener('pointerdown',e=>{
     if(mode!=='erase'||!e.isPrimary||(e.pointerType==='mouse'&&e.button!==0))return;
     const ball=e.target.closest('.ball');
@@ -92,7 +115,6 @@
     removeBall(ball.dataset.n);
   },true);
 
-  /* ---- keep the table anchored to the wrapper, but still allow pinch zoom ---- */
   applyTableTransform=function(){
     tableFrame.style.transformOrigin='0 0';
     tableFrame.style.transform=`scale(${fitScale*tableZoom})`;
@@ -103,34 +125,35 @@
   tablePan={x:0,y:0};
   applyTableTransform();
 
-  /* ---- undo / redo ---- */
   const toolsRow=document.querySelector('.tools-row');
   const drawRow=document.querySelector('#drawBtn')?.closest('.editor-row');
-  function historyControl(id,label,symbol){
+  const iconUndo='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 7H4v-5"/><path d="M4 7c2.2-2.7 5.2-4 8.5-3.6 4.4.5 7.5 4 7.5 8.6 0 4.9-3.9 8-8.5 8"/></svg>';
+  const iconRedo='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 7h5v-5"/><path d="M20 7c-2.2-2.7-5.2-4-8.5-3.6C7.1 3.9 4 7.4 4 12c0 4.9 3.9 8 8.5 8"/></svg>';
+  const iconZoomReset='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="5.5"/><path d="M14.2 14.2 20 20"/><path d="M7.5 10h5"/><path d="M10 7.5v5"/><path d="M4.2 4.7 2.8 6.1M4.2 4.7 5.6 6.1M4.2 4.7v3.2"/></svg>';
+  const iconReset='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7V3m0 0h4M4 3l3.2 3.2"/><path d="M5 10a7 7 0 1 0 2-4.9"/><circle cx="12" cy="12" r="1.4"/><path d="M12 8.2v1.2M15.8 12h-1.2M12 15.8v-1.2M8.2 12h1.2"/></svg>';
+
+  function historyControl(id,label,svg){
     const row=document.createElement('div');row.className='editor-row history-row';
     const help=document.createElement('span');help.className='tool-help';help.textContent=label;
-    const btn=document.createElement('button');btn.type='button';btn.id=id;btn.title=label;btn.setAttribute('aria-label',label);
-    btn.innerHTML=`<span aria-hidden="true" style="font-size:24px;line-height:1">${symbol}</span>`;
+    const btn=document.createElement('button');btn.type='button';btn.id=id;btn.title=label;btn.setAttribute('aria-label',label);btn.innerHTML=svg;
     row.append(help,btn);return {row,btn};
   }
-  const undo=historyControl('undoBtn','1個前に戻る','↩');
-  const redo=historyControl('redoBtn','1個前に進む','↪');
+  const undo=historyControl('undoBtn','1個前に戻る',iconUndo);
+  const redo=historyControl('redoBtn','1個前に進む',iconRedo);
   if(drawRow){toolsRow.insertBefore(undo.row,drawRow);toolsRow.insertBefore(redo.row,drawRow)}else{toolsRow.append(undo.row,redo.row)}
 
-  /* ---- move reset buttons into the editor menu ---- */
-  function moveButtonIntoMenu(button,label,symbol,beforeRow=null){
+  function moveButtonIntoMenu(button,label,svg,beforeRow=null){
     if(!button)return;
     const row=document.createElement('div');row.className='editor-row menu-reset-row';
     const help=document.createElement('span');help.className='tool-help';help.textContent=label;
     button.classList.add('menu-reset-button');
-    button.title=label;button.setAttribute('aria-label',label);
-    button.innerHTML=`<span class="menu-reset-icon" aria-hidden="true">${symbol}</span>`;
+    button.title=label;button.setAttribute('aria-label',label);button.innerHTML=svg;
     row.append(help,button);
     if(beforeRow)toolsRow.insertBefore(row,beforeRow);else toolsRow.append(row);
   }
   const saveRow=document.querySelector('#saveBtn')?.closest('.editor-row');
-  moveButtonIntoMenu(document.querySelector('#zoomResetBtn'),'拡大リセット','⊙',saveRow);
-  moveButtonIntoMenu(document.querySelector('#resetBtn'),'全体リセット','⟲',saveRow);
+  moveButtonIntoMenu(document.querySelector('#zoomResetBtn'),'拡大を元に戻す',iconZoomReset,saveRow);
+  moveButtonIntoMenu(document.querySelector('#resetBtn'),'配置を全部リセット',iconReset,saveRow);
 
   let history=[],historyIndex=-1,historyTimer=null,applyingHistory=false;
   const snap=()=>({
@@ -150,9 +173,7 @@
     if(history.length>80)history.shift();
     historyIndex=history.length-1;refreshHistoryButtons();
   }
-  function scheduleHistory(){
-    clearTimeout(historyTimer);historyTimer=setTimeout(pushHistoryNow,180);
-  }
+  function scheduleHistory(){clearTimeout(historyTimer);historyTimer=setTimeout(pushHistoryNow,180)}
   const oldMarkUnsaved=markUnsaved;
   markUnsaved=function(){oldMarkUnsaved();if(!applyingHistory)scheduleHistory()};
   function applyHistory(s){
@@ -169,16 +190,8 @@
     render();layoutTable(true);oldMarkUnsaved();
     applyingHistory=false;refreshHistoryButtons();
   }
-  undo.btn.onclick=()=>{
-    if(historyTimer)pushHistoryNow();
-    if(historyIndex<=0)return;
-    historyIndex--;applyHistory(history[historyIndex]);
-  };
-  redo.btn.onclick=()=>{
-    if(historyTimer)pushHistoryNow();
-    if(historyIndex>=history.length-1)return;
-    historyIndex++;applyHistory(history[historyIndex]);
-  };
+  undo.btn.onclick=()=>{if(historyTimer)pushHistoryNow();if(historyIndex<=0)return;historyIndex--;applyHistory(history[historyIndex])};
+  redo.btn.onclick=()=>{if(historyTimer)pushHistoryNow();if(historyIndex>=history.length-1)return;historyIndex++;applyHistory(history[historyIndex])};
   gridToggleBtn.addEventListener('click',()=>{if(!applyingHistory)scheduleHistory()});
   pushHistoryNow();
 
