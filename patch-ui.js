@@ -30,11 +30,10 @@
     }
     .editor-sidebar.menu-detached.menu-collapsed{width:68px!important;min-width:68px!important;max-width:68px!important;height:68px!important;min-height:68px!important;max-height:68px!important}
     .history-row button:disabled{opacity:.3;cursor:default}
+    .menu-reset-icon{font-size:20px;line-height:1;font-weight:900}
   `;
   document.head.append(style);
 
-  // A detached landscape menu used to lose the .board-column.landscape ancestor,
-  // so its horizontal styling disappeared. Keep orientation on the menu itself.
   const originalLockCurrentMenuSize=lockCurrentMenuSize;
   lockCurrentMenuSize=function(){
     const r=editorSidebar.getBoundingClientRect();
@@ -51,7 +50,6 @@
     originalLockCurrentMenuSize();
   };
 
-  // Closing/opening a moved menu must not send it back to the default slot.
   setMenuExpanded=function(expanded){
     const detached=editorSidebar.classList.contains('menu-detached');
     const before=editorSidebar.getBoundingClientRect();
@@ -94,9 +92,9 @@
     removeBall(ball.dataset.n);
   },true);
 
-  /* ---- lock the table itself; pinch may zoom but must never pan it away ---- */
+  /* ---- keep the table anchored to the wrapper, but still allow pinch zoom ---- */
   applyTableTransform=function(){
-    tableFrame.style.transformOrigin='center center';
+    tableFrame.style.transformOrigin='0 0';
     tableFrame.style.transform=`scale(${fitScale*tableZoom})`;
   };
   resetTableZoom=function(){
@@ -115,9 +113,24 @@
     btn.innerHTML=`<span aria-hidden="true" style="font-size:24px;line-height:1">${symbol}</span>`;
     row.append(help,btn);return {row,btn};
   }
-  const undo=historyControl('undoBtn','1個前に戻る','↶');
-  const redo=historyControl('redoBtn','1個前に進む','↷');
+  const undo=historyControl('undoBtn','1個前に戻る','↩');
+  const redo=historyControl('redoBtn','1個前に進む','↪');
   if(drawRow){toolsRow.insertBefore(undo.row,drawRow);toolsRow.insertBefore(redo.row,drawRow)}else{toolsRow.append(undo.row,redo.row)}
+
+  /* ---- move reset buttons into the editor menu ---- */
+  function moveButtonIntoMenu(button,label,symbol,beforeRow=null){
+    if(!button)return;
+    const row=document.createElement('div');row.className='editor-row menu-reset-row';
+    const help=document.createElement('span');help.className='tool-help';help.textContent=label;
+    button.classList.add('menu-reset-button');
+    button.title=label;button.setAttribute('aria-label',label);
+    button.innerHTML=`<span class="menu-reset-icon" aria-hidden="true">${symbol}</span>`;
+    row.append(help,button);
+    if(beforeRow)toolsRow.insertBefore(row,beforeRow);else toolsRow.append(row);
+  }
+  const saveRow=document.querySelector('#saveBtn')?.closest('.editor-row');
+  moveButtonIntoMenu(document.querySelector('#zoomResetBtn'),'拡大リセット','⊙',saveRow);
+  moveButtonIntoMenu(document.querySelector('#resetBtn'),'全体リセット','⟲',saveRow);
 
   let history=[],historyIndex=-1,historyTimer=null,applyingHistory=false;
   const snap=()=>({
@@ -166,7 +179,6 @@
     if(historyIndex>=history.length-1)return;
     historyIndex++;applyHistory(history[historyIndex]);
   };
-  // Include grid toggles in history as well.
   gridToggleBtn.addEventListener('click',()=>{if(!applyingHistory)scheduleHistory()});
   pushHistoryNow();
 
