@@ -1147,3 +1147,10 @@ body>.editor-sidebar.menu-detached[data-orientation="portrait"]:not(.menu-collap
 }
 
 @media(max-width:767px){.tray button{font-size:12px;padding:8px 3px;white-space:nowrap}}
+
+/* Ball placement is a drag gesture, never a browser text-selection gesture. */
+.table-wrap,.table-wrap *,.tray .ball,.tray .ball *{
+  user-select:none;
+  -webkit-user-select:none;
+}
+.tray .ball{-webkit-touch-callout:none}

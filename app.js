@@ -244,13 +244,20 @@ function renderTray(){
     const cleanup=()=>{gesture?.preview?.remove();gesture=null};
     ball.onclick=()=>{if(suppressClick){suppressClick=false;return}place(freeSpot())};
     ball.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();place(freeSpot())}};
-    ball.addEventListener('pointerdown',e=>{if(!e.isPrimary||e.button!==0)return;suppressClick=false;gesture={id:e.pointerId,x:e.clientX,y:e.clientY};ball.setPointerCapture(e.pointerId)});
+    ball.addEventListener('pointerdown',e=>{if(!e.isPrimary||e.button!==0)return;suppressClick=false;e.preventDefault();gesture={id:e.pointerId,x:e.clientX,y:e.clientY};ball.setPointerCapture(e.pointerId)});
     ball.addEventListener('pointermove',e=>{
       if(!gesture||gesture.id!==e.pointerId)return;
       if(!gesture.preview&&Math.hypot(e.clientX-gesture.x,e.clientY-gesture.y)<5)return;
       if(!gesture.preview){gesture.preview=ballEl(n,0,0);gesture.preview.classList.add('tray-drag-preview');document.body.append(gesture.preview)}
-      const lift=e.pointerType==='touch'?28:0,preview=gesture.preview;preview.style.left=e.clientX+'px';preview.style.top=(e.clientY-lift)+'px';preview.style.width=preview.style.height=ballDiameter()+'px';
-      const r=table.getBoundingClientRect();if(e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom)showTargetGuide(ballPoint(point({clientX:e.clientX,clientY:e.clientY-lift})));else hideTargetGuide();
+      e.preventDefault();
+      const lift=e.pointerType==='touch'?28:0,preview=gesture.preview,r=table.getBoundingClientRect();
+      const inside=e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom;
+      const destination=inside?ballPoint(point({clientX:e.clientX,clientY:e.clientY-lift})):null;
+      // Preview, crosshair and drop all use the same clamped/snapped table point.
+      preview.style.left=(destination?r.left+destination.x*r.width/100:e.clientX)+'px';
+      preview.style.top=(destination?r.top+destination.y*r.height/100:e.clientY-lift)+'px';
+      preview.style.width=preview.style.height=ballDiameter()+'px';
+      if(destination)showTargetGuide(destination);else hideTargetGuide();
     });
     ball.addEventListener('pointerup',e=>{
       if(!gesture||gesture.id!==e.pointerId)return;
@@ -377,6 +384,7 @@ function endGroupDrag(){if(groupDrag){groupDrag=null;markUnsaved()}}
 
 table.addEventListener('pointerdown',e=>{
   if(!e.isPrimary||e.button!==0)return;
+  e.preventDefault();
   if(e.target.closest('.table-note'))return;
   const ball=e.target.closest('.ball')||(mode==='move'?layer.querySelector(`[data-n="${nearestBall(point(e),22)}"]`):null);
   if(ball)startBallHold(e,ball.dataset.n);
