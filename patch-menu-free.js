@@ -10,7 +10,7 @@ html body #editorMenu>.menu-toggle-btn{order:99!important;position:static!import
 html body #editorMenu.menu-collapsed{height:68px!important;min-height:68px!important;max-height:68px!important;padding:3px!important;border:0!important;background:transparent!important;box-shadow:none!important;border-radius:50%!important;overflow:visible!important;justify-content:center!important}
 html body #editorMenu.menu-collapsed>.orientation-control,html body #editorMenu.menu-collapsed>.tools{display:none!important}
 html body #editorMenu.menu-collapsed>.menu-toggle-btn{width:62px!important;min-width:62px!important;max-width:62px!important;height:62px!important;min-height:62px!important;max-height:62px!important;flex:0 0 62px!important;border-radius:50%!important;box-shadow:none!important;z-index:1!important}
-html body #editorMenu .history-row button,html body #editorMenu button[data-mode="move"]{color:#fff!important;border-color:#fff!important;background:#20282e!important;opacity:1!important}
+html body #editorMenu .history-row button,html body #editorMenu button[data-mode="move"]{color:#fff!important;border-color:#56636b!important;background:#20282e!important;opacity:1!important}
 html body #editorMenu .history-row button:not(:disabled):active,html body #editorMenu button[data-mode="move"]:active{background:#46535e!important}
 html body #editorMenu .history-row button:focus-visible,html body #editorMenu button[data-mode="move"]:focus-visible{outline:2px solid #fff!important;outline-offset:2px!important}
 /* Restore the existing horizontal menu and native horizontal scrolling. */

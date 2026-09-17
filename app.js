@@ -51,7 +51,17 @@ function ballColor(n){const kind=ballKind(n);return kind==='cue'?'#fff':kind==='
 function repeatBallId(kind){repeatBallSeq+=1;return `${kind}-${Date.now()}-${repeatBallSeq}`}
 
 function markUnsaved(){document.querySelector('#saveState').textContent='未保存'}
-function showTargetGuide(p){targetGuide.hidden=false;targetGuide.style.setProperty('--guide-x',p.x+'%');targetGuide.style.setProperty('--guide-y',p.y+'%')}
+function showTargetGuide(p,ballId=null){
+  targetGuide.hidden=false;
+  const clothRect=table.getBoundingClientRect(),guideRect=targetGuide.getBoundingClientRect();
+  const ball=ballId===null?null:layer.querySelector('[data-n="'+ballId+'"]');
+  const ballRect=ball?.getBoundingClientRect();
+  const x=ballRect?ballRect.left+ballRect.width/2:clothRect.left+p.x*clothRect.width/100;
+  const y=ballRect?ballRect.top+ballRect.height/2:clothRect.top+p.y*clothRect.height/100;
+  // Convert the rendered center back into the guide's own unscaled coordinate space.
+  targetGuide.style.setProperty('--guide-x',(x-guideRect.left)/guideRect.width*100+'%');
+  targetGuide.style.setProperty('--guide-y',(y-guideRect.top)/guideRect.height*100+'%');
+}
 function hideTargetGuide(){targetGuide.hidden=true}
 function defaultState(){state={};lines=[];notes=[];tip=null;selectedLine=-1;currentSaveId=null;render();markUnsaved()}
 function clearTable(){state={};lines=[];notes=[];tip=null;selectedLine=-1;currentSaveId=null;hideTargetGuide();render();markUnsaved()}
@@ -389,7 +399,7 @@ table.addEventListener('pointerdown',e=>{
   const ball=e.target.closest('.ball')||(mode==='move'?layer.querySelector(`[data-n="${nearestBall(point(e),22)}"]`):null);
   if(ball)startBallHold(e,ball.dataset.n);
   if(mode==='move'&&groupMoveMode){startGroupDrag(e);return}
-  if(ball&&mode==='move'){selectedLine=-1;draggingBall=ball.dataset.n;ballPress={x:e.clientX,y:e.clientY,origin:{...state[draggingBall]},touch:e.pointerType==='touch'};ballMoved=false;table.setPointerCapture(e.pointerId);renderLines();return}
+  if(ball&&mode!=='erase'){selectedLine=-1;draggingBall=ball.dataset.n;ballPress={x:e.clientX,y:e.clientY,origin:{...state[draggingBall]},touch:e.pointerType==='touch'};ballMoved=false;table.setPointerCapture(e.pointerId);renderLines();return}
   if(mode==='erase'&&ball)return;
   if(mode==='line'||mode==='plain'){
     const p=point(e),startBall=ball?.dataset.n||nearestBall(p,42),a=startBall?state[startBall]:p;lineStart={...p,ball:startBall};showTargetGuide(p);
@@ -399,7 +409,7 @@ table.addEventListener('pointerdown',e=>{
 });
 table.addEventListener('pointermove',e=>{
   if(groupDrag){moveGroupDrag(e);return}
-  if(draggingBall){e.preventDefault();ballMoved=true;const r=table.getBoundingClientRect();state[draggingBall]=ballPoint({x:ballPress.origin.x+(e.clientX-ballPress.x)/r.width*100,y:ballPress.origin.y+(e.clientY-ballPress.y-(ballPress.touch?28:0))/r.height*100},draggingBall);showTargetGuide(state[draggingBall]);syncBallLines(draggingBall);updateBallPositions();if(lines.length)renderLines();return}
+  if(draggingBall){e.preventDefault();ballMoved=true;const r=table.getBoundingClientRect();state[draggingBall]=ballPoint({x:ballPress.origin.x+(e.clientX-ballPress.x)/r.width*100,y:ballPress.origin.y+(e.clientY-ballPress.y-(ballPress.touch?28:0))/r.height*100},draggingBall);syncBallLines(draggingBall);updateBallPositions();showTargetGuide(state[draggingBall],draggingBall);if(lines.length)renderLines();return}
   if(lineStart){const p=point(e),endBall=nearestBall(p,42,lineStart.ball),b=endBall?state[endBall]:p;lineDraft.x2=b.x;lineDraft.y2=b.y;lineDraft.endBall=endBall||null;showTargetGuide(b);renderLines();return}
   if(!draggingLine)return;e.preventDefault();const p=point(e),l=lines[draggingLine.i],o=draggingLine.original;showTargetGuide(p);
   if(draggingLine.kind==='start'){
@@ -491,6 +501,41 @@ drawBtn.onclick=()=>{
   refreshColorChoice();
 };
 document.querySelector('#lineColorClose').onclick=()=>{colorPanel.hidden=true};
+
+/* Drag the settings header without changing any input or drawing mode. */
+let paletteDrag=null;
+colorPanel.style.setProperty('z-index','6000','important');
+const paletteHeader=colorPanel.querySelector('.color-panel-head');
+paletteHeader.style.touchAction='none';
+paletteHeader.style.cursor='grab';
+paletteHeader.style.userSelect='none';
+function clampPalette(){
+  if(colorPanel.hidden||!colorPanel.dataset.moved)return;
+  const vv=window.visualViewport,r=colorPanel.getBoundingClientRect();
+  const x=vv?.offsetLeft||0,y=vv?.offsetTop||0,w=vv?.width||innerWidth,h=vv?.height||innerHeight;
+  colorPanel.style.setProperty('left',Math.max(x+6,Math.min(r.left,x+w-r.width-6))+'px','important');
+  colorPanel.style.setProperty('top',Math.max(y+6,Math.min(r.top,y+h-r.height-6))+'px','important');
+}
+paletteHeader.addEventListener('pointerdown',e=>{
+  if(!e.isPrimary||e.button!==0||e.target.closest('button,input,select'))return;
+  const r=colorPanel.getBoundingClientRect();
+  paletteDrag={id:e.pointerId,x:e.clientX,y:e.clientY,left:r.left,top:r.top};
+  e.preventDefault();paletteHeader.setPointerCapture(e.pointerId);
+});
+paletteHeader.addEventListener('pointermove',e=>{
+  if(!paletteDrag||paletteDrag.id!==e.pointerId)return;
+  e.preventDefault();colorPanel.dataset.moved='true';
+  colorPanel.style.setProperty('inset','auto','important');
+  colorPanel.style.setProperty('transform','none','important');
+  colorPanel.style.setProperty('margin','0','important');
+  colorPanel.style.setProperty('left',paletteDrag.left+e.clientX-paletteDrag.x+'px','important');
+  colorPanel.style.setProperty('top',paletteDrag.top+e.clientY-paletteDrag.y+'px','important');
+  clampPalette();
+});
+for(const event of ['pointerup','pointercancel','lostpointercapture'])paletteHeader.addEventListener(event,()=>{paletteDrag=null});
+window.addEventListener('resize',clampPalette);
+window.visualViewport?.addEventListener('resize',clampPalette);
+
 document.addEventListener('pointerdown',e=>{if(colorPanel.hidden||colorPanel.contains(e.target)||e.target.closest('#drawBtn'))return;colorPanel.hidden=true});
 
 const memoDialogEl=document.querySelector('#memoDialog'),memoInput=document.querySelector('#memo'),memoColor=document.querySelector('#memoColor'),memoBackground=document.querySelector('#memoBackground'),memoTransparent=document.querySelector('#memoTransparent'),memoFont=document.querySelector('#memoFont'),memoSize=document.querySelector('#memoSize');
@@ -588,7 +633,7 @@ function showSaveToast(message){
   saveToastTimer=setTimeout(()=>{toast.hidden=true},2200);
 }
 document.querySelector('#saveBtn').onclick=()=>{
-  const saved=JSON.parse(localStorage.getItem('poolNotes')||'[]'),now=new Date().toISOString(),data={title:currentTitle||'名称なし',state:structuredClone(state),lines:structuredClone(lines),notes:structuredClone(notes),tip:tip?{...tip}:null,orientation,result:document.querySelector('input[name=result]:checked')?.value||'',updatedAt:now};let label='新規保存済み';
+  const saved=JSON.parse(localStorage.getItem('poolNotes')||'[]'),now=new Date().toISOString(),data={title:currentTitle||'名称なし',state:structuredClone(state),lines:structuredClone(lines),notes:structuredClone(notes),tip:tip?{...tip}:null,orientation,updatedAt:now};let label='新規保存済み';
   const index=currentSaveId===null?-1:saved.findIndex(s=>String(s.id)===String(currentSaveId));
   if(index>=0){saved[index]={...saved[index],...data,createdAt:saved[index].createdAt||saved[index].date||now};label='上書き保存済み'}
   else{currentSaveId=Date.now();saved.unshift({id:currentSaveId,...data,createdAt:now,date:new Date().toLocaleDateString('ja-JP')})}
