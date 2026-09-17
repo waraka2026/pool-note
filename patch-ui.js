@@ -171,8 +171,8 @@
       editorSidebar.style.setProperty('overflow-y','auto','important');
       editorSidebar.style.setProperty('overflow-x','hidden','important');
     }else{
-      editorSidebar.style.setProperty('width','68px','important');
-      editorSidebar.style.setProperty('max-width','68px','important');
+      editorSidebar.style.setProperty('width','min(620px,calc(100vw - 24px))','important');
+      editorSidebar.style.setProperty('max-width','min(620px,calc(100vw - 24px))','important');
       editorSidebar.style.setProperty('overflow-x','auto','important');
       editorSidebar.style.setProperty('overflow-y','hidden','important');
       editorSidebar.style.removeProperty('max-height');
@@ -182,8 +182,8 @@
   const originalLockCurrentMenuSize=lockCurrentMenuSize;
   lockCurrentMenuSize=function(){
     if(orientation==='landscape'){
-      editorSidebar.style.setProperty('width','68px','important');
-      editorSidebar.style.setProperty('max-width','68px','important');
+      editorSidebar.style.setProperty('width','min(620px,calc(100vw - 24px))','important');
+      editorSidebar.style.setProperty('max-width','min(620px,calc(100vw - 24px))','important');
       editorSidebar.style.setProperty('height','auto','important');
       editorSidebar.style.removeProperty('min-height');
       editorSidebar.style.removeProperty('max-height');
@@ -210,8 +210,8 @@
       editorSidebar.style.bottom='auto';
       editorSidebar.style.transform='none';
       if(expanded&&orientation==='landscape'){
-        editorSidebar.style.setProperty('width','68px','important');
-        editorSidebar.style.setProperty('max-width','68px','important');
+        editorSidebar.style.setProperty('width','min(620px,calc(100vw - 24px))','important');
+        editorSidebar.style.setProperty('max-width','min(620px,calc(100vw - 24px))','important');
       }
     }
 
