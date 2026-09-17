@@ -19,7 +19,6 @@ let ballPress=null,ballMoved=false,savedView='cards',savedSortOrder='newest';
 let ballHold=null,lastTouchTime=0;
 let ghostEnabled=false;
 let ghostDrag=null;
-let gridVisible=true;
 let fitScale=1,tableZoom=1,tablePan={x:0,y:0},pinchGesture=null;
 const tableTouches=new Map();
 function cancelBallHold(){if(ballHold)clearTimeout(ballHold.timer);ballHold=null}
@@ -104,7 +103,7 @@ function reserveDefaultMenuSlot(){
   const parent=editorSidebar.parentElement,r=editorSidebar.getBoundingClientRect(),style=getComputedStyle(editorSidebar);
   menuPlaceholder.dataset.orientation=orientation;
   if(orientation==='portrait'){
-    menuPlaceholder.style.cssText='display:block;flex:0 0 58px;width:58px;height:1px;pointer-events:none';
+    menuPlaceholder.style.cssText='display:block;flex:0 0 68px;width:68px;height:1px;pointer-events:none';
   }else{
     menuPlaceholder.style.cssText=`display:block;width:${r.width}px;height:${r.height}px;max-width:620px;margin:${style.margin};pointer-events:none`;
   }
@@ -496,8 +495,6 @@ memoTransparent.onchange=()=>{memoBackground.disabled=memoTransparent.checked};
 memoDialogEl.addEventListener('close',()=>{const text=memoInput.value.trim();if(memoDialogEl.returnValue==='ok'&&text){const offset=(notes.length%5)*5;notes.push({text,color:memoColor.value,background:memoTransparent.checked?'transparent':memoBackground.value,font:memoFont.value,size:Number(memoSize.value),x:50+offset,y:50+offset});renderNotes();markUnsaved()}memoInput.value=''});
 document.querySelector('#resetBtn').onclick=clearTable;
 document.querySelector('#zoomResetBtn').onclick=resetTableZoom;
-const gridToggleBtn=document.querySelector('#gridToggleBtn'),gridHelp=document.querySelector('#gridHelp');
-gridToggleBtn.onclick=()=>{gridVisible=!gridVisible;table.classList.toggle('grid-hidden',!gridVisible);gridToggleBtn.classList.toggle('active',gridVisible);gridToggleBtn.setAttribute('aria-pressed',String(gridVisible));gridHelp.textContent=gridVisible?'罫線を表示':'罫線を非表示'};
 
 function roundedRect(ctx,x,y,w,h,r){ctx.beginPath();ctx.roundRect(x,y,w,h,r)}
 function drawCanvasBall(ctx,n,x,y,r){

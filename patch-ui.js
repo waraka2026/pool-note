@@ -171,8 +171,8 @@
       editorSidebar.style.setProperty('overflow-y','auto','important');
       editorSidebar.style.setProperty('overflow-x','hidden','important');
     }else{
-      editorSidebar.style.setProperty('width','calc(100vw - 12px)','important');
-      editorSidebar.style.setProperty('max-width','calc(100vw - 12px)','important');
+      editorSidebar.style.setProperty('width','68px','important');
+      editorSidebar.style.setProperty('max-width','68px','important');
       editorSidebar.style.setProperty('overflow-x','auto','important');
       editorSidebar.style.setProperty('overflow-y','hidden','important');
       editorSidebar.style.removeProperty('max-height');
@@ -182,8 +182,8 @@
   const originalLockCurrentMenuSize=lockCurrentMenuSize;
   lockCurrentMenuSize=function(){
     if(orientation==='landscape'){
-      editorSidebar.style.setProperty('width','calc(100vw - 12px)','important');
-      editorSidebar.style.setProperty('max-width','calc(100vw - 12px)','important');
+      editorSidebar.style.setProperty('width','68px','important');
+      editorSidebar.style.setProperty('max-width','68px','important');
       editorSidebar.style.setProperty('height','auto','important');
       editorSidebar.style.removeProperty('min-height');
       editorSidebar.style.removeProperty('max-height');
@@ -210,8 +210,8 @@
       editorSidebar.style.bottom='auto';
       editorSidebar.style.transform='none';
       if(expanded&&orientation==='landscape'){
-        editorSidebar.style.setProperty('width','calc(100vw - 12px)','important');
-        editorSidebar.style.setProperty('max-width','calc(100vw - 12px)','important');
+        editorSidebar.style.setProperty('width','68px','important');
+        editorSidebar.style.setProperty('max-width','68px','important');
       }
     }
 
@@ -316,7 +316,7 @@
   let history=[],historyIndex=-1,historyTimer=null,applyingHistory=false;
   const snap=()=>({
     state:structuredClone(state),lines:structuredClone(lines),notes:structuredClone(notes),
-    tip:tip?structuredClone(tip):null,orientation,gridVisible,currentSaveId,currentTitle
+    tip:tip?structuredClone(tip):null,orientation,currentSaveId,currentTitle
   });
   const key=s=>JSON.stringify(s);
   function refreshHistoryButtons(){
@@ -341,18 +341,12 @@
     state=structuredClone(s.state);lines=structuredClone(s.lines);notes=structuredClone(s.notes);tip=s.tip?structuredClone(s.tip):null;
     currentSaveId=s.currentSaveId;currentTitle=s.currentTitle||'';
     if(orientation!==s.orientation)setOrientation(s.orientation,false,false);
-    gridVisible=s.gridVisible!==false;
-    table.classList.toggle('grid-hidden',!gridVisible);
-    gridToggleBtn.classList.toggle('active',gridVisible);
-    gridToggleBtn.setAttribute('aria-pressed',String(gridVisible));
-    gridHelp.textContent=gridVisible?'罫線を表示':'罫線を非表示';
     selectedLine=-1;draggingBall=null;draggingLine=null;lineStart=null;lineDraft=null;groupDrag=null;
     render();layoutTable(true);oldMarkUnsaved();
     applyingHistory=false;refreshHistoryButtons();fitMenuScroll();clampDetachedMenu();
   }
   undo.btn.onclick=()=>{if(historyTimer)pushHistoryNow();if(historyIndex<=0)return;historyIndex--;applyHistory(history[historyIndex])};
   redo.btn.onclick=()=>{if(historyTimer)pushHistoryNow();if(historyIndex>=history.length-1)return;historyIndex++;applyHistory(history[historyIndex])};
-  gridToggleBtn.addEventListener('click',()=>{if(!applyingHistory)scheduleHistory()});
 
   window.addEventListener('resize',()=>requestAnimationFrame(()=>{fitMenuScroll();clampDetachedMenu()}));
   if(window.visualViewport)window.visualViewport.addEventListener('resize',()=>requestAnimationFrame(()=>{fitMenuScroll();clampDetachedMenu()}));

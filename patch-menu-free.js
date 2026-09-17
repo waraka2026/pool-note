@@ -1,91 +1,18 @@
 (()=>{
   'use strict';
   const s=document.createElement('style');
-  s.textContent=`
-    /* Collapsed menu: show only the round menu button. Never show a dark clipped wedge. */
-    .editor-sidebar.menu-collapsed,
-    .board-column.landscape .editor-sidebar.menu-collapsed,
-    .board-column.portrait .editor-sidebar.menu-collapsed{
-      width:74px!important;
-      min-width:74px!important;
-      max-width:74px!important;
-      height:74px!important;
-      min-height:74px!important;
-      max-height:74px!important;
-      padding:6px!important;
-      background:transparent!important;
-      border:0!important;
-      box-shadow:none!important;
-      border-radius:50%!important;
-      overflow:visible!important;
-      flex-basis:74px!important;
-    }
-    .editor-sidebar.menu-collapsed .menu-drag-handle{display:none!important}
-    .editor-sidebar.menu-collapsed .menu-toggle-btn{
-      display:flex!important;
-      width:62px!important;
-      min-width:62px!important;
-      max-width:62px!important;
-      height:62px!important;
-      min-height:62px!important;
-      max-height:62px!important;
-      margin:0!important;
-      flex:0 0 62px!important;
-      border-radius:50%!important;
-      position:static!important;
-      transform:none!important;
-    }
-
-    /* Detached portrait menu: same free-floating behavior as before, with vertical scrolling. */
-    .editor-sidebar.menu-detached[data-orientation="portrait"]:not(.menu-collapsed){
-      width:150px!important;
-      min-width:150px!important;
-      max-width:150px!important;
-      height:auto!important;
-      max-height:calc(100dvh - 24px)!important;
-      overflow-y:auto!important;
-      overflow-x:hidden!important;
-      touch-action:pan-y!important;
-    }
-
-    /* Detached landscape menu: free-floating panel, not viewport-width. Its contents scroll sideways. */
-    .editor-sidebar.menu-detached[data-orientation="landscape"]:not(.menu-collapsed){
-      width:min(620px,calc(100vw - 24px))!important;
-      min-width:0!important;
-      max-width:min(620px,calc(100vw - 24px))!important;
-      height:58px!important;
-      min-height:58px!important;
-      max-height:58px!important;
-      padding:6px 8px!important;
-      overflow-x:auto!important;
-      overflow-y:hidden!important;
-      touch-action:pan-x!important;
-      flex-wrap:nowrap!important;
-      -webkit-overflow-scrolling:touch;
-      scrollbar-width:thin;
-    }
-    .editor-sidebar.menu-detached[data-orientation="landscape"]:not(.menu-collapsed) .orientation-control,
-    .editor-sidebar.menu-detached[data-orientation="landscape"]:not(.menu-collapsed) .tools,
-    .editor-sidebar.menu-detached[data-orientation="landscape"]:not(.menu-collapsed) .tools-row{
-      display:flex!important;
-      flex-direction:row!important;
-      flex-wrap:nowrap!important;
-      width:max-content!important;
-      min-width:max-content!important;
-      max-width:none!important;
-      overflow:visible!important;
-    }
-
-    /* Default landscape menu also scrolls horizontally instead of stretching across the page. */
-    .board-column.landscape>.editor-sidebar:not(.menu-detached):not(.menu-collapsed){
-      width:min(620px,calc(100vw - 24px))!important;
-      min-width:0!important;
-      max-width:min(620px,calc(100vw - 24px))!important;
-      overflow-x:auto!important;
-      overflow-y:hidden!important;
-      touch-action:pan-x!important;
-    }
-  `;
+  s.textContent=`html body #editorMenu{width:68px!important;min-width:68px!important;max-width:68px!important;flex:0 0 68px!important;display:flex!important;flex-direction:column!important;align-items:center!important;gap:4px!important;padding:7px!important;margin:0!important;height:auto!important;min-height:0!important;max-height:calc(100dvh - 20px)!important;overflow-x:hidden!important;overflow-y:auto!important;background:#192026!important;border:1px solid #56636b!important;border-radius:10px!important;backdrop-filter:none!important;position:relative;z-index:5000!important;isolation:isolate;touch-action:pan-y!important}
+html body #editorMenu .orientation-control,html body #editorMenu .tools,html body #editorMenu .tools-row{display:flex!important;flex-direction:column!important;align-items:center!important;width:100%!important;min-width:0!important;max-width:100%!important;flex:0 0 auto!important;gap:4px!important;margin:0!important;padding:0!important;border:0!important;overflow:visible!important}
+html body #editorMenu .editor-row{display:flex!important;justify-content:center!important;width:100%!important;min-width:0!important;height:38px!important;flex:0 0 auto!important}
+html body #editorMenu .editor-row>button{width:38px!important;min-width:38px!important;max-width:38px!important;height:38px!important;min-height:38px!important;max-height:38px!important;flex:0 0 38px!important;margin:0!important;padding:5px!important}
+html body #editorMenu>.menu-drag-handle{order:-1!important;flex:0 0 18px!important;width:38px!important;height:18px!important;margin:0 auto!important;color:#fff!important}
+html body #editorMenu>.menu-toggle-btn{order:99!important;position:static!important;transform:none!important;width:38px!important;min-width:38px!important;max-width:38px!important;height:38px!important;min-height:38px!important;max-height:38px!important;flex:0 0 38px!important;margin:0!important;background:#20282e!important;border:1px solid #fff!important;color:#fff!important;opacity:1!important}
+html body #editorMenu.menu-collapsed{height:68px!important;min-height:68px!important;max-height:68px!important;padding:3px!important;border:0!important;background:transparent!important;box-shadow:none!important;overflow:visible!important;justify-content:center!important}
+html body #editorMenu.menu-collapsed>.orientation-control,html body #editorMenu.menu-collapsed>.tools{display:none!important}
+html body #editorMenu.menu-collapsed>.menu-toggle-btn{width:62px!important;min-width:62px!important;max-width:62px!important;height:62px!important;min-height:62px!important;max-height:62px!important;flex:0 0 62px!important;border-radius:50%!important;z-index:1!important}
+html body #editorMenu .history-row button,html body #editorMenu button[data-mode="move"]{color:#fff!important;border-color:#fff!important;background:#20282e!important;opacity:1!important}
+html body #editorMenu .history-row button:not(:disabled):active,html body #editorMenu button[data-mode="move"]:active{background:#46535e!important}
+html body #editorMenu .history-row button:focus-visible,html body #editorMenu button[data-mode="move"]:focus-visible{outline:2px solid #fff!important;outline-offset:2px!important}`;
   document.head.append(s);
 
   function viewportBox(){
@@ -124,23 +51,7 @@
     editorSidebar.style.transform='none';
   };
 
-  lockCurrentMenuSize=function(){
-    if(orientation==='landscape'){
-      editorSidebar.style.setProperty('width','min(620px,calc(100vw - 24px))','important');
-      editorSidebar.style.setProperty('max-width','min(620px,calc(100vw - 24px))','important');
-      editorSidebar.style.removeProperty('min-width');
-      editorSidebar.style.setProperty('height','58px','important');
-      editorSidebar.style.setProperty('max-height','58px','important');
-      editorSidebar.style.removeProperty('flex-basis');
-    }else{
-      editorSidebar.style.setProperty('width','150px','important');
-      editorSidebar.style.setProperty('min-width','150px','important');
-      editorSidebar.style.setProperty('max-width','150px','important');
-      editorSidebar.style.setProperty('height','auto','important');
-      editorSidebar.style.setProperty('max-height','calc(100dvh - 24px)','important');
-      editorSidebar.style.removeProperty('flex-basis');
-    }
-  };
+  lockCurrentMenuSize=function(){clearMenuSizeLock();for(const prop of ['width','min-width','max-width'])editorSidebar.style.setProperty(prop,'68px','important');};
 
   /* Open/close keeps the floating menu at the same center in BOTH orientations. */
   setMenuExpanded=function(expanded){
