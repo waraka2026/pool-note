@@ -121,7 +121,8 @@ function updateSideLayout(){
   if(orientation==='landscape'){
     if(!detached&&editorSidebar.parentElement!==boardColumn)boardColumn.append(editorSidebar);
     if(trayEl.parentElement!==boardColumn)boardColumn.append(trayEl);
-    if(!detached&&editorSidebar.nextElementSibling!==trayEl)boardColumn.insertBefore(editorSidebar,trayEl);
+    // Keep the balls directly below the table, independent of menu expansion.
+    if(tableAndTip.nextElementSibling!==trayEl)boardColumn.insertBefore(trayEl,tableAndTip.nextElementSibling);
   }else{
     if(!detached&&editorSidebar.parentElement!==tableAndTip)tableAndTip.insertBefore(editorSidebar,tableWrap);
     if(trayEl.parentElement!==sideControls)sideControls.append(trayEl);
@@ -136,7 +137,7 @@ function availableTableWidth(){
 function availableTableHeight(){
   const vh=window.visualViewport?window.visualViewport.height:document.documentElement.clientHeight,top=Math.max(0,tableAndTip.getBoundingClientRect().top);
   let reserve=16;
-  if(orientation==='landscape'){const menuSlot=editorSidebar.parentElement===boardColumn?editorSidebar:menuPlaceholder.parentElement===boardColumn?menuPlaceholder:null;reserve+=trayEl.getBoundingClientRect().height+(menuSlot?menuSlot.getBoundingClientRect().height+3:0)+6}
+  if(orientation==='landscape')reserve+=trayEl.getBoundingClientRect().height+68+3+6;
   return Math.max(140,vh-top-reserve);
 }
 function layoutTable(force=false){
