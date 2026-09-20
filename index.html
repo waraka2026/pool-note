@@ -10,15 +10,13 @@
   <title>ビリヤード配置図メーカー｜球配置・ショットライン作成</title>
   <meta name="description" content="ビリヤードの球配置とショットラインをブラウザで作成・保存できる無料の配置図メーカー。手球と1〜15番の球に対応。" />
   <link rel="stylesheet" href="styles.css?v=74" />
-  <link rel="stylesheet" href="editor-v2.css?v=5" />
+  <link rel="stylesheet" href="editor-v2.css?v=6" />
 <style id="tabletCritical">
 @media(max-width:1180px){
-  body.v2-ui{padding-bottom:18px!important}
-  .v2-ui .table-and-tip{position:relative!important;display:block!important;width:100%!important}
-  .v2-ui #editorMenu{display:none!important}
-  .v2-ui .table-wrap{display:grid!important;place-items:start center!important;width:100%!important;max-width:100%!important;margin:0!important;padding:8px 0 26px!important;justify-self:stretch!important}
-  .v2-ui #tableFrame,.v2-ui .table-frame{margin-left:auto!important;margin-right:auto!important;justify-self:center!important}
-  .mobile-v2-dock{display:flex!important;position:fixed!important;left:10px!important;right:auto!important;top:50%!important;bottom:auto!important;transform:translateY(-50%)!important;width:60px!important;flex-direction:column!important;gap:6px!important;padding:6px!important;z-index:450!important}
+  .v2-ui #editorMenu{display:block!important;position:sticky!important;top:62px!important;width:100%!important;margin:8px 0 10px!important;z-index:440!important}
+  .v2-ui .table-and-tip{display:block!important;width:100%!important}
+  .v2-ui .table-wrap{display:grid!important;place-items:start center!important;width:100%!important;margin:0!important}
+  .mobile-v2-dock,.mobile-v2-more{display:none!important}
 }
 </style>
 </head>
@@ -76,6 +74,6 @@
   <script src="app.js?v=64"></script>
   <script src="patch-ui.js?v=8"></script>
   <script src="patch-pan.js?v=3"></script>
-  <script src="editor-v2.js?v=5"></script>
+  <script src="editor-v2.js?v=6"></script>
 </body>
 </html>
