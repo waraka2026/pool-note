@@ -9,13 +9,62 @@
   <meta http-equiv="Expires" content="0" />
   <title>ビリヤード配置図メーカー｜球配置・ショットライン作成</title>
   <meta name="description" content="ビリヤードの球配置とショットラインをブラウザで作成・保存できる無料の配置図メーカー。手球と1〜15番の球に対応。" />
-  <link rel="stylesheet" href="styles.css?v=74" />
-  <link rel="stylesheet" href="editor-v2.css?v=6" />
+  <link rel="stylesheet" href="styles.css?v=80" />
+  <link rel="stylesheet" href="editor-v2.css?v=10" />
 <style id="tabletCritical">
-@media(max-width:1180px){
-  .v2-ui #editorMenu{display:block!important;position:sticky!important;top:62px!important;width:100%!important;margin:8px 0 10px!important;z-index:440!important}
+@media(max-width:1366px){
+  body.v2-ui{padding-bottom:0!important}
+  .v2-ui #editorMenu{
+    display:block!important;
+    position:sticky!important;
+    top:62px!important;
+    z-index:999!important;
+    width:100%!important;
+    max-width:none!important;
+    min-width:0!important;
+    margin:8px 0 10px!important;
+    padding:8px 10px!important;
+    background:#fff!important;
+    border:1px solid #dce9e3!important;
+    border-radius:16px!important;
+    box-shadow:0 10px 28px rgba(20,55,46,.14)!important;
+    transform:none!important;
+    left:auto!important;right:auto!important;bottom:auto!important;
+  }
+  .v2-ui #editorMenu .menu-drag-handle{display:none!important}
+  .v2-ui #editorMenu .menu-toggle-btn{
+    display:flex!important;
+    position:absolute!important;
+    top:8px!important;right:8px!important;
+    width:auto!important;min-width:44px!important;height:36px!important;
+    padding:0 10px!important;align-items:center!important;justify-content:center!important;
+    border:1px solid #dce9e3!important;border-radius:10px!important;background:#f1f7f4!important;
+    color:#31594e!important;font-weight:900!important;z-index:3!important
+  }
+  .v2-ui #editorMenu .menu-toggle-btn small{display:inline!important}
+  .v2-ui #editorMenu .orientation-control{
+    display:flex!important;gap:6px!important;align-items:center!important;
+    width:max-content!important;margin:0 72px 8px 0!important;padding:0 0 8px!important;
+    border-right:0!important;border-bottom:1px solid #dce9e3!important
+  }
+  .v2-ui #editorMenu .tools{display:block!important;width:100%!important;overflow:visible!important;max-height:none!important}
+  .v2-ui #editorMenu .tools-row{display:flex!important;flex-wrap:wrap!important;gap:6px!important;width:100%!important;align-items:center!important}
+  .v2-ui #editorMenu .editor-row{display:block!important;width:auto!important;flex:0 0 auto!important}
+  .v2-ui #editorMenu .tool-help{display:none!important}
+  .v2-ui #editorMenu.menu-collapsed .orientation-control,
+  .v2-ui #editorMenu.menu-collapsed .tools{display:none!important}
   .v2-ui .table-and-tip{display:block!important;width:100%!important}
-  .v2-ui .table-wrap{display:grid!important;place-items:start center!important;width:100%!important;margin:0!important}
+  .v2-ui .table-wrap{
+    display:grid!important;
+    place-items:start center!important;
+    width:100%!important;
+    max-width:100%!important;
+    margin:0!important;
+    padding:8px 0 26px!important
+  }
+  .v2-ui #tableFrame,.v2-ui .table-frame{
+    margin-left:auto!important;margin-right:auto!important;justify-self:center!important
+  }
   .mobile-v2-dock,.mobile-v2-more{display:none!important}
 }
 </style>
@@ -27,7 +76,6 @@
       <button id="guideBtn" type="button">配置の作り方</button><button id="savedBtn" type="button">保存した配置</button><button id="matchRecordBtn" type="button" onclick="location.href='matches.html'">対戦記録</button>
       <small class="quick-help"><span>球の削除：PCは右クリック／スマホは長押し</span><span class="menu-help-line">編集メニューは固定。台は常に中央に表示します。</span></small>
     </nav>
-    <div class="workspace"><div id="boardColumn" class="board-column portrait"><div class="table-and-tip">
     <aside id="editorMenu" class="editor-sidebar" data-orientation="portrait" aria-label="台の向きと編集ツール">
       <div class="menu-drag-handle" aria-label="メニューを移動" title="ここをドラッグして移動">•••</div>
       <button id="menuToggleBtn" class="menu-toggle-btn" type="button" aria-expanded="true" aria-label="編集メニューを閉じる" title="編集メニューを閉じる"><span aria-hidden="true">×</span><small>閉じる</small></button>
@@ -42,38 +90,38 @@
         <div class="editor-row"><span class="tool-help">メモを追加</span><button type="button" id="memoBtn" title="メモ" aria-label="メモ"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1-6L16 3l5 5-11 11-6 1zM13 6l5 5"/></svg></button></div>
         <div class="editor-row"><span class="tool-help" id="saveHelp" aria-live="polite">配置を保存</span><button type="button" id="saveBtn" class="save" title="配置を保存" aria-label="配置を保存"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h12l4 4v14H3V3h2Z"/><path d="M7 3v6h10V3M7 21v-8h10v8M14 5v2"/></svg></button></div>
       </div></nav></aside>
+<div class="workspace"><div id="boardColumn" class="board-column portrait"><div class="table-and-tip">
+    
     <section class="table-wrap" aria-label="ビリヤード台"><div id="table" class="table"><div class="rail top"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="rail bottom"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="rail left"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="rail right"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="cloth"><div class="head-line"></div><div class="spot head-spot"></div><div class="spot foot-spot"></div><div id="targetGuide" class="target-guide" hidden></div><svg id="lines"></svg><div id="ballsLayer"></div><div id="notesLayer"></div></div><b class="pocket p1"></b><b class="pocket p2"></b><b class="pocket p3"></b><b class="pocket p4"></b><b class="pocket p5"></b><b class="pocket p6"></b></div><div class="hint" id="hint">球をドラッグして配置</div></section>
     <div class="side-controls"><section class="tip-point" aria-label="撞点"><p class="tip-label">撞点</p><div id="cueDiagram" class="cue-diagram" title="手玉をタップして撞点を記録"><div id="tipMark" class="tip-mark" hidden></div></div><p class="tip-help">赤い点をドラッグ</p><button id="tipClearBtn" class="tip-clear">印を消す</button></section><section class="tray"><div id="trayBalls" class="tray-balls"></div><button id="zoomResetBtn" type="button" title="台の拡大を元に戻す">拡大リセット</button><button id="resetBtn">リセット</button></section></div>
     </div></div></div></div></main>
-  <nav id="mobileV2Dock" class="mobile-v2-dock" aria-label="スマホ編集メニュー">
-  <button type="button" data-sheet="balls"><span>🎱</span>球</button>
-  <button type="button" data-sheet="arrow"><span>↗</span>矢印</button>
-  <button type="button" data-sheet="line"><span>╱</span>線</button>
-  <button type="button" data-sheet="tip"><span>◎</span>撞点</button>
-  <button type="button" data-sheet="more"><span>☰</span>その他</button>
-</nav>
-<section id="mobileV2More" class="mobile-v2-more" aria-label="その他の編集">
-  <button id="mobileV2Close" class="mobile-v2-close" type="button" aria-label="閉じる">×</button>
-  <div class="mobile-v2-more-grid">
-    <button id="mvPortrait" type="button">縦向き</button>
-    <button id="mvLandscape" type="button">横向き</button>
-    <button id="mvGroup" type="button">全部まとめて移動</button>
-    <button id="mvUndo" type="button">↶ 戻る</button>
-    <button id="mvRedo" type="button">↷ 進む</button>
-    <button id="mvMemo" type="button">✎ メモ</button>
-    <button id="mvSave" type="button">💾 保存</button>
-    <button id="mvZoom" type="button">拡大リセット</button>
-    <button id="mvReset" type="button">配置リセット</button>
-    <button id="mvGuide" type="button">使い方</button>
-    <button id="mvSaved" type="button">保存した配置</button>
-  </div>
-</section>
   <dialog id="memoDialog"><form method="dialog"><h2>ショットメモ</h2><textarea id="memo" placeholder="例：右下を撞いて、2クッションで戻す"></textarea><div class="memo-style-grid"><label>文字色 <input id="memoColor" type="color" value="#ffe15b"></label><label>背景色 <input id="memoBackground" type="color" value="#07110d"></label><label>フォント<select id="memoFont"><option value="gothic">ゴシック</option><option value="mincho">明朝</option><option value="rounded">丸ゴシック</option><option value="hand">手書き風</option></select></label><label>文字サイズ<select id="memoSize"><option value="15">小</option><option value="18" selected>中</option><option value="22">大</option></select></label></div><label class="memo-transparent"><input id="memoTransparent" type="checkbox"> 背景色なし</label><div class="memo-actions"><button value="cancel" class="memo-cancel">閉じる</button><button value="ok">完了</button></div></form></dialog>
   <dialog id="guideDialog" class="guide-dialog"><div class="dialog-head"><div><p class="guide-label">操作ガイド</p><h2>配置の作り方</h2></div><button id="guideCloseBtn" type="button" aria-label="閉じる">×</button></div><ol><li><b>固定メニューから編集する</b><span>メニューは固定表示です。球の移動、まとめて移動、矢印・線、消去、メモ、保存を選べます。</span></li><li><b>台の向きを選ぶ</b><span>台の左にある「縦」「横」で切り替えます。スマホを横向きにすると、台全体・穴・球・線・メモが一緒に横向きになります。PCでもスマホでも同じ台のデザインを拡大・縮小して表示します</span></li><li><b>左のアイコンで編集する</b><span>台の左に編集アイコンを縦に並べています。各アイコンの左側に短い説明があります。球の移動、まとめて移動、矢印・線、線の消去、メモ、保存をここから選べます</span></li><li><b>球を置く</b><span>球の一覧をタップすると台に追加できます。一覧から置きたい場所へ直接ドラッグ＆ドロップもできます。球同士を近づけると、ぴったり接触する位置にそろいます。拡大・縮小しても位置関係は変わりません。手玉と点線のイメージボールは何個でも置けます</span></li><li><b>矢印・線を描く</b><span>「矢印・線」を開いて種類と色を選びます。選んだ機能は、同じ種類をもう一度押して解除するまで続けて描けます</span></li><li><b>色と太さを指定して描く</b><span>基本は描き始めた球と同じ色です。1〜15番の球色または自由色、線の太さも変更できます</span></li><li><b>移動・追従を外す</b><span>球をつかむと球だけ、矢印・線をつかむとその線だけが動きます。線の先端をつかむと球への追従が外れ、その端を自由に動かせます</span></li><li><b>まとめて移動</b><span>「まとめて移動」を押すと、球・線・メモをどこをつかんでも全部まとめて移動できます。もう一度押すと個別移動に戻ります</span></li><li><b>球を削除する</b><span>PCでは台の上の球を右クリック、スマホでは球を動かさず約0.6秒長押しすると削除できます。タップ・ダブルタップ・ダブルクリックでは球は消えません。ドラッグや2本指の操作を始めると長押し削除はキャンセルされます。消去モードでも球の削除方法は同じです</span></li><li><b>線・メモを削除する</b><span>線・配置したメモはダブルクリックで削除できます。線は「消去」を選んでタップしても削除できます</span></li><li><b>撞点を記録</b><span>大きい手玉をタップし、赤い点を好きな位置へドラッグできます</span></li><li><b>保存済みを開く</b><span>画面上部の「保存した配置」から、保存した配置の一覧を呼び出せます</span></li><li><b>対戦記録に紐づける</b><span>画面上部の「対戦記録」から、保存した配置図をプルダウンで選び、どの試合での配置かを記録できます</span></li></ol><p class="guide-tip">色パネルは「閉じる」かパネルの外側をクリックすると閉じます。保存した配置の「画像を保存」では、画面と同じ向きの台・罫線・穴・球・線・メモ・撞点を1枚の画像として保存できます。</p></dialog>
   <dialog id="savedDialog"><div class="dialog-head"><h2>保存した配置</h2><button onclick="savedDialog.close()">×</button></div><div class="saved-controls"><div class="saved-view-buttons" aria-label="表示方法"><button id="savedCardView" type="button">カード</button><button id="savedListView" type="button">一覧</button><button type="button" onclick="location.href='matches.html'">対戦記録で使う</button></div><label>並び順<select id="savedSort"><option value="newest">更新日時：新しい順</option><option value="oldest">更新日時：古い順</option></select></label></div><div id="savedList"></div></dialog>
-  <script src="app.js?v=64"></script>
-  <script src="patch-ui.js?v=8"></script>
-  <script src="patch-pan.js?v=3"></script>
-  <script src="editor-v2.js?v=6"></script>
+  <script src="app.js?v=70"></script>
+  <script src="patch-ui.js?v=10"></script>
+  <script src="patch-pan.js?v=10"></script>
+  
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  const m=document.getElementById('editorMenu');
+  const old=document.getElementById('menuToggleBtn');
+  if(m&&old){
+    m.classList.remove('menu-collapsed');
+    const n=old.cloneNode(true);
+    old.replaceWith(n);
+    const sync=()=>{
+      const c=m.classList.contains('menu-collapsed');
+      n.setAttribute('aria-expanded',String(!c));
+      const s=n.querySelector('small'); if(s) s.textContent=c?'開く':'閉じる';
+      const i=n.querySelector('span'); if(i) i.textContent=c?'☰':'×';
+    };
+    sync();
+    n.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();m.classList.toggle('menu-collapsed');sync()});
+  }
+  const sd=document.getElementById('savedDialog');
+  if(sd) sd.addEventListener('click',e=>{if(e.target===sd)sd.close()});
+});
+</script>
 </body>
 </html>
