@@ -91,3 +91,32 @@
   window.addEventListener('resize',()=>requestAnimationFrame(forceCenter));
   requestAnimationFrame(()=>{forceCenter(); if(typeof layoutTable==='function')layoutTable(true)});
 })();
+/* v3 dialog backdrop-close + hard centering */
+(()=>{
+  const saved=document.querySelector('#savedDialog');
+  if(saved){
+    saved.addEventListener('pointerdown',e=>{
+      if(e.target===saved) saved.close();
+    });
+  }
+
+  function hardCenterTable(){
+    if(!matchMedia('(max-width:760px)').matches)return;
+    const wrap=document.querySelector('.table-wrap');
+    const frame=document.querySelector('#tableFrame,.table-frame');
+    if(wrap){
+      wrap.style.setProperty('display','grid','important');
+      wrap.style.setProperty('place-items','start center','important');
+      wrap.style.setProperty('width','100%','important');
+      wrap.style.setProperty('margin','0','important');
+    }
+    if(frame){
+      frame.style.setProperty('margin-left','auto','important');
+      frame.style.setProperty('margin-right','auto','important');
+      frame.style.setProperty('justify-self','center','important');
+    }
+  }
+  window.addEventListener('resize',()=>requestAnimationFrame(hardCenterTable));
+  window.visualViewport?.addEventListener('resize',()=>requestAnimationFrame(hardCenterTable));
+  requestAnimationFrame(()=>requestAnimationFrame(hardCenterTable));
+})();
