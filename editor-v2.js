@@ -143,3 +143,31 @@
   window.addEventListener('resize',()=>requestAnimationFrame(centerTablet));
   window.visualViewport?.addEventListener('resize',()=>requestAnimationFrame(centerTablet));
 })();
+
+/* v6: fixed top editor collapse/expand */
+(()=>{
+  const menu=document.querySelector('#editorMenu');
+  const toggle=document.querySelector('#menuToggleBtn');
+  if(menu && toggle){
+    // Default expanded.
+    menu.classList.remove('menu-collapsed');
+    toggle.setAttribute('aria-expanded','true');
+    const label=toggle.querySelector('small');
+    if(label) label.textContent='閉じる';
+    const icon=toggle.querySelector('span');
+    if(icon) icon.textContent='×';
+
+    // Replace prior toggle behavior with explicit collapse state.
+    const fresh=toggle.cloneNode(true);
+    toggle.parentNode.replaceChild(fresh,toggle);
+
+    fresh.addEventListener('click',()=>{
+      const collapsed=menu.classList.toggle('menu-collapsed');
+      fresh.setAttribute('aria-expanded',String(!collapsed));
+      const l=fresh.querySelector('small');
+      const i=fresh.querySelector('span');
+      if(l) l.textContent=collapsed?'開く':'閉じる';
+      if(i) i.textContent=collapsed?'☰':'×';
+    });
+  }
+})();
