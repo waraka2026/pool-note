@@ -1,0 +1,50 @@
+name: Restore raw white UI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/restore-raw-white-ui.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  restore:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract original HTML from backup
+        shell: python
+        run: |
+          from pathlib import Path
+          import re, base64, gzip
+
+          src = Path("backup/index-20260920-heavy-white-ui.html").read_text(encoding="utf-8")
+          m = re.search(r'const b="([^"]+)"', src)
+          if not m:
+              raise SystemExit("compressed original HTML not found")
+
+          html = gzip.decompress(base64.b64decode(m.group(1))).decode("utf-8")
+
+          # Keep the original design, only remove stale mascot-bubble JS calls
+          # left after the mascot itself was removed.
+          html = re.sub(
+              r'\s*\$\("#petBubble"\)\.innerHTML=\(msgs\[state\.tool\]\|\|"いい配置ができたら<br>保存しよう！"\)\.replace\("。","！<br>"\);?',
+              '',
+              html
+          )
+          html = re.sub(
+              r'\s*\$\("#petBubble"\)\.innerHTML="保存できた！<br>あとで見返せるよ";?',
+              '',
+              html
+          )
+
+          Path("index.html").write_text(html, encoding="utf-8")
+      - name: Commit restored raw HTML
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "Restore original raw white UI HTML" || exit 0
+          git push
