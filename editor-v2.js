@@ -120,3 +120,26 @@
   window.visualViewport?.addEventListener('resize',()=>requestAnimationFrame(hardCenterTable));
   requestAnimationFrame(()=>requestAnimationFrame(hardCenterTable));
 })();
+
+/* v4: include iPad/tablet widths when centering */
+(()=>{
+  function centerTablet(){
+    if(!matchMedia('(max-width:1180px)').matches)return;
+    const wrap=document.querySelector('.table-wrap');
+    const frame=document.querySelector('#tableFrame,.table-frame');
+    if(wrap){
+      wrap.style.setProperty('display','grid','important');
+      wrap.style.setProperty('place-items','start center','important');
+      wrap.style.setProperty('width','100%','important');
+      wrap.style.setProperty('margin','0','important');
+    }
+    if(frame){
+      frame.style.setProperty('margin-left','auto','important');
+      frame.style.setProperty('margin-right','auto','important');
+      frame.style.setProperty('justify-self','center','important');
+    }
+  }
+  requestAnimationFrame(()=>requestAnimationFrame(centerTablet));
+  window.addEventListener('resize',()=>requestAnimationFrame(centerTablet));
+  window.visualViewport?.addEventListener('resize',()=>requestAnimationFrame(centerTablet));
+})();
