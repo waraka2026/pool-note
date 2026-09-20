@@ -474,3 +474,213 @@ body.v2-ui{margin:0!important;min-height:100vh!important}
     overflow:auto!important;
   }
 }
+
+/* v12: compact labelled top toolbar + popup ball/tip panels */
+@media(max-width:1366px){
+  .v2-ui #editorMenu{
+    position:sticky!important;
+    top:62px!important;
+    display:flex!important;
+    align-items:center!important;
+    gap:8px!important;
+    flex-wrap:wrap!important;
+    padding:8px!important;
+    min-height:58px!important;
+  }
+
+  .v2-ui #editorMenu .orientation-control{
+    display:flex!important;
+    align-items:center!important;
+    gap:6px!important;
+    margin:0!important;
+    padding:0 8px 0 0!important;
+    border:0!important;
+    border-right:1px solid var(--v2line)!important;
+    flex:0 0 auto!important;
+  }
+
+  .v2-ui #editorMenu .tools{
+    display:block!important;
+    flex:1 1 auto!important;
+    width:auto!important;
+    min-width:0!important;
+    margin:0!important;
+    padding:0!important;
+  }
+
+  .v2-ui #editorMenu .tools-row{
+    display:flex!important;
+    flex-wrap:wrap!important;
+    align-items:center!important;
+    gap:6px!important;
+    width:100%!important;
+  }
+
+  .v2-ui #editorMenu .editor-row{
+    display:block!important;
+    width:auto!important;
+    flex:0 0 auto!important;
+  }
+
+  .v2-ui #editorMenu .tool-help{display:none!important}
+
+  .v2-ui #editorMenu .editor-row button{
+    width:auto!important;
+    min-width:72px!important;
+    height:40px!important;
+    padding:0 10px!important;
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:6px!important;
+    border-radius:11px!important;
+  }
+
+  .v2-ui #editorMenu .editor-row button svg{
+    width:18px!important;
+    height:18px!important;
+    flex:0 0 auto!important;
+  }
+
+  .v2-ui #editorMenu .editor-row button::after{
+    content:attr(aria-label);
+    font-size:11px!important;
+    font-weight:900!important;
+    white-space:nowrap!important;
+  }
+
+  .v2-ui #editorMenu .editor-row button .simple-icon{
+    display:inline-block!important;
+    font-size:16px!important;
+    line-height:1!important;
+  }
+
+  .v2-ui #editorMenu .orientation-control button{
+    height:40px!important;
+    min-width:48px!important;
+    padding:0 10px!important;
+  }
+
+  .v2-ui #editorMenu .menu-toggle-btn{
+    position:static!important;
+    margin-left:auto!important;
+    height:40px!important;
+    flex:0 0 auto!important;
+  }
+
+  .v2-ui #editorMenu.menu-collapsed{
+    min-height:50px!important;
+    justify-content:flex-end!important;
+  }
+
+  .v2-ui #editorMenu.menu-collapsed .orientation-control,
+  .v2-ui #editorMenu.menu-collapsed .tools{
+    display:none!important;
+  }
+
+  .v2-ui .side-controls{
+    display:block!important;
+    position:static!important;
+    width:0!important;
+    min-width:0!important;
+    height:0!important;
+    margin:0!important;
+    padding:0!important;
+    overflow:visible!important;
+  }
+
+  .v2-ui .tray,
+  .v2-ui .tip-point{
+    display:none!important;
+    position:fixed!important;
+    left:50%!important;
+    right:auto!important;
+    top:150px!important;
+    bottom:auto!important;
+    transform:translateX(-50%)!important;
+    width:min(520px,calc(100vw - 28px))!important;
+    max-height:62vh!important;
+    overflow:auto!important;
+    z-index:1200!important;
+    background:#fff!important;
+    border:1px solid var(--v2line)!important;
+    border-radius:18px!important;
+    box-shadow:0 22px 60px rgba(18,54,44,.24)!important;
+    padding:14px!important;
+  }
+
+  body.v2-ui.show-ball-panel .tray{display:block!important}
+  body.v2-ui.show-tip-panel .tip-point{display:block!important}
+
+  .v2-ui .tray-balls{
+    display:grid!important;
+    grid-template-columns:repeat(6,1fr)!important;
+    gap:8px!important;
+  }
+
+  .v2-ui #ballPanelBtn.panel-active,
+  .v2-ui #tipPanelBtn.panel-active{
+    background:var(--v2g)!important;
+    color:#fff!important;
+    border-color:var(--v2g)!important;
+  }
+
+  .v2-ui .table-wrap{
+    width:100%!important;
+    display:grid!important;
+    place-items:start center!important;
+    margin:0!important;
+  }
+}
+
+@media(max-width:760px){
+  .v2-ui #editorMenu{
+    top:56px!important;
+    gap:6px!important;
+    padding:6px!important;
+  }
+
+  .v2-ui #editorMenu .orientation-control{
+    width:100%!important;
+    border-right:0!important;
+    border-bottom:1px solid var(--v2line)!important;
+    padding:0 0 6px!important;
+  }
+
+  .v2-ui #editorMenu .tools-row{
+    display:grid!important;
+    grid-template-columns:repeat(4,1fr)!important;
+    gap:5px!important;
+  }
+
+  .v2-ui #editorMenu .editor-row{
+    width:100%!important;
+  }
+
+  .v2-ui #editorMenu .editor-row button{
+    width:100%!important;
+    min-width:0!important;
+    height:42px!important;
+    padding:0 5px!important;
+  }
+
+  .v2-ui #editorMenu .editor-row button::after{
+    font-size:9px!important;
+  }
+
+  .v2-ui #editorMenu .menu-toggle-btn{
+    position:absolute!important;
+    top:6px!important;
+    right:6px!important;
+  }
+
+  .v2-ui .tray,
+  .v2-ui .tip-point{
+    top:170px!important;
+    width:calc(100vw - 20px)!important;
+  }
+
+  .v2-ui .tray-balls{
+    grid-template-columns:repeat(5,1fr)!important;
+  }
+}
