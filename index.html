@@ -568,7 +568,7 @@ function showAim(e){
 }
 function hideAim(){aimGuide.classList.remove("visible")}
 function clampBall(x,y){
-  const r=cloth.getBoundingClientRect(),radius=10.5;
+  const r=cloth.getBoundingClientRect(),radius=10.5*state.zoom+1;
   return {x:Math.max(radius/r.width,Math.min(1-radius/r.width,x)),y:Math.max(radius/r.height,Math.min(1-radius/r.height,y))};
 }
 const guideDialog=$("#guideDialog"), savedDialog=$("#savedDialog"), memoDialog=$("#memoDialog");
@@ -588,6 +588,18 @@ stage.addEventListener("pointermove",e=>{
 });
 function stopPan(){panAction=null;stage.classList.remove("is-panning")}
 stage.addEventListener("pointerup",stopPan);stage.addEventListener("pointercancel",stopPan);
+stage.addEventListener("wheel",e=>{
+  if(e.ctrlKey)return;
+  e.preventDefault();
+  const oldZoom=state.zoom;
+  const next=Math.max(.65,Math.min(1.45,oldZoom+(e.deltaY<0?.1:-.1)));
+  if(next===oldZoom)return;
+  const r=stage.getBoundingClientRect();
+  const localX=e.clientX-(r.left+r.width/2)-panX,localY=e.clientY-(r.top+r.height/2)-panY;
+  const ratio=next/oldZoom;
+  panX-=localX*(ratio-1);panY-=localY*(ratio-1);
+  state.zoom=next;renderAll();
+},{passive:false});
 
 function deep(){ return JSON.parse(JSON.stringify(state)); }
 function snap(){
