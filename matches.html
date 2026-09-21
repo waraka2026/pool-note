@@ -435,45 +435,128 @@ input,select,textarea{font:inherit}
   .records-table th,.records-table td{font-size:13px;padding:11px 9px}
 }
 
+
+/* ===== 2026-09-21 COUNTER / RECORDS SPLIT ===== */
+.counter-layout{
+  grid-template-columns:280px minmax(0,1fr);
+  grid-template-areas:"left center";
+  max-width:1400px;
+}
+.left-stack{grid-area:left;align-self:start;position:sticky;top:88px}
+.left-panel{position:relative!important;top:auto!important;max-height:none!important}
+.center-panel{grid-area:center}
+.right-panel,.records-panel{display:none!important}
+
+.left-brand{
+  margin:0 0 10px 0;
+  padding:0;
+  overflow:visible;
+}
+.counter-logo{
+  width:310px!important;
+  height:68px!important;
+  overflow:visible!important;
+  background:transparent!important;
+}
+.counter-logo img{
+  width:300px!important;
+  height:auto!important;
+  left:0!important;
+  top:0!important;
+}
+.logo-top-mask{
+  left:78px!important;
+  top:0!important;
+  width:165px!important;
+  height:18px!important;
+  background:#f5faf7!important;
+}
+.logo-word-mask{
+  left:218px!important;
+  top:19px!important;
+  width:92px!important;
+  height:48px!important;
+  background:#f5faf7!important;
+}
+.counter-logo-word{
+  left:220px!important;
+  top:34px!important;
+  font-size:23px!important;
+  white-space:nowrap;
+}
+.record-panel{
+  padding:16px;
+  box-shadow:none;
+  border-radius:20px;
+}
+.record-panel-head{margin-bottom:10px}
+.record-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.record-fields,.record-extra{min-width:0}
+.record-panel .field{background:#f8fbf9}
+.record-panel .section-title{margin-bottom:0}
+.record-panel .primary{margin-top:8px}
+
+@media(max-width:900px){
+  .counter-layout{grid-template-columns:190px minmax(0,1fr);grid-template-areas:"left center"}
+  .left-stack{top:76px}
+  .counter-logo{width:220px!important;height:54px!important}
+  .counter-logo img{width:235px!important}
+  .logo-top-mask{left:61px!important;width:132px!important;height:14px!important}
+  .logo-word-mask{left:171px!important;top:15px!important;width:70px!important;height:38px!important}
+  .counter-logo-word{left:171px!important;top:27px!important;font-size:18px!important}
+}
+@media(max-width:620px){
+  .counter-layout{display:block}
+  .left-stack{position:relative;top:auto;margin-bottom:8px}
+  .counter-logo{width:270px!important;height:61px!important}
+  .counter-logo img{width:270px!important}
+  .logo-top-mask{left:70px!important;width:151px!important;height:16px!important}
+  .logo-word-mask{left:196px!important;top:17px!important;width:80px!important;height:43px!important}
+  .counter-logo-word{left:197px!important;top:31px!important;font-size:20px!important}
+  .record-grid{grid-template-columns:1fr}
+}
+
 </style>
-<!-- build:2026-09-21-1648-layout-fix -->
+<!-- build:2026-09-21-1725-records-split -->
 </head>
 <body>
-
 <header class="app-header">
   <div class="header-inner">
     <nav class="topnav">
       <button type="button" onclick="location.href='index.html'">⌂ 配置図</button>
       <button class="active" type="button">▣ カウンター</button>
-      <button type="button" onclick="document.getElementById('recordsPanel').scrollIntoView({behavior:'smooth'})">▣ 対戦記録</button>
+      <button type="button" onclick="window.open('billiards-match-records.html','_blank')">▣ 対戦記録</button>
       <button type="button" onclick="document.getElementById('counterHelp').scrollIntoView({behavior:'smooth'})">? 使い方</button>
     </nav>
   </div>
 </header>
 
 <main class="counter-layout">
-  <aside class="panel left-panel">
+  <div class="left-stack">
     <div class="left-brand" aria-label="Billiards 9 Counter">
       <div class="counter-logo">
-        <img src="assets/brand-logo.png" alt="">
+        <img src="assets/brand-logo.png" alt="Billiards 9">
         <span class="logo-top-mask" aria-hidden="true"></span>
         <span class="logo-word-mask" aria-hidden="true"></span>
         <span class="counter-logo-word" aria-hidden="true"><i>C</i><i>o</i><i>u</i><i>n</i><i>t</i><i>e</i><i>r</i></span>
       </div>
     </div>
-    <div class="panel-title"><strong>カウンター操作</strong><small>試合中に使う操作をまとめています</small></div>
-    <div class="tool-list">
-      <button id="recordOn" class="tool active" type="button"><span class="ico">✓</span><span class="text">記録する</span></button>
-      <button id="recordOff" class="tool" type="button"><span class="ico">−</span><span class="text">記録しない</span></button>
-      <div class="divider"></div>
-      <button id="timeStart" class="tool" type="button"><span class="ico">▶</span><span class="text">タイマー開始</span></button>
-      <button id="timeStop" class="tool" type="button"><span class="ico">■</span><span class="text">タイマー停止</span></button>
-      <button id="toggleTime" class="tool" type="button"><span class="ico">◉</span><span class="text">タイマー非表示</span></button>
-      <div class="divider"></div>
-      <button id="resetAll" class="tool danger" type="button"><span class="ico">↺</span><span class="text">すべてリセット</span></button>
-    </div>
-    <div class="tip-box" id="counterHelp"><b>使い方のヒント</b><br>＋ / −でスコアを変更。チェスクロックは自分・相手の枠をタップすると切り替わります。入力内容は自動保存されます。</div>
-  </aside>
+
+    <aside class="panel left-panel">
+      <div class="panel-title"><strong>カウンター操作</strong><small>試合中に使う操作をまとめています</small></div>
+      <div class="tool-list">
+        <button id="recordOn" class="tool active" type="button"><span class="ico">✓</span><span class="text">記録する</span></button>
+        <button id="recordOff" class="tool" type="button"><span class="ico">−</span><span class="text">記録しない</span></button>
+        <div class="divider"></div>
+        <button id="timeStart" class="tool" type="button"><span class="ico">▶</span><span class="text">タイマー開始</span></button>
+        <button id="timeStop" class="tool" type="button"><span class="ico">■</span><span class="text">タイマー停止</span></button>
+        <button id="toggleTime" class="tool" type="button"><span class="ico">◉</span><span class="text">タイマー非表示</span></button>
+        <div class="divider"></div>
+        <button id="resetAll" class="tool danger" type="button"><span class="ico">↺</span><span class="text">すべてリセット</span></button>
+      </div>
+      <div class="tip-box" id="counterHelp"><b>使い方のヒント</b><br>＋ / −でスコアを変更。チェスクロックは自分・相手の枠をタップすると切り替わります。入力内容は自動保存されます。</div>
+    </aside>
+  </div>
 
   <section class="panel center-panel">
     <div class="center-top">
@@ -524,55 +607,47 @@ input,select,textarea{font:inherit}
         </div>
         <button id="clockStopReset" class="stop" type="button">停止 / リセット</button>
       </section>
+
+      <section class="panel record-panel" id="recordPanel">
+        <div class="record-panel-head">
+          <div class="section-title">▣ 記録内容</div>
+        </div>
+        <div class="record-grid">
+          <div class="record-fields">
+            <label class="field"><span class="label">日付</span><input id="date" type="date"></label>
+            <label class="field"><span class="label">店舗名</span><input id="shop" placeholder="店舗名を入力"></label>
+            <label class="field"><span class="label">相手</span><input id="opponent" placeholder="相手名"></label>
+            <label class="field"><span class="label">種目</span>
+              <select id="game"><option value=""></option><option>9ボール</option><option>10ボール</option><option>エイトボール</option><option>ローテーション</option><option>自由入力</option></select>
+              <input id="gameFree" class="free" placeholder="種目を自由入力">
+            </label>
+            <label class="field"><span class="label">形式</span>
+              <select id="type"><option value=""></option><option>平場</option><option>セットマッチ</option><option>大会</option><option>練習</option><option>自由入力</option></select>
+              <input id="typeFree" class="free" placeholder="形式を自由入力">
+            </label>
+            <label class="field"><span class="label">先取</span>
+              <select id="race"><option value=""></option><option>3先</option><option>4先</option><option>5先</option><option>7先</option><option>自由入力</option></select>
+              <input id="raceFree" class="free" placeholder="例：点数制・10点">
+            </label>
+          </div>
+          <div class="record-extra">
+            <div class="layout-box">
+              <p class="layout-title">この試合に紐づける配置図</p>
+              <select id="layoutSelect"></select>
+              <div class="layout-actions">
+                <button id="layoutRefresh" class="btn" type="button">配置図リストを更新</button>
+                <a class="btn" href="index.html">配置図を開く</a>
+              </div>
+              <small id="layoutMeta" class="layout-meta"></small>
+            </div>
+            <label class="field"><span class="label">メモ</span><textarea id="memo" placeholder="例：9番前の出しが薄くなった。次は厚めに残す。"></textarea></label>
+            <button id="saveMatch" class="btn primary" type="button">✓ 試合終了して保存</button>
+          </div>
+        </div>
+      </section>
     </div>
 
     <div class="guide-foot">💡 <b>使い方のヒント</b>　途中で配置図へ戻っても、スコア・時間・入力内容はブラウザ内に自動保存されます。</div>
-  </section>
-
-  <aside class="panel right-panel" id="recordPanel">
-    <section class="section">
-      <div class="section-title">▣ 記録内容</div>
-      <label class="field"><span class="label">日付</span><input id="date" type="date"></label>
-      <label class="field"><span class="label">店舗名</span><input id="shop" placeholder="店舗名を入力"></label>
-      <label class="field"><span class="label">相手</span><input id="opponent" placeholder="相手名"></label>
-      <label class="field"><span class="label">種目</span>
-        <select id="game"><option value=""></option><option>9ボール</option><option>10ボール</option><option>エイトボール</option><option>ローテーション</option><option>自由入力</option></select>
-        <input id="gameFree" class="free" placeholder="種目を自由入力">
-      </label>
-      <label class="field"><span class="label">形式</span>
-        <select id="type"><option value=""></option><option>平場</option><option>セットマッチ</option><option>大会</option><option>練習</option><option>自由入力</option></select>
-        <input id="typeFree" class="free" placeholder="形式を自由入力">
-      </label>
-      <label class="field"><span class="label">先取</span>
-        <select id="race"><option value=""></option><option>3先</option><option>4先</option><option>5先</option><option>7先</option><option>自由入力</option></select>
-        <input id="raceFree" class="free" placeholder="例：点数制・10点">
-      </label>
-    </section>
-
-    <section class="section">
-      <div class="section-title">⌑ 配置図メーカー</div>
-      <div class="layout-box">
-        <p class="layout-title">この試合に紐づける配置図</p>
-        <select id="layoutSelect"></select>
-        <div class="layout-actions">
-          <button id="layoutRefresh" class="btn" type="button">配置図リストを更新</button>
-          <a class="btn" href="index.html">配置図を開く</a>
-        </div>
-        <small id="layoutMeta" class="layout-meta"></small>
-      </div>
-      <label class="field"><span class="label">メモ</span><textarea id="memo" placeholder="例：9番前の出しが薄くなった。次は厚めに残す。"></textarea></label>
-      <button id="saveMatch" class="btn primary" type="button">✓ 試合終了して保存</button>
-    </section>
-  </aside>
-
-  <section class="panel records-panel" id="recordsPanel">
-    <div class="records-head"><div><h2>対戦記録一覧表</h2><span>編集・削除・詳細確認</span></div></div>
-    <div class="table-wrap">
-      <table class="records-table">
-        <thead id="recordsHead"><tr><th>日付</th><th>店舗</th><th>自分</th><th>相手</th><th>スコア</th><th>結果</th><th>試合時間</th><th>チェスクロック</th><th>種目/形式/先取</th><th>配置図/メモ</th><th>操作</th></tr></thead>
-        <tbody id="recordsBody"></tbody>
-      </table>
-    </div>
   </section>
 </main>
 <div id="toast" class="toast"></div>
@@ -620,6 +695,7 @@ function resultClass(r){return r==='勝ち'?'win':r==='負け'?'lose':'draw'}
 function displayMeta(r){return[norm(r.game),norm(r.type),norm(r.race)].filter(Boolean).map(esc).join('<br>')}
 function clockRecordText(r){if(!r.clockUsed)return'';const ln=norm(r.leftName)||'自分',rn=norm(r.rightName)||'相手';return `${esc(ln)} ${fmtMin(r.clockLeft??0)} / ${esc(rn)} ${fmtMin(r.clockRight??0)}`}
 function renderRecords(){
+  if(!$('#recordsBody')||!$('#recordsHead')) return;
   const rows=load(store.matches,[]);
   const head=$('#recordsHead');
   if(!rows.length){
