@@ -336,18 +336,18 @@ dialog::backdrop{background:rgba(11,39,31,.34);backdrop-filter:blur(3px)}
 #diagram .table:not(.landscape) .p5{left:30px;bottom:30px}#diagram .table:not(.landscape) .p6{right:30px;bottom:30px}
 #diagram .table:not(.landscape) .p3{left:13px;top:50%;transform:translateY(-50%)}#diagram .table:not(.landscape) .p4{right:13px;top:50%;transform:translateY(-50%)}
 /* Keep the supplied frame pixels, and replace only the marked-up playing cloth. */
-#diagram .table.landscape{padding:0;border:0;border-radius:0;background:transparent url("assets/reference-table-hd.png") -7px -11px / 104.12% 105.79% no-repeat;box-shadow:0 14px 30px rgba(26,62,61,.12)}
+#diagram .table.landscape{padding:0;border:0;border-radius:0;background:transparent url("assets/reference-table-hd.png") center / 100% 100% no-repeat;box-shadow:0 14px 30px rgba(26,62,61,.12)}
 #diagram .table.landscape::before,#diagram .table.landscape::after{display:none!important;content:none!important}
 #diagram .table.landscape .corner-cap,#diagram .table.landscape .side-cap,#diagram .table.landscape .rail-sights,#diagram .table.landscape .pocket{display:none!important}
 #diagram .table.landscape .cloth{position:absolute;left:6.7%;top:12.4%;width:86.4%;height:75.2%;border:0;border-radius:0;box-shadow:none;clip-path:polygon(10px 0,calc(100% - 10px) 0,100% 10px,100% calc(100% - 10px),calc(100% - 10px) 100%,10px 100%,0 calc(100% - 10px),0 10px)}
 #diagram .table.landscape .cloth.grid{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 700 300' preserveAspectRatio='none'%3E%3Cg fill='none' stroke='%23ffffff' stroke-opacity='.33' stroke-width='.8' stroke-dasharray='1.5 2.5'%3E%3Cpath d='M100 0V300M200 0V300M300 0V300M400 0V300M500 0V300M600 0V300M0 75H700M0 150H700M0 225H700'/%3E%3C/g%3E%3C/svg%3E"),linear-gradient(#149fa2,#149fa2);background-size:100% 100%,100% 100%}
 #diagram .table.landscape .cloth:not(.grid){background:#149fa2}
-#diagram .table.landscape .cloth-edge-cover{display:block;position:absolute;z-index:1;left:104px;top:39px;width:25px;height:7px;background:linear-gradient(#087f86,#149fa2);pointer-events:none}
+#diagram .table.landscape .cloth-edge-cover{display:none!important}
 #diagram .table:not(.landscape) .cloth-edge-cover{display:none}
 /* The frame artwork remains the original image; only its display size changes. */
 .stage{padding:20px 22px 48px;min-width:0}
 .table-shell{width:100%;display:flex;justify-content:center}
-#diagram .table.landscape{width:100%;height:auto;aspect-ratio:650/365;max-width:none;background-position:26% 52%;border-radius:28px;overflow:hidden}
+#diagram .table.landscape{width:100%;height:auto;aspect-ratio:650/365;max-width:none;border-radius:34px;overflow:hidden}
 #diagram .table.landscape .cloth-edge-cover{left:16%;top:10.7%;width:3.85%;height:1.92%}
 #diagram .table:not(.landscape){flex:none}
 #petZone{display:none!important}
@@ -378,8 +378,8 @@ dialog::backdrop{background:rgba(11,39,31,.34);backdrop-filter:blur(3px)}
 .ball-pick{touch-action:none}
 .tool .ico svg{display:block;width:20px;height:20px}
 /* Rotate the exact same frame image for portrait orientation. */
-#diagram .table:not(.landscape){width:365px;height:650px;overflow:hidden;padding:0;border:0;border-radius:28px;background:none;box-shadow:0 14px 30px rgba(26,62,61,.12)}
-#diagram .table:not(.landscape)::before{content:""!important;display:block!important;position:absolute;left:0;top:100%;width:178.0822%;height:56.1538%;border:0;border-radius:0;background:transparent url("assets/reference-table-hd.png") 26% 52% / 104.12% 105.79% no-repeat;box-shadow:none;transform-origin:top left;transform:rotate(-90deg);z-index:0}
+#diagram .table:not(.landscape){width:365px;height:650px;overflow:hidden;padding:0;border:0;border-radius:34px;background:none;box-shadow:0 14px 30px rgba(26,62,61,.12)}
+#diagram .table:not(.landscape)::before{content:""!important;display:block!important;position:absolute;left:0;top:100%;width:178.0822%;height:56.1538%;border:0;border-radius:0;background:transparent url("assets/reference-table-hd.png") center / 100% 100% no-repeat;box-shadow:none;transform-origin:top left;transform:rotate(-90deg);z-index:0}
 #diagram .table:not(.landscape)::after{display:none!important;content:none!important}
 #diagram .table:not(.landscape) .corner-cap,#diagram .table:not(.landscape) .side-cap,#diagram .table:not(.landscape) .rail-sights,#diagram .table:not(.landscape) .pocket{display:none!important}
 #diagram .table:not(.landscape) .cloth{position:absolute;left:12.4%;top:6.7%;width:75.2%;height:86.4%;border:0;border-radius:0;box-shadow:none;clip-path:polygon(10px 0,calc(100% - 10px) 0,100% 10px,100% calc(100% - 10px),calc(100% - 10px) 100%,10px 100%,0 calc(100% - 10px),0 10px)}
@@ -889,8 +889,8 @@ async function exportImage(sourceState=state,format="png",title="billiards-layou
   const x=45,y=45,w=W-90,h=H-90;
   const frame=new Image();frame.src="assets/reference-table-hd.png";
   try{await frame.decode()}catch(error){alert("台の枠を読み込めませんでした");return}
-  if(portrait){g.save();g.translate(x,y+h);g.rotate(-Math.PI/2);g.drawImage(frame,20,32,1844,1036,0,0,h,w);g.restore()}
-  else g.drawImage(frame,20,32,1844,1036,x,y,w,h);
+  if(portrait){g.save();g.translate(x,y+h);g.rotate(-Math.PI/2);g.drawImage(frame,0,0,h,w);g.restore()}
+  else g.drawImage(frame,x,y,w,h);
   const cx=x+w*(portrait?.124:.067),cy=y+h*(portrait?.067:.124);
   const cw=w*(portrait?.752:.864),ch=h*(portrait?.864:.752);
   g.fillStyle="#149fa2";roundRect(g,cx,cy,cw,ch,10);g.fill();
