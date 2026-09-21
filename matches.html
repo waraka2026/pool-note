@@ -3,61 +3,378 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#050806">
-<title>対戦記録｜ビリヤード配置図メーカー</title>
+<meta name="theme-color" content="#ffffff">
+<title>Billiards 9 Counter｜対戦記録</title>
 <style>
-:root{--g:#07543d;--g2:#0e8a62;--c:#f7f5ee;--i:#16231d;--m:#718078;--l:#e7e2d7;--br:#7a421f;--br2:#5d321b}*{box-sizing:border-box}body{margin:0;min-height:100dvh;background:#030503;color:var(--i);font-family:system-ui,-apple-system,"Noto Sans JP","Yu Gothic",sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer}.app{width:min(980px,calc(100% - 22px));margin:auto;padding:18px 0 30px}.top{color:#fff;margin-bottom:14px}.top h1{font-size:clamp(32px,7vw,46px);line-height:1.15;margin:0 0 10px}.top p{margin:0;color:#ffffffb8;line-height:1.8}.top a{display:inline-block;margin-top:14px;border:1px solid #ffffff55;background:#ffffff20;color:#fff;text-decoration:none;border-radius:999px;padding:10px 14px;font-weight:900}.choice{display:flex;gap:10px;justify-content:center;margin:14px 0 10px;flex-wrap:wrap}.choice button{border:0;border-radius:999px;background:#eee;color:#222;padding:12px 24px;font-weight:950;font-size:18px}.choice button.active{background:linear-gradient(135deg,#12a874,#087655);color:#fff}.board{border:1.5px solid #ffffffdd;border-radius:26px;overflow:hidden;background:radial-gradient(circle at 30% 20%,#ffffff12,transparent 24rem),linear-gradient(145deg,#07543d,#044130);box-shadow:0 16px 38px #0006}.section{padding:18px}.timer{display:flex;align-items:center;gap:12px;justify-content:center;margin:2px 0 14px;color:#fff;overflow:auto}.time{font-size:clamp(30px,8vw,52px);font-weight:950;letter-spacing:.03em;white-space:nowrap}.mini{border:0;border-radius:999px;background:#ffffff2e;color:#fff;padding:12px 16px;font-weight:950;min-height:48px}.score-card{padding:18px 16px 20px;border-radius:24px;background:linear-gradient(145deg,#06523b,#063f2e);color:#fff}.names,.score-row,.score-buttons{display:grid;grid-template-columns:minmax(0,1fr) 78px minmax(0,1fr);gap:20px;text-align:center;align-items:center}.name{background:transparent;border:0;border-bottom:4px solid #ffffff38;border-radius:0;color:#fff;text-align:center;font-size:clamp(30px,8vw,52px);font-weight:950;padding:6px 4px 10px}.name::placeholder{color:#ffffffb5}.score-row{margin-top:12px}.num{font-size:clamp(82px,23vw,170px);line-height:.92;font-weight:950;letter-spacing:.02em}.dash{font-size:clamp(54px,13vw,100px);font-weight:950;color:#fffc;padding-top:18px}.score-buttons{margin-top:16px}.score-controls{display:flex;align-items:center;justify-content:center;gap:16px}.score-btn{border:0;border-radius:50%;width:76px;height:76px;min-width:76px;min-height:76px;color:#fff;font-size:40px;font-weight:950;line-height:1;display:grid;place-items:center;box-shadow:inset 0 0 0 1px #ffffff2a,0 8px 14px #0004;touch-action:manipulation}.plus{background:linear-gradient(135deg,#12b77a,#07845e)}.minus{background:#6d7772}.clock{margin-top:18px;border-radius:26px;background:linear-gradient(145deg,var(--br),var(--br2));color:#fff;padding:18px;box-shadow:inset 0 0 0 1px #ffffff20}.clock-head{display:flex;align-items:center;gap:12px;margin-bottom:14px}.clock-head h2{margin:0;font-size:clamp(28px,7vw,44px);line-height:1.2}.clock-head span{color:#ffffffb8;font-weight:850}.presets,.faces{display:grid;grid-template-columns:1fr 1fr;gap:14px}.preset label{display:block;font-weight:950;margin-bottom:8px}.preset select{width:100%;border:0;border-radius:16px;background:#fff;color:#2b1a12;padding:12px 14px;font-size:22px;font-weight:950}.face{border:3px solid #ffffff42;border-radius:22px;padding:16px 8px;text-align:center;background:#0002;color:#fff}.face.active{background:#ffffff29;box-shadow:0 0 0 3px #ffffff2e}.face b{display:block;font-size:30px;margin-bottom:6px}.face strong{font-size:clamp(52px,13vw,84px);line-height:1;font-weight:950}.stop{width:100%;border:0;border-radius:22px;background:#fff;color:#2b1a12;margin-top:16px;min-height:70px;font-size:32px;font-weight:950}.panel{margin-top:18px;background:var(--c);border-radius:24px;overflow:hidden}.head{background:linear-gradient(135deg,var(--g),var(--g2));color:#fff;padding:16px 18px}.head h2{margin:0;font-size:25px}.head span{display:block;margin-top:4px;color:#ffffffbf;font-size:13px}.content{padding:14px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.field{background:#fff;border:1px solid var(--l);border-radius:16px;padding:12px;display:block;box-shadow:0 4px 12px rgba(18,36,28,.06)}.label{display:block;color:var(--m);font-size:12px;font-weight:900;margin-bottom:5px}input,select,textarea{width:100%;border:0;outline:0;background:transparent;color:var(--i);font-weight:800}textarea{min-height:80px;resize:vertical;line-height:1.6;font-weight:500}.free{display:none;margin-top:8px;border-top:1px solid var(--l);padding-top:8px}.layout-box{margin-top:12px;background:#fff;border:1px solid var(--l);border-radius:18px;padding:12px}.layout-title{font-size:26px;font-weight:950;color:#0b3e30;margin:0 0 8px}.layout-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.layout-meta{display:block;margin-top:8px;color:var(--m);font-weight:800;line-height:1.55}.btn{border:1px solid var(--l);border-radius:16px;background:#fff;color:#0a513d;padding:12px 14px;font-weight:950}.primary{width:100%;margin-top:12px;background:linear-gradient(135deg,var(--g),var(--g2));color:#fff;border:0;padding:16px;font-size:20px}.table-wrap{overflow:auto}.records-table{width:100%;border-collapse:collapse;background:#fff;min-width:900px}.records-table th,.records-table td{border-bottom:1px solid #ece7dd;padding:10px 8px;text-align:left;font-size:13px;vertical-align:top}.records-table th{background:#fbfaf7;color:var(--m);font-weight:950}.badge{display:inline-block;padding:4px 8px;border-radius:999px;font-weight:950}.win{background:#d9f5e7;color:#087040}.lose{background:#ffe0e0;color:#c93a3a}.draw{background:#e8ebef;color:#3d4650}.actions{display:flex;gap:6px;flex-wrap:wrap}.actions button{border:0;border-radius:999px;background:#eef6f2;color:#07543d;padding:7px 10px;font-weight:900}.actions .danger{background:#ffe6e6;color:#b62222}.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(18px);background:#111;color:#fff;border-radius:999px;padding:12px 18px;opacity:0;transition:.22s;z-index:30;white-space:nowrap}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}@media(max-width:720px){.app{width:100%;padding:0 0 24px}.top{padding:28px 18px 10px}.top h1{font-size:38px}.choice{justify-content:space-between;padding:0 18px;margin:8px 0 10px}.choice button{font-size:18px;padding:10px 16px;min-width:30%}.board{border-radius:26px 26px 0 0;border-left:1.5px solid #ffffffdd;border-right:1.5px solid #ffffffdd;border-bottom:1.5px solid #ffffffdd}.section{padding:16px 14px}.timer{justify-content:flex-start}.time{font-size:42px}.mini{font-size:18px;min-height:56px;padding:10px 16px}.names,.score-row,.score-buttons{grid-template-columns:minmax(0,1fr) 38px minmax(0,1fr);gap:10px}.name{font-size:40px}.num{font-size:112px}.dash{font-size:68px}.score-buttons{margin-top:14px}.score-controls{gap:10px}.score-btn{width:62px;height:62px;min-width:62px;min-height:62px;font-size:34px}.clock-head{align-items:flex-start}.clock-head h2{font-size:38px;max-width:45%}.face strong{font-size:58px}.stop{font-size:30px}.grid{grid-template-columns:1fr 1fr}.records-table th,.records-table td{font-size:12px}}
-
-/* Compact phones retain the two-player layout without shrinking button labels. */
-@media(max-width:720px){
-  .app{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
-  .section{padding:14px 10px}
-  .choice{gap:6px;padding:0 10px}.choice button{flex:1;min-width:0;white-space:nowrap;font-size:clamp(13px,4vw,18px);padding:10px 6px}
-  .timer{flex-wrap:wrap;justify-content:center;overflow:visible;gap:8px}
-  .time{flex:1 0 100%;text-align:center;font-size:clamp(30px,9vw,42px);font-variant-numeric:tabular-nums}
-  .mini{flex:0 0 auto;white-space:nowrap;font-size:16px;min-height:44px;padding:10px 16px}
-  .score-card{padding:14px 10px 18px}
-  .names,.score-row,.score-buttons{grid-template-columns:minmax(0,1fr) 18px minmax(0,1fr);gap:6px}
-  .name{min-width:0;font-size:clamp(24px,7vw,40px)}
-  .num{font-size:clamp(56px,19vw,112px);letter-spacing:0;overflow-wrap:anywhere}
-  .dash{font-size:40px;padding-top:0}
-  .score-controls{gap:6px;min-width:0}
-  .score-btn{width:clamp(44px,13vw,62px);height:clamp(44px,13vw,62px);min-width:44px;min-height:44px;font-size:30px;flex-shrink:0}
-  .clock{padding:14px 10px}.clock-head{flex-wrap:wrap;gap:6px}
-  .clock-head h2{flex-basis:100%;max-width:100%;font-size:clamp(22px,6vw,34px);white-space:nowrap}
-  .clock-head span{font-size:14px;line-height:1.5}
-  .presets,.faces{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-  .preset,.face,.field{min-width:0}.preset label{font-size:13px}.preset select{padding:10px 6px;font-size:18px;min-width:0}
-  .face{padding:14px 4px}.face b{font-size:clamp(18px,5vw,26px);overflow-wrap:anywhere}
-  .face strong{font-size:clamp(28px,8vw,52px);white-space:nowrap;font-variant-numeric:tabular-nums}
-  .stop{font-size:22px;min-height:52px}
-  .grid{grid-template-columns:repeat(2,minmax(0,1fr))}.field{padding:10px 8px}
-  input,select,textarea{min-width:0;max-width:100%}.layout-title{font-size:24px}
-  .layout-meta,.layout-actions .btn{overflow-wrap:anywhere}
-  .toast{max-width:calc(100vw - 24px);white-space:normal;text-align:center;border-radius:16px}
+:root{
+  --green:#0ba577;--green2:#07845f;--deep:#123d35;--mint:#edf9f4;
+  --line:#dbe8e2;--paper:#fff;--soft:#f8fbf9;--yellow:#ffc928;
+  --shadow:0 12px 34px rgba(24,77,62,.10);--muted:#6b837a;--danger:#b04b43;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+html,body{margin:0;min-height:100%;font-family:Inter,"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;color:#163a32;background:#f5faf7}
+body{overflow-x:hidden}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+a{color:inherit}
+.app-header{
+  height:96px;background:#fff;border-bottom:1px solid var(--line);
+  display:flex;align-items:center;justify-content:space-between;padding:0 26px;
+  position:sticky;top:0;z-index:50
+}
+.brand{display:flex;align-items:center;min-width:455px}
+.brand-logo-counter{position:relative;width:455px;height:86px;overflow:hidden;flex:none}
+.brand-logo-counter .base-logo{position:absolute;left:0;top:0;width:383px;height:86px;object-fit:contain;object-position:left center}
+.brand-logo-counter .small-mask{position:absolute;left:118px;top:2px;width:176px;height:20px;background:#fff}
+.brand-logo-counter .big-mask{position:absolute;left:286px;top:24px;width:168px;height:58px;background:#fff}
+.brand-logo-counter .small-counter{
+  position:absolute;left:125px;top:7px;font-size:9px;letter-spacing:.13em;
+  font-weight:900;color:#168b68;white-space:nowrap
+}
+.counter-word{
+  position:absolute;left:287px;top:31px;display:flex;align-items:center;gap:0;
+  font-size:24px;line-height:1;font-weight:1000;letter-spacing:-1px;
+  -webkit-text-stroke:1px rgba(14,69,58,.20);
+  text-shadow:0 1px 0 #fff,0 2px 2px rgba(21,67,57,.16)
+}
+.counter-word span:nth-child(1){color:#08a879}
+.counter-word span:nth-child(2){color:#f2a71d}
+.counter-word span:nth-child(3){color:#e9523f}
+.counter-word span:nth-child(4){color:#3f73cf}
+.counter-word span:nth-child(5){color:#8457b5}
+.counter-word span:nth-child(6){color:#0ba577}
+.counter-word span:nth-child(7){color:#f07b31}
+.topnav{display:flex;align-items:center;gap:8px}
+.topnav button{
+  border:0;background:#f5f8f6;color:#274a41;border-radius:999px;padding:11px 15px;font-weight:800
+}
+.topnav button.active{background:var(--green);color:#fff}
+.header-actions{display:flex;gap:8px}
+.header-actions button{
+  border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px 12px;font-weight:800;color:#24443b
+}
+.counter-layout{
+  display:grid;grid-template-columns:220px minmax(540px,1fr) 320px;
+  gap:14px;padding:16px;max-width:1536px;margin:0 auto;align-items:start
+}
+.panel{background:#fff;border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow)}
+.left-panel,.right-panel{
+  padding:14px;max-height:calc(100vh - 128px);overflow:auto;position:sticky;top:112px;align-self:start
+}
+.left-panel::-webkit-scrollbar,.right-panel::-webkit-scrollbar{width:7px}
+.left-panel::-webkit-scrollbar-thumb,.right-panel::-webkit-scrollbar-thumb{background:#cdded6;border-radius:9px}
+.panel-title{padding:4px 2px 12px}
+.panel-title strong{display:block;font-size:15px;color:#173f35}
+.panel-title small{display:block;color:var(--muted);margin-top:3px}
+.tool-list{display:grid;gap:8px}
+.tool{
+  width:100%;display:flex;align-items:center;gap:12px;min-height:54px;border:1px solid var(--line);
+  border-radius:14px;background:#fff;color:#23463d;padding:9px 12px;font-weight:800;text-align:left
+}
+.tool .ico{
+  width:30px;height:30px;border-radius:9px;background:#eef7f3;display:grid;place-items:center;
+  font-size:18px;color:#0b6f56;flex:0 0 auto
+}
+.tool .text{white-space:nowrap}
+.tool.active{background:linear-gradient(135deg,#0a9c72,#08b080);color:#fff;border-color:transparent}
+.tool.active .ico{background:rgba(255,255,255,.18);color:#fff}
+.tool.danger{color:#8a3a35}.tool.danger .ico{color:#b04b43;background:#fff1ef}
+.divider{height:1px;background:var(--line);margin:10px 0}
+.tip-box{margin-top:12px;background:#eaf8f2;border-radius:14px;padding:11px 12px;color:#527168;font-size:11px;line-height:1.65}
+.tip-box b{color:#07865f}
+.center-panel{
+  min-height:760px;overflow:hidden;background:
+  radial-gradient(circle at 30% 20%,rgba(13,170,123,.08),transparent 32%),
+  linear-gradient(#fcfffd,#f3fbf7);
+  display:flex;flex-direction:column
+}
+.center-top{
+  display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--line);
+  background:rgba(255,255,255,.82)
+}
+.center-top strong{font-size:15px}
+.status{font-size:12px;color:var(--muted);margin-top:3px}
+.center-actions{display:flex;gap:8px;align-items:center}
+.center-actions button{
+  border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px 13px;font-weight:900;color:#2d5148
+}
+.center-actions .primary{background:var(--green);color:#fff;border-color:var(--green)}
+.counter-stage{padding:20px 22px 18px;display:grid;gap:16px}
+.match-timer{
+  display:flex;align-items:center;justify-content:center;gap:10px;background:#fff;border:1px solid var(--line);
+  border-radius:18px;padding:14px 16px;box-shadow:0 6px 20px rgba(24,77,62,.06)
+}
+.match-timer .label{font-size:12px;font-weight:900;color:#688077}
+.time{font-size:clamp(34px,4vw,56px);font-weight:1000;letter-spacing:.03em;font-variant-numeric:tabular-nums;color:#163f35}
+.score-card{
+  padding:24px 22px;border:1px solid var(--line);border-radius:22px;background:#fff;
+  box-shadow:0 8px 24px rgba(24,77,62,.06)
+}
+.names,.score-row,.score-buttons{
+  display:grid;grid-template-columns:minmax(0,1fr) 54px minmax(0,1fr);gap:18px;text-align:center;align-items:center
+}
+.name{
+  min-width:0;background:#f8fbf9;border:1px solid var(--line);border-radius:14px;color:#173e35;
+  text-align:center;font-size:clamp(24px,3vw,38px);font-weight:1000;padding:11px 8px;outline:0
+}
+.name:focus{border-color:#7bcdb2;box-shadow:0 0 0 3px rgba(11,165,119,.10)}
+.score-row{margin-top:18px}
+.num{font-size:clamp(76px,9vw,142px);line-height:.92;font-weight:1000;letter-spacing:.02em;color:#123d35;font-variant-numeric:tabular-nums}
+.dash{font-size:clamp(42px,5vw,76px);font-weight:900;color:#8aa096}
+.score-buttons{margin-top:18px}
+.score-controls{display:flex;align-items:center;justify-content:center;gap:14px}
+.score-btn{
+  border:0;border-radius:50%;width:68px;height:68px;min-width:68px;min-height:68px;
+  font-size:38px;font-weight:900;line-height:1;display:grid;place-items:center;
+  box-shadow:0 7px 16px rgba(24,77,62,.14);touch-action:manipulation
+}
+.plus{background:linear-gradient(135deg,#10b37e,#07845f);color:#fff}
+.minus{background:#eef3f0;color:#35564d;border:1px solid var(--line)}
+.clock{
+  border:1px solid var(--line);border-radius:22px;background:#fff;padding:18px;
+  box-shadow:0 8px 24px rgba(24,77,62,.06)
+}
+.clock-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:14px}
+.clock-head h2{margin:0;font-size:22px;color:#153f35}
+.clock-head span{color:var(--muted);font-size:12px;font-weight:800}
+.presets,.faces{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.preset label{display:block;font-size:12px;font-weight:900;color:#557168;margin-bottom:6px}
+.preset select{
+  width:100%;border:1px solid var(--line);border-radius:12px;background:#f8fbf9;color:#24443b;
+  padding:11px 12px;font-weight:900;outline:0
+}
+.faces{margin-top:10px}
+.face{
+  border:1px solid var(--line);border-radius:18px;padding:16px 8px;text-align:center;background:#f8fbf9;color:#173e35
+}
+.face.active{background:linear-gradient(135deg,#0ba577,#07845f);color:#fff;border-color:transparent;box-shadow:0 8px 22px rgba(11,165,119,.22)}
+.face b{display:block;font-size:18px;margin-bottom:5px}
+.face strong{font-size:clamp(42px,5vw,66px);line-height:1;font-weight:1000;font-variant-numeric:tabular-nums}
+.stop{
+  width:100%;border:1px solid var(--line);border-radius:14px;background:#fff;color:#31554b;
+  margin-top:12px;min-height:52px;font-size:16px;font-weight:900
+}
+.guide-foot{margin:0 22px 20px;background:#eaf8f2;border-radius:16px;padding:12px 14px;font-size:11px;color:#49685e;line-height:1.7}
+.guide-foot b{color:#07865f}
+.section{padding:4px 0 16px}
+.section+.section{border-top:1px solid var(--line);padding-top:16px}
+.section-title{display:flex;align-items:center;gap:8px;font-weight:950;color:#0b7557;margin-bottom:12px}
+.field{
+  background:#f8fbf9;border:1px solid var(--line);border-radius:14px;padding:10px 11px;display:block;margin-bottom:9px
+}
+.field .label{display:block;color:#6b837a;font-size:11px;font-weight:900;margin-bottom:5px}
+input,select,textarea{font:inherit}
+.field input,.field select,.field textarea,.layout-box select{
+  width:100%;border:0;outline:0;background:transparent;color:#173e35;font-weight:800;min-width:0
+}
+.field textarea{min-height:84px;resize:vertical;line-height:1.55;font-weight:600}
+.free{display:none;margin-top:8px;border-top:1px solid var(--line)!important;padding-top:8px}
+.layout-box{background:#f8fbf9;border:1px solid var(--line);border-radius:14px;padding:11px;margin-bottom:9px}
+.layout-title{font-size:13px;font-weight:950;color:#0b7557;margin:0 0 8px}
+.layout-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}
+.btn{
+  border:1px solid var(--line);border-radius:11px;background:#fff;color:#0a513d;padding:9px 10px;
+  font-weight:900;text-decoration:none;text-align:center
+}
+.primary{width:100%;background:linear-gradient(135deg,#0ba577,#07845f);color:#fff;border:0;padding:13px}
+.layout-meta{display:block;margin-top:7px;color:var(--muted);font-size:10px;font-weight:700;line-height:1.5}
+.records-panel{grid-column:1/-1;overflow:hidden}
+.records-head{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 18px;border-bottom:1px solid var(--line)
+}
+.records-head h2{margin:0;font-size:18px}.records-head span{font-size:12px;color:var(--muted)}
+.table-wrap{overflow:auto}
+.records-table{width:100%;border-collapse:collapse;background:#fff;min-width:980px}
+.records-table th,.records-table td{border-bottom:1px solid #e8efeb;padding:10px 8px;text-align:left;font-size:12px;vertical-align:top}
+.records-table th{background:#f8fbf9;color:#668078;font-weight:950;position:sticky;top:0}
+.badge{display:inline-block;padding:4px 8px;border-radius:999px;font-weight:950}
+.win{background:#dff7ea;color:#087040}.lose{background:#ffe7e4;color:#bb3a31}.draw{background:#edf1ef;color:#4e625b}
+.actions{display:flex;gap:6px;flex-wrap:wrap}
+.actions button{border:0;border-radius:999px;background:#eef7f3;color:#07543d;padding:7px 10px;font-weight:900}
+.actions .danger{background:#fff0ee;color:#b62222}
+.toast{
+  position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(18px);
+  background:#173e35;color:#fff;border-radius:999px;padding:12px 18px;opacity:0;transition:.22s;z-index:80;white-space:nowrap;
+  box-shadow:0 10px 28px rgba(0,0,0,.18)
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media(max-width:1180px){
+  .counter-layout{grid-template-columns:190px minmax(460px,1fr) 280px}
+  .brand{min-width:390px}.brand-logo-counter{transform:scale(.88);transform-origin:left center;width:400px}
+}
+@media(max-width:900px){
+  .app-header{height:auto;min-height:76px;padding:8px 12px;gap:8px;flex-wrap:wrap}
+  .brand{min-width:0;flex:1}.brand-logo-counter{transform:scale(.72);transform-origin:left center;width:330px;height:64px;margin-right:-80px}
+  .header-actions{display:none}.topnav{overflow:auto;max-width:100%;padding-bottom:2px}.topnav button{white-space:nowrap;padding:9px 12px}
+  .counter-layout{grid-template-columns:92px minmax(0,1fr);gap:8px;padding:8px}
+  .left-panel{padding:8px;top:86px}.left-panel .panel-title,.left-panel .tip-box{display:none}
+  .left-panel .tool{padding:7px;justify-content:center}.left-panel .tool .text{display:none}.left-panel .tool .ico{width:40px;height:40px}
+  .center-panel{min-height:auto}.right-panel{grid-column:1/-1;position:relative;top:auto;max-height:none}
+  .records-panel{grid-column:1/-1}
+  .counter-stage{padding:14px 12px}.guide-foot{margin:0 12px 14px}
+}
+@media(max-width:620px){
+  .app-header{align-items:center}.brand-logo-counter{transform:scale(.62);width:290px;margin-right:-95px}
+  .topnav{width:100%}
+  .counter-layout{display:block;padding:7px}
+  .center-panel{margin-bottom:8px}.left-panel,.right-panel{position:relative;top:auto;max-height:none;margin-bottom:8px}
+  .left-panel{padding:10px}.left-panel .panel-title{display:block}.left-panel .tool-list{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+  .left-panel .tool{min-height:58px;justify-content:center;padding:7px}.left-panel .tool .text{display:none}.left-panel .tool .ico{width:38px;height:38px}
+  .left-panel .divider{display:none}.left-panel .tip-box{display:block;grid-column:1/-1}
+  .center-top{padding:11px 12px}.center-actions{gap:5px}.center-actions button{font-size:12px;padding:8px 9px}
+  .counter-stage{padding:10px;gap:10px}.match-timer{padding:10px}.match-timer .label{display:none}.time{font-size:34px}
+  .score-card{padding:14px 8px}.names,.score-row,.score-buttons{grid-template-columns:minmax(0,1fr) 22px minmax(0,1fr);gap:6px}
+  .name{font-size:22px;padding:9px 4px}.num{font-size:64px}.dash{font-size:36px}
+  .score-controls{gap:7px}.score-btn{width:50px;height:50px;min-width:50px;min-height:50px;font-size:29px}
+  .clock{padding:13px 10px}.clock-head{align-items:flex-start;flex-direction:column;gap:3px}.clock-head h2{font-size:20px}
+  .presets,.faces{gap:7px}.face{padding:12px 4px}.face b{font-size:16px}.face strong{font-size:34px}
+  .right-panel{padding:11px}.toast{max-width:calc(100vw - 24px);white-space:normal;text-align:center;border-radius:14px}
 }
 </style>
 </head>
 <body>
-<main class="app">
-  <section class="top"><h1>対戦記録</h1><p>途中で別ページへ移動しても、スコア・時間・入力内容は自動保存されます。</p><a href="index.html">← 配置図へ戻る</a></section>
-  <div class="choice"><button id="recordOn" class="active" type="button">記録する</button><button id="recordOff" type="button">記録しない</button><button id="resetAll" type="button">リセット</button></div>
-  <section class="board"><div class="section">
-    <div class="timer"><div id="matchTime" class="time">00:00:00</div><button id="toggleTime" class="mini" type="button">非表示</button><button id="timeStart" class="mini" type="button">開始</button><button id="timeStop" class="mini" type="button">停止</button></div>
-    <section class="score-card"><div class="names"><input id="leftName" class="name" value="自分"><span></span><input id="rightName" class="name" value="相手"></div><div class="score-row"><div id="leftScore" class="num">00</div><div class="dash">-</div><div id="rightScore" class="num">00</div></div><div class="score-buttons"><div class="score-controls"><button class="score-btn plus" data-score="left" data-delta="1" type="button">＋</button><button class="score-btn minus" data-score="left" data-delta="-1" type="button">−</button></div><span></span><div class="score-controls"><button class="score-btn plus" data-score="right" data-delta="1" type="button">＋</button><button class="score-btn minus" data-score="right" data-delta="-1" type="button">−</button></div></div></section>
-    <section class="clock"><div class="clock-head"><h2>チェスクロック</h2><span>左右の枠をタップして開始</span></div><div class="presets"><div class="preset"><label>自分の持ち時間</label><select id="leftClockSelect"></select></div><div class="preset"><label>相手の持ち時間</label><select id="rightClockSelect"></select></div></div><div class="faces"><button id="leftClockFace" class="face" type="button"><b>自分</b><strong id="leftClock">10:00</strong></button><button id="rightClockFace" class="face" type="button"><b>相手</b><strong id="rightClock">10:00</strong></button></div><button id="clockStopReset" class="stop" type="button">停止 / リセット</button></section>
-  </div></section>
-  <section class="panel"><div class="head"><h2>記録内容</h2><span>保存する内容だけ下で入力</span></div><div class="content"><div class="grid">
-    <label class="field"><span class="label">日付</span><input id="date" type="date"></label>
-    <label class="field"><span class="label">店舗名</span><input id="shop" placeholder="店舗名を入力"></label>
-    <label class="field"><span class="label">相手</span><input id="opponent" placeholder="相手名"></label>
-    <label class="field"><span class="label">種目</span><select id="game"><option value=""></option><option>9ボール</option><option>10ボール</option><option>エイトボール</option><option>ローテーション</option><option>自由入力</option></select><input id="gameFree" class="free" placeholder="種目を自由入力"></label>
-    <label class="field"><span class="label">形式</span><select id="type"><option value=""></option><option>平場</option><option>セットマッチ</option><option>大会</option><option>練習</option><option>自由入力</option></select><input id="typeFree" class="free" placeholder="形式を自由入力"></label>
-    <label class="field"><span class="label">先取</span><select id="race"><option value=""></option><option>3先</option><option>4先</option><option>5先</option><option>7先</option><option>自由入力</option></select><input id="raceFree" class="free" placeholder="例：点数制・10点"></label>
-  </div><div class="layout-box"><p class="layout-title">配置図メーカー</p><label><span class="label">この試合に紐づける配置図</span><select id="layoutSelect"></select></label><div class="layout-actions"><button id="layoutRefresh" class="btn" type="button">配置図リストを更新</button><a class="btn" href="index.html">配置図メーカーを開く</a></div><small id="layoutMeta" class="layout-meta"></small></div><label class="field" style="display:block;margin-top:12px"><span class="label">メモ</span><textarea id="memo" placeholder="例：9番前の出しが薄くなった。次は厚めに残す。"></textarea></label><button id="saveMatch" class="btn primary" type="button">✓ 試合終了して保存</button></div></section>
-  <section class="panel"><div class="head"><h2>対戦記録一覧表</h2><span>編集・削除・詳細確認</span></div><div class="table-wrap"><table class="records-table"><thead><tr><th>日付</th><th>店舗</th><th>自分</th><th>相手</th><th>スコア</th><th>結果</th><th>試合時間</th><th>チェスクロック</th><th>種目/形式/先取</th><th>配置図/メモ</th><th>操作</th></tr></thead><tbody id="recordsBody"></tbody></table></div></section>
+
+<header class="app-header">
+  <div class="brand" aria-label="Billiards 9 Counter">
+    <div class="brand-logo-counter">
+      <img class="base-logo" src="assets/brand-logo.png" alt="">
+      <span class="small-mask" aria-hidden="true"></span>
+      <span class="big-mask" aria-hidden="true"></span>
+      <span class="small-counter">BILLIARDS COUNTER</span>
+      <span class="counter-word" aria-hidden="true"><span>C</span><span>o</span><span>u</span><span>n</span><span>t</span><span>e</span><span>r</span></span>
+    </div>
+  </div>
+  <nav class="topnav">
+    <button type="button" onclick="location.href='index.html'">⌂ 配置図</button>
+    <button class="active" type="button">▣ カウンター</button>
+    <button type="button" onclick="document.getElementById('recordsPanel').scrollIntoView({behavior:'smooth'})">▣ 対戦記録</button>
+    <button type="button" onclick="document.getElementById('counterHelp').scrollIntoView({behavior:'smooth'})">? 使い方</button>
+  </nav>
+  <div class="header-actions">
+    <button type="button" onclick="location.href='index.html'">配置図へ戻る</button>
+    <button type="button" onclick="document.getElementById('recordsPanel').scrollIntoView({behavior:'smooth'})">記録一覧</button>
+  </div>
+</header>
+
+<main class="counter-layout">
+  <aside class="panel left-panel">
+    <div class="panel-title"><strong>カウンター操作</strong><small>試合中に使う操作をまとめています</small></div>
+    <div class="tool-list">
+      <button id="recordOn" class="tool active" type="button"><span class="ico">✓</span><span class="text">記録する</span></button>
+      <button id="recordOff" class="tool" type="button"><span class="ico">−</span><span class="text">記録しない</span></button>
+      <div class="divider"></div>
+      <button id="timeStart" class="tool" type="button"><span class="ico">▶</span><span class="text">タイマー開始</span></button>
+      <button id="timeStop" class="tool" type="button"><span class="ico">■</span><span class="text">タイマー停止</span></button>
+      <button id="toggleTime" class="tool" type="button"><span class="ico">◉</span><span class="text">タイマー非表示</span></button>
+      <div class="divider"></div>
+      <button id="resetAll" class="tool danger" type="button"><span class="ico">↺</span><span class="text">すべてリセット</span></button>
+    </div>
+    <div class="tip-box" id="counterHelp"><b>使い方のヒント</b><br>＋ / −でスコアを変更。チェスクロックは自分・相手の枠をタップすると切り替わります。入力内容は自動保存されます。</div>
+  </aside>
+
+  <section class="panel center-panel">
+    <div class="center-top">
+      <div><strong>カウンター</strong><div class="status">スコア・試合時間・チェスクロック</div></div>
+      <div class="center-actions">
+        <button type="button" onclick="document.getElementById('counterHelp').scrollIntoView({behavior:'smooth'})">? 使い方</button>
+        <button class="primary" type="button" onclick="document.getElementById('recordPanel').scrollIntoView({behavior:'smooth'})">記録内容</button>
+      </div>
+    </div>
+
+    <div class="counter-stage">
+      <section class="match-timer">
+        <span class="label">試合時間</span>
+        <div id="matchTime" class="time">00:00:00</div>
+      </section>
+
+      <section class="score-card">
+        <div class="names">
+          <input id="leftName" class="name" value="自分" aria-label="自分の名前">
+          <span></span>
+          <input id="rightName" class="name" value="相手" aria-label="相手の名前">
+        </div>
+        <div class="score-row">
+          <div id="leftScore" class="num">00</div><div class="dash">-</div><div id="rightScore" class="num">00</div>
+        </div>
+        <div class="score-buttons">
+          <div class="score-controls">
+            <button class="score-btn plus" data-score="left" data-delta="1" type="button">＋</button>
+            <button class="score-btn minus" data-score="left" data-delta="-1" type="button">−</button>
+          </div>
+          <span></span>
+          <div class="score-controls">
+            <button class="score-btn plus" data-score="right" data-delta="1" type="button">＋</button>
+            <button class="score-btn minus" data-score="right" data-delta="-1" type="button">−</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="clock">
+        <div class="clock-head"><h2>チェスクロック</h2><span>左右の枠をタップして開始・切り替え</span></div>
+        <div class="presets">
+          <div class="preset"><label>自分の持ち時間</label><select id="leftClockSelect"></select></div>
+          <div class="preset"><label>相手の持ち時間</label><select id="rightClockSelect"></select></div>
+        </div>
+        <div class="faces">
+          <button id="leftClockFace" class="face" type="button"><b>自分</b><strong id="leftClock">10:00</strong></button>
+          <button id="rightClockFace" class="face" type="button"><b>相手</b><strong id="rightClock">10:00</strong></button>
+        </div>
+        <button id="clockStopReset" class="stop" type="button">停止 / リセット</button>
+      </section>
+    </div>
+
+    <div class="guide-foot">💡 <b>使い方のヒント</b>　途中で配置図へ戻っても、スコア・時間・入力内容はブラウザ内に自動保存されます。</div>
+  </section>
+
+  <aside class="panel right-panel" id="recordPanel">
+    <section class="section">
+      <div class="section-title">▣ 記録内容</div>
+      <label class="field"><span class="label">日付</span><input id="date" type="date"></label>
+      <label class="field"><span class="label">店舗名</span><input id="shop" placeholder="店舗名を入力"></label>
+      <label class="field"><span class="label">相手</span><input id="opponent" placeholder="相手名"></label>
+      <label class="field"><span class="label">種目</span>
+        <select id="game"><option value=""></option><option>9ボール</option><option>10ボール</option><option>エイトボール</option><option>ローテーション</option><option>自由入力</option></select>
+        <input id="gameFree" class="free" placeholder="種目を自由入力">
+      </label>
+      <label class="field"><span class="label">形式</span>
+        <select id="type"><option value=""></option><option>平場</option><option>セットマッチ</option><option>大会</option><option>練習</option><option>自由入力</option></select>
+        <input id="typeFree" class="free" placeholder="形式を自由入力">
+      </label>
+      <label class="field"><span class="label">先取</span>
+        <select id="race"><option value=""></option><option>3先</option><option>4先</option><option>5先</option><option>7先</option><option>自由入力</option></select>
+        <input id="raceFree" class="free" placeholder="例：点数制・10点">
+      </label>
+    </section>
+
+    <section class="section">
+      <div class="section-title">⌑ 配置図メーカー</div>
+      <div class="layout-box">
+        <p class="layout-title">この試合に紐づける配置図</p>
+        <select id="layoutSelect"></select>
+        <div class="layout-actions">
+          <button id="layoutRefresh" class="btn" type="button">配置図リストを更新</button>
+          <a class="btn" href="index.html">配置図を開く</a>
+        </div>
+        <small id="layoutMeta" class="layout-meta"></small>
+      </div>
+      <label class="field"><span class="label">メモ</span><textarea id="memo" placeholder="例：9番前の出しが薄くなった。次は厚めに残す。"></textarea></label>
+      <button id="saveMatch" class="btn primary" type="button">✓ 試合終了して保存</button>
+    </section>
+  </aside>
+
+  <section class="panel records-panel" id="recordsPanel">
+    <div class="records-head"><div><h2>対戦記録一覧表</h2><span>編集・削除・詳細確認</span></div></div>
+    <div class="table-wrap">
+      <table class="records-table">
+        <thead><tr><th>日付</th><th>店舗</th><th>自分</th><th>相手</th><th>スコア</th><th>結果</th><th>試合時間</th><th>チェスクロック</th><th>種目/形式/先取</th><th>配置図/メモ</th><th>操作</th></tr></thead>
+        <tbody id="recordsBody"></tbody>
+      </table>
+    </div>
+  </section>
 </main>
 <div id="toast" class="toast"></div>
+
 <script>
 const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s),store={draft:'poolMatchDraft',matches:'poolMatchRecords',layouts:'poolNotes'};
 let left=0,right=0,recording=true,editingId=null,matchSec=0,timer=null,timeVisible=true,clockRun=null,last=0,clockLeft=600,clockRight=600,clockUsed=false,lastStopTap=0,savePause=false;
