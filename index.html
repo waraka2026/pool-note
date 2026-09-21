@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>ビリヤード配置図メーカー｜球配置・ショットライン作成</title>
+<title>Billiards - Layout</title>
 <style>
 :root{
   --green:#0ba577; --green2:#07845f; --deep:#123d35; --mint:#edf9f4;
@@ -366,13 +366,23 @@ dialog::backdrop{background:rgba(11,39,31,.34);backdrop-filter:blur(3px)}
 .row input[type="range"]{flex:1 1 auto;min-width:0;max-width:130px;touch-action:none}
 .row #widthValue{min-width:1.5em;text-align:right;flex:none}
 @media(max-width:860px){.stage{padding:16px 10px 48px}#diagram .table.landscape{width:100%}}
+.brand-stamp{width:52px;height:52px;object-fit:cover;border-radius:12px;flex:none}
+.tool .ico svg{display:block;width:20px;height:20px}
+/* Rotate the exact same frame image for portrait orientation. */
+#diagram .table:not(.landscape){width:365px;height:650px;overflow:hidden;padding:0;border:0;border-radius:0;background:none;box-shadow:0 14px 30px rgba(26,62,61,.12)}
+#diagram .table:not(.landscape)::before{content:""!important;display:block!important;position:absolute;left:0;top:100%;width:178.0822%;height:56.1538%;border:0;border-radius:0;background:#e6e8e8 url("assets/reference-table.png") 26% 52% / 104.12% 105.79% no-repeat;box-shadow:none;transform-origin:top left;transform:rotate(-90deg);z-index:0}
+#diagram .table:not(.landscape)::after{display:none!important;content:none!important}
+#diagram .table:not(.landscape) .corner-cap,#diagram .table:not(.landscape) .side-cap,#diagram .table:not(.landscape) .rail-sights,#diagram .table:not(.landscape) .pocket{display:none!important}
+#diagram .table:not(.landscape) .cloth{position:absolute;left:12.4%;top:6.7%;width:75.2%;height:86.4%;border:0;border-radius:0;box-shadow:none;clip-path:polygon(10px 0,calc(100% - 10px) 0,100% 10px,100% calc(100% - 10px),calc(100% - 10px) 100%,10px 100%,0 calc(100% - 10px),0 10px)}
+#diagram .table:not(.landscape) .cloth.grid{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 700' preserveAspectRatio='none'%3E%3Cg fill='none' stroke='%23ffffff' stroke-opacity='.33' stroke-width='.8' stroke-dasharray='1.5 2.5'%3E%3Cpath d='M75 0V700M150 0V700M225 0V700M0 100H300M0 200H300M0 300H300M0 400H300M0 500H300M0 600H300'/%3E%3C/g%3E%3C/svg%3E"),linear-gradient(#149fa2,#149fa2);background-size:100% 100%,100% 100%}
+#diagram .table:not(.landscape) .cloth:not(.grid){background:#149fa2}
 </style>
 </head>
 <body>
 <header class="app-header">
   <div class="brand">
-    <div class="brand-ball">8</div>
-    <div><small>BILLIARDS LAYOUT MAKER</small><h1>ビリヤード配置図メーカー</h1></div>
+    <img class="brand-stamp" src="assets/logo-stamp.png" alt="Billiards logo">
+    <div><small>BILLIARDS LAYOUT MAKER</small><h1>Billiards - Layout</h1></div>
   </div>
   <nav class="topnav">
     <button class="active">⌂ 配置図</button><button type="button" onclick="location.href='matches.html'">▣ カウンター</button><button type="button" onclick="location.href='matches.html'">▣ 対戦記録</button><button id="guideTop">? 使い方</button>
@@ -382,7 +392,7 @@ dialog::backdrop{background:rgba(11,39,31,.34);backdrop-filter:blur(3px)}
 
 <div class="quick-help">
   <b>球の削除：</b>PCは右クリック／スマホは長押し　
-  <b>メニュー：</b>縦・横 / 移動 / まとめて / 戻る・進む / 矢印・線 / 消去 / メモ / 拡大・縮小 / 保存　
+  <b>メニュー：</b>縦・横 / 移動 / まとめて / 戻る・進む / 矢印・線 / 削除 / メモ / 拡大・縮小 / 保存　
   <b>右側：</b>ボール / 矢印・線設定 / 撞点 / 表示設定
 </div>
 
@@ -400,7 +410,7 @@ dialog::backdrop{background:rgba(11,39,31,.34);backdrop-filter:blur(3px)}
       <button class="tool" id="redoBtn"><span class="ico">↷</span><span class="text">進む</span></button>
       <button class="tool" data-tool="arrow"><span class="ico">↗</span><span class="text">矢印</span></button>
       <button class="tool" data-tool="line"><span class="ico">╱</span><span class="text">線</span></button>
-      <button class="tool" data-tool="erase"><span class="ico">◇</span><span class="text">線を消す</span></button>
+      <button class="tool" data-tool="erase"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M3 14.5 13.5 4a2 2 0 0 1 2.8 0L21 8.7a2 2 0 0 1 0 2.8L10.5 22H6l-3-3v-4.5Z"/><path d="m9 8.5 7 7M10.5 22H21"/></svg></span><span class="text">削除</span></button>
       <button class="tool" data-tool="memo"><span class="ico">✎</span><span class="text">メモ</span></button>
       <div class="divider"></div>
       <button class="tool" id="zoomInBtn"><span class="ico">⊕</span><span class="text">拡大</span></button>
@@ -424,7 +434,6 @@ dialog::backdrop{background:rgba(11,39,31,.34);backdrop-filter:blur(3px)}
     </div>
 
     <div class="stage" id="stage">
-      <div class="reference-dog" aria-hidden="true"></div>
       <div class="table-shell" id="tableShell">
         <div class="table" id="table">
           <i class="cloth-edge-cover" aria-hidden="true"></i>
@@ -514,7 +523,7 @@ dialog::backdrop{background:rgba(11,39,31,.34);backdrop-filter:blur(3px)}
     <li><b>台の向きを選ぶ</b>「縦向き」「横向き」でビリヤード台だけが回転します。メニューや右側の設定欄は動きません。</li>
     <li><b>球を置く</b>右の球一覧を押すと台に追加されます。台の球はドラッグで移動できます。手玉は何個でも配置できます。</li>
     <li><b>矢印・線を描く</b>左の「矢印」「線」を押し、右側で色・太さを選んで台の上をドラッグします。ポップアップは出ません。</li>
-    <li><b>移動・削除</b>球はPCでは右クリック、スマホでは長押しで削除。線は「線を消す」モードでクリックすると削除できます。</li>
+    <li><b>移動・削除</b>球はPCでは右クリック、スマホでは長押しで削除。「削除」モードでは球と線をクリックして削除できます。</li>
     <li><b>まとめて移動</b>「全部まとめて」を選び、台の余白をドラッグすると球・線・メモをまとめて移動できます。</li>
     <li><b>メモ</b>「メモを追加」を押して台をクリックするとメモ入力画面が開きます。作成したメモもドラッグできます。</li>
     <li><b>撞点</b>右側の大きな手玉の赤い点をドラッグし、撞く位置を残せます。</li>
@@ -611,7 +620,7 @@ function renderBalls(){
     if(b.n){ const sp=document.createElement("span"); sp.textContent=b.n; el.appendChild(sp); }
     let longTimer=null, moved=false;
     el.addEventListener("pointerdown",e=>{
-      if(state.tool==="erase"){ e.preventDefault(); return; }
+      if(state.tool==="erase"){ e.preventDefault();e.stopPropagation();removeBall(b.id);return; }
       moved=false; el.setPointerCapture(e.pointerId); snap();showAim(e);
       const start={x:e.clientX,y:e.clientY,bx:b.x,by:b.y};
       longTimer=setTimeout(()=>{ if(!moved){ removeBall(b.id); }},650);
@@ -697,9 +706,9 @@ function setTool(v,fromClick=true){
 }
 function updateStatus(){
   const o=state.orientation==="portrait"?"縦向き":"横向き";
-  const names={move:"移動",group:"全部まとめて移動",arrow:"矢印",line:"線",erase:"消去",memo:"メモ"};
+  const names={move:"移動",group:"全部まとめて移動",arrow:"矢印",line:"線",erase:"削除",memo:"メモ"};
   status.textContent=`${o}・${names[state.tool]||state.tool}モード`;
-  const msgs={move:"球をドラッグして動かせます",arrow:"台の上をドラッグして矢印を描けます",line:"台の上をドラッグして線を描けます",memo:"台をクリックするとメモを追加できます",erase:"線をクリックすると削除できます",group:"台の余白をドラッグすると全部まとめて移動します"};
+  const msgs={move:"球をドラッグして動かせます",arrow:"台の上をドラッグして矢印を描けます",line:"台の上をドラッグして線を描けます",memo:"台をクリックするとメモを追加できます",erase:"球や線をクリックすると削除できます",group:"台の余白をドラッグすると全部まとめて移動します"};
   $("#petBubble").innerHTML=(msgs[state.tool]||"いい配置ができたら<br>保存しよう！").replace("。","！<br>");
 }
 
