@@ -344,6 +344,25 @@ dialog::backdrop{background:rgba(11,39,31,.34);backdrop-filter:blur(3px)}
 #diagram .table.landscape .cloth:not(.grid){background:#149fa2}
 #diagram .table.landscape .cloth-edge-cover{display:block;position:absolute;z-index:1;left:104px;top:39px;width:25px;height:7px;background:linear-gradient(#087f86,#149fa2);pointer-events:none}
 #diagram .table:not(.landscape) .cloth-edge-cover{display:none}
+/* The frame artwork remains the original image; only its display size changes. */
+.stage{padding:20px 22px 48px;min-width:0}
+.table-shell{width:100%;display:flex;justify-content:center}
+#diagram .table.landscape{width:100%;height:auto;aspect-ratio:650/365;max-width:none;background-position:26% 52%}
+#diagram .table.landscape .cloth-edge-cover{left:16%;top:10.7%;width:3.85%;height:1.92%}
+#diagram .table:not(.landscape){flex:none}
+#petZone{display:none!important}
+#diagram .ball{width:26px;height:26px;cursor:grab}
+#diagram .ball:active{cursor:grabbing}
+#diagram .ball span{width:12px;min-width:12px;height:12px;font-size:7px}
+#diagram .ball::before{left:4px;top:3px;width:9px;height:7px}
+.mini-ball.solid,.ball.solid{background:radial-gradient(circle at 31% 24%,rgba(255,255,255,.88) 0 3%,rgba(255,255,255,.28) 10%,transparent 24%),radial-gradient(circle at 43% 37%,var(--ball-color) 0 56%,color-mix(in srgb,var(--ball-color) 65%,black) 100%)!important}
+.mini-ball.stripe::after,.ball.stripe::after{top:25%!important;height:50%!important}
+#aimGuide{position:absolute;inset:0;z-index:7;pointer-events:none;display:none}
+#aimGuide.visible{display:block}
+#aimGuide::before,#aimGuide::after{content:"";position:absolute;border-color:rgba(255,255,255,.72);filter:drop-shadow(0 0 1px #22595b)}
+#aimGuide::before{left:var(--aim-x);top:0;bottom:0;border-left:1px dashed}
+#aimGuide::after{top:var(--aim-y);left:0;right:0;border-top:1px dashed}
+@media(max-width:860px){.stage{padding:16px 10px 48px}#diagram .table.landscape{width:100%}}
 </style>
 </head>
 <body>
@@ -418,6 +437,7 @@ dialog::backdrop{background:rgba(11,39,31,.34);backdrop-filter:blur(3px)}
           <div class="rail-sights rail-sights-right" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
           <b class="pocket p1"></b><b class="pocket p2"></b><b class="pocket p3"></b><b class="pocket p4"></b><b class="pocket p5"></b><b class="pocket p6"></b>
           <div class="cloth grid" id="cloth">
+            <div id="aimGuide" aria-hidden="true"></div>
             <svg id="lineSvg">
               <defs>
                 <marker id="arrowHead" markerWidth="8" markerHeight="8" refX="7" refY="3.5" orient="auto">
@@ -513,18 +533,27 @@ dialog::backdrop{background:rgba(11,39,31,.34);backdrop-filter:blur(3px)}
 <script>
 (() => {
 const colors = {
-  1:"#f4c928",2:"#237fce",3:"#df4540",4:"#8b58ae",5:"#eb862d",6:"#2f9563",7:"#8a3e36",8:"#222",
-  9:"#f4c928",10:"#237fce",11:"#df4540",12:"#8b58ae",13:"#eb862d",14:"#2f9563",15:"#8a3e36"
+  1:"#edbb22",2:"#113d9c",3:"#a91f16",4:"#dc4438",5:"#e9681f",6:"#00583b",7:"#76501b",8:"#171a18",
+  9:"#edbb22",10:"#113d9c",11:"#a91f16",12:"#dc4438",13:"#e9681f",14:"#00583b",15:"#76501b"
 };
 const state = {
   orientation:"landscape", tool:"move", lineType:"arrow", lineColor:"#ffffff", lineWidth:3,
-  zoom:1, grid:true, pockets:true, pet:true, ghost:false, tip:{x:.5,y:.5},
+  zoom:1, grid:true, pockets:true, pet:false, ghost:false, tip:{x:.5,y:.5},
   balls:[], lines:[], notes:[], nextId:1
 };
 let undoStack=[], redoStack=[];
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const cloth=$("#cloth"), table=$("#table"), shell=$("#tableShell"), svg=$("#lineSvg");
 const palette=$("#ballPalette"), status=$("#status");
+const aimGuide=$("#aimGuide");
+function showAim(e){
+  const r=cloth.getBoundingClientRect();
+  aimGuide.style.setProperty("--aim-x",`${Math.max(0,Math.min(100,(e.clientX-r.left)/r.width*100))}%`);
+  aimGuide.style.setProperty("--aim-y",`${Math.max(0,Math.min(100,(e.clientY-r.top)/r.height*100))}%`);
+  aimGuide.classList.add("visible");
+}
+cloth.addEventListener("pointermove",showAim);
+cloth.addEventListener("pointerleave",()=>aimGuide.classList.remove("visible"));
 const guideDialog=$("#guideDialog"), savedDialog=$("#savedDialog"), memoDialog=$("#memoDialog");
 let pendingMemoPos=null, pointerAction=null;
 
