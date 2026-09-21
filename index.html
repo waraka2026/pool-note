@@ -406,7 +406,7 @@ dialog::backdrop{background:rgba(11,39,31,.34);backdrop-filter:blur(3px)}
     </div>
 
     <div class="tool-list">
-      <button class="tool active" data-tool="move"><span class="ico">➤</span><span class="text">移動</span></button>
+      <button class="tool active" data-tool="move"><span class="ico">✋</span><span class="text">移動</span></button>
       <button class="tool" data-tool="group"><span class="ico">▣</span><span class="text">全部まとめて移動</span></button>
       <button class="tool" id="undoBtn"><span class="ico">↶</span><span class="text">戻る</span></button>
       <button class="tool" id="redoBtn"><span class="ico">↷</span><span class="text">進む</span></button>
@@ -576,7 +576,7 @@ let pendingMemoPos=null, pointerAction=null,panX=0,panY=0,panAction=null;
 
 const stage=$("#stage");
 stage.addEventListener("pointerdown",e=>{
-  if(state.zoom===1||e.target.closest(".ball,.note,button"))return;
+  if(state.zoom===1||state.tool!=="move"||e.target.closest(".ball,.note,button"))return;
   panAction={x:e.clientX,y:e.clientY,startX:panX,startY:panY};
   stage.setPointerCapture(e.pointerId);stage.classList.add("is-panning");
   e.preventDefault();e.stopPropagation();
@@ -746,7 +746,7 @@ function renderAll(){
   cloth.classList.toggle("grid",state.grid);
   $$(".pocket").forEach(p=>p.style.display=state.pockets?"block":"none");
   shell.style.transform=`translate(${panX}px,${panY}px) scale(${state.zoom})`;
-  $("#stage").classList.toggle("can-pan",state.zoom!==1);
+  $("#stage").classList.toggle("can-pan",state.zoom!==1&&state.tool==="move");
   $("#gridSwitch").classList.toggle("on",state.grid);
   $("#pocketSwitch").classList.toggle("on",state.pockets);
   $("#petSwitch").classList.toggle("on",state.pet);
@@ -759,6 +759,8 @@ function renderAll(){
 function setOrientation(v){ if(state.orientation===v)return; snap();state.orientation=v;renderAll(); updateStatus(); }
 function setTool(v,fromClick=true){
   state.tool=v;
+  stopPan();
+  stage.classList.toggle("can-pan",state.zoom!==1&&v==="move");
   $$(".tool[data-tool]").forEach(b=>b.classList.toggle("active",b.dataset.tool===v));
   $("#typeArrow").classList.toggle("active",state.lineType==="arrow");
   $("#typeLine").classList.toggle("active",state.lineType==="line");
