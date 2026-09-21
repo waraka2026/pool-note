@@ -347,7 +347,7 @@ dialog::backdrop{background:rgba(11,39,31,.34);backdrop-filter:blur(3px)}
 /* The frame artwork remains the original image; only its display size changes. */
 .stage{padding:20px 22px 48px;min-width:0}
 .table-shell{width:100%;display:flex;justify-content:center}
-#diagram .table.landscape{width:100%;height:auto;aspect-ratio:650/365;max-width:none;background-position:26% 52%}
+#diagram .table.landscape{width:100%;height:auto;aspect-ratio:650/365;max-width:none;background-position:26% 52%;border-radius:28px;overflow:hidden}
 #diagram .table.landscape .cloth-edge-cover{left:16%;top:10.7%;width:3.85%;height:1.92%}
 #diagram .table:not(.landscape){flex:none}
 #petZone{display:none!important}
@@ -370,14 +370,15 @@ dialog::backdrop{background:rgba(11,39,31,.34);backdrop-filter:blur(3px)}
 .brand h1{display:flex;align-items:center;gap:6px}
 .brand-nine{position:relative;width:25px;height:25px;flex:none;border-radius:50%;background:radial-gradient(circle at 30% 23%,#fff 0 6%,transparent 21%),linear-gradient(to bottom,#f9f9f4 0 26%,#e8b624 27% 74%,#f9f9f4 75%);border:1px solid #d6d5c7;box-shadow:inset -3px -3px 5px #66532166,0 2px 4px #0004}
 .brand-nine::after{content:"9";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:13px;height:13px;border-radius:50%;background:#fff;color:#222;display:grid;place-items:center;font-size:9px;font-weight:900;line-height:1}
-.mini-ball.cue::after,#diagram .ball.cue::after{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 20% 30%,#bf2728 0 1.5px,transparent 2px),radial-gradient(circle at 76% 24%,#bf2728 0 1.5px,transparent 2px),radial-gradient(circle at 54% 78%,#bf2728 0 1.5px,transparent 2px);pointer-events:none;z-index:4}
-.mini-ball.cue::after{background:radial-gradient(circle at 20% 30%,#bf2728 0 2.5px,transparent 3px),radial-gradient(circle at 76% 24%,#bf2728 0 2.5px,transparent 3px),radial-gradient(circle at 54% 78%,#bf2728 0 2.5px,transparent 3px)}
+.mini-ball.cue::after,#diagram .ball.cue::after{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 20% 30%,#bf2728 0 1px,transparent 1.5px),radial-gradient(circle at 76% 24%,#bf2728 0 1px,transparent 1.5px),radial-gradient(circle at 54% 78%,#bf2728 0 1px,transparent 1.5px);pointer-events:none;z-index:4}
+.mini-ball.cue::after{background:radial-gradient(circle at 20% 30%,#bf2728 0 1.8px,transparent 2.3px),radial-gradient(circle at 76% 24%,#bf2728 0 1.8px,transparent 2.3px),radial-gradient(circle at 54% 78%,#bf2728 0 1.8px,transparent 2.3px)}
+.stage.can-pan{cursor:grab}.stage.is-panning{cursor:grabbing}.stage.can-pan .cloth{cursor:grab}.stage.is-panning .cloth{cursor:grabbing}
 .palette-drag-preview{position:fixed;z-index:1000;pointer-events:none;transform:translate(-50%,-50%);opacity:.9}
 .palette-drag-preview .mini-ball{width:24px;height:24px}
 .ball-pick{touch-action:none}
 .tool .ico svg{display:block;width:20px;height:20px}
 /* Rotate the exact same frame image for portrait orientation. */
-#diagram .table:not(.landscape){width:365px;height:650px;overflow:hidden;padding:0;border:0;border-radius:0;background:none;box-shadow:0 14px 30px rgba(26,62,61,.12)}
+#diagram .table:not(.landscape){width:365px;height:650px;overflow:hidden;padding:0;border:0;border-radius:28px;background:none;box-shadow:0 14px 30px rgba(26,62,61,.12)}
 #diagram .table:not(.landscape)::before{content:""!important;display:block!important;position:absolute;left:0;top:100%;width:178.0822%;height:56.1538%;border:0;border-radius:0;background:#e6e8e8 url("assets/reference-table.png") 26% 52% / 104.12% 105.79% no-repeat;box-shadow:none;transform-origin:top left;transform:rotate(-90deg);z-index:0}
 #diagram .table:not(.landscape)::after{display:none!important;content:none!important}
 #diagram .table:not(.landscape) .corner-cap,#diagram .table:not(.landscape) .side-cap,#diagram .table:not(.landscape) .rail-sights,#diagram .table:not(.landscape) .pocket{display:none!important}
@@ -571,7 +572,22 @@ function clampBall(x,y){
   return {x:Math.max(radius/r.width,Math.min(1-radius/r.width,x)),y:Math.max(radius/r.height,Math.min(1-radius/r.height,y))};
 }
 const guideDialog=$("#guideDialog"), savedDialog=$("#savedDialog"), memoDialog=$("#memoDialog");
-let pendingMemoPos=null, pointerAction=null;
+let pendingMemoPos=null, pointerAction=null,panX=0,panY=0,panAction=null;
+
+const stage=$("#stage");
+stage.addEventListener("pointerdown",e=>{
+  if(state.zoom===1||e.target.closest(".ball,.note,button"))return;
+  panAction={x:e.clientX,y:e.clientY,startX:panX,startY:panY};
+  stage.setPointerCapture(e.pointerId);stage.classList.add("is-panning");
+  e.preventDefault();e.stopPropagation();
+},true);
+stage.addEventListener("pointermove",e=>{
+  if(!panAction)return;
+  panX=panAction.startX+e.clientX-panAction.x;panY=panAction.startY+e.clientY-panAction.y;
+  shell.style.transform=`translate(${panX}px,${panY}px) scale(${state.zoom})`;
+});
+function stopPan(){panAction=null;stage.classList.remove("is-panning")}
+stage.addEventListener("pointerup",stopPan);stage.addEventListener("pointercancel",stopPan);
 
 function deep(){ return JSON.parse(JSON.stringify(state)); }
 function snap(){
@@ -727,7 +743,8 @@ function renderAll(){
   $("#landscapeBtn").classList.toggle("active",state.orientation==="landscape");
   cloth.classList.toggle("grid",state.grid);
   $$(".pocket").forEach(p=>p.style.display=state.pockets?"block":"none");
-  shell.style.transform=`scale(${state.zoom})`;
+  shell.style.transform=`translate(${panX}px,${panY}px) scale(${state.zoom})`;
+  $("#stage").classList.toggle("can-pan",state.zoom!==1);
   $("#gridSwitch").classList.toggle("on",state.grid);
   $("#pocketSwitch").classList.toggle("on",state.pockets);
   $("#petSwitch").classList.toggle("on",state.pet);
@@ -791,7 +808,7 @@ $$(".tool[data-tool]").forEach(b=>b.onclick=()=>setTool(b.dataset.tool));
 $("#undoBtn").onclick=undo;$("#redoBtn").onclick=redo;
 $("#zoomInBtn").onclick=()=>{state.zoom=Math.min(1.45,state.zoom+.1);renderAll()};
 $("#zoomOutBtn").onclick=()=>{state.zoom=Math.max(.65,state.zoom-.1);renderAll()};
-$("#zoomResetBtn").onclick=()=>{state.zoom=1;renderAll()};
+$("#zoomResetBtn").onclick=()=>{state.zoom=1;panX=0;panY=0;renderAll()};
 $("#resetBtn").onclick=()=>{if(confirm("配置をすべてリセットしますか？")){snap();state.balls=[];state.lines=[];state.notes=[];state.tip={x:.5,y:.5};renderAll()}};
 
 $("#typeArrow").onclick=()=>{state.lineType="arrow";setTool("arrow");};
@@ -799,7 +816,7 @@ $("#typeLine").onclick=()=>{state.lineType="line";setTool("line");};
 $("#colorPicker").oninput=e=>state.lineColor=e.target.value;
 $("#widthRange").oninput=e=>{state.lineWidth=+e.target.value;$("#widthValue").textContent=e.target.value};
 
-const swatches=["#0ba577","#ffc928","#ed4943","#2583cf","#252525","#ffffff"];
+const swatches=["#edbb22","#113d9c","#a91f16","#dc4438","#e9681f","#00583b","#76501b","#171a18"];
 const sw=$("#swatches");
 swatches.forEach(c=>{const b=document.createElement("button");b.className="swatch";b.style.background=c;b.onclick=()=>{state.lineColor=c;$("#colorPicker").value=c;$$(".swatch").forEach(x=>x.classList.remove("active"));b.classList.add("active")};sw.appendChild(b)});
 
@@ -829,10 +846,11 @@ function renderSaved(){
   items.forEach(it=>{
     const row=document.createElement("div");row.className="saved-item";
     row.innerHTML=`<div><b>${escapeHtml(it.title)}</b><small style="display:block;color:#71877e;margin-top:4px">${it.date}</small></div><div></div>`;
-    const acts=row.lastElementChild,op=document.createElement("button"),del=document.createElement("button");
+    const acts=row.lastElementChild,op=document.createElement("button"),jpg=document.createElement("button"),del=document.createElement("button");
     op.className="open-btn";op.textContent="開く";op.onclick=()=>{snap();restore(it.state);savedDialog.close()};
+    jpg.className="open-btn";jpg.textContent="JPEG";jpg.onclick=()=>exportImage(it.state,"jpeg",it.title);
     del.className="delete-btn";del.textContent="削除";del.onclick=()=>{localStorage.setItem("billiardsLayoutsV2",JSON.stringify(items.filter(x=>x.id!==it.id)));renderSaved()};
-    acts.append(op,del);box.appendChild(row);
+    acts.append(op,jpg,del);box.appendChild(row);
   })
 }
 function openSaved(){renderSaved();savedDialog.showModal()}
@@ -841,9 +859,9 @@ $("#saveBtn").onclick=saveLayout;$("#saveCenter").onclick=saveLayout;
 
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
 
-$("#imageBtn").onclick=exportPng;
-async function exportPng(){
-  const portrait=state.orientation==="portrait";
+$("#imageBtn").onclick=()=>exportImage(state,"png","billiards-layout");
+async function exportImage(sourceState=state,format="png",title="billiards-layout"){
+  const portrait=sourceState.orientation==="portrait";
   const W=portrait?658:1100,H=portrait?1100:658;
   const c=document.createElement("canvas");c.width=W;c.height=H;const g=c.getContext("2d");
   g.fillStyle="#f6fbf8";g.fillRect(0,0,W,H);
@@ -855,22 +873,24 @@ async function exportPng(){
   const cx=x+w*(portrait?.124:.067),cy=y+h*(portrait?.067:.124);
   const cw=w*(portrait?.752:.864),ch=h*(portrait?.864:.752);
   g.fillStyle="#149fa2";roundRect(g,cx,cy,cw,ch,10);g.fill();
-  if(state.grid){
+  if(sourceState.grid){
     g.strokeStyle="rgba(255,255,255,.33)";g.lineWidth=1;g.setLineDash([2,3]);
     const xDiv=portrait?4:7,yDiv=portrait?7:4;
     for(let i=1;i<xDiv;i++){g.beginPath();g.moveTo(cx+cw*i/xDiv,cy);g.lineTo(cx+cw*i/xDiv,cy+ch);g.stroke()}
     for(let i=1;i<yDiv;i++){g.beginPath();g.moveTo(cx,cy+ch*i/yDiv);g.lineTo(cx+cw,cy+ch*i/yDiv);g.stroke()}
     g.setLineDash([]);
   }
-  state.lines.forEach(l=>{
+  sourceState.lines.forEach(l=>{
     g.strokeStyle=l.color;g.lineWidth=l.width*2;g.lineCap="round";
     const X1=cx+l.x1*cw,Y1=cy+l.y1*ch,X2=cx+l.x2*cw,Y2=cy+l.y2*ch;
     g.beginPath();g.moveTo(X1,Y1);g.lineTo(X2,Y2);g.stroke();
     if(l.type==="arrow"){const angle=Math.atan2(Y2-Y1,X2-X1),size=16;g.beginPath();g.moveTo(X2,Y2);g.lineTo(X2-Math.cos(angle-.55)*size,Y2-Math.sin(angle-.55)*size);g.moveTo(X2,Y2);g.lineTo(X2-Math.cos(angle+.55)*size,Y2-Math.sin(angle+.55)*size);g.stroke()}
   });
-  state.balls.forEach(ball=>drawCanvasBall(g,cx+ball.x*cw,cy+ball.y*ch,ball.n,ball.ghost));
-  state.notes.forEach(note=>{g.fillStyle="#fff5ca";g.fillRect(cx+note.x*cw-55,cy+note.y*ch-15,110,30);g.fillStyle="#273d36";g.font="bold 13px sans-serif";g.textAlign="center";g.fillText(note.text.slice(0,14),cx+note.x*cw,cy+note.y*ch+5)});
-  const link=document.createElement("a");link.download="billiards-layout.png";link.href=c.toDataURL("image/png");link.click();
+  sourceState.balls.forEach(ball=>drawCanvasBall(g,cx+ball.x*cw,cy+ball.y*ch,ball.n,ball.ghost));
+  sourceState.notes.forEach(note=>{g.fillStyle="#fff5ca";g.fillRect(cx+note.x*cw-55,cy+note.y*ch-15,110,30);g.fillStyle="#273d36";g.font="bold 13px sans-serif";g.textAlign="center";g.fillText(note.text.slice(0,14),cx+note.x*cw,cy+note.y*ch+5)});
+  const isJpeg=format==="jpeg"||format==="jpg",ext=isJpeg?"jpg":"png";
+  const safe=String(title||"billiards-layout").replace(/[\\/:*?"<>|]+/g,"-");
+  const link=document.createElement("a");link.download=`${safe}.${ext}`;link.href=c.toDataURL(isJpeg?"image/jpeg":"image/png",.94);link.click();
 }
 function roundRect(g,x,y,w,h,r){g.beginPath();g.roundRect?g.roundRect(x,y,w,h,r):(g.rect(x,y,w,h))}
 function drawCanvasBall(g,x,y,n,ghost){
