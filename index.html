@@ -351,11 +351,11 @@ dialog::backdrop{background:rgba(11,39,31,.34);backdrop-filter:blur(3px)}
 #diagram .table.landscape .cloth-edge-cover{left:16%;top:10.7%;width:3.85%;height:1.92%}
 #diagram .table:not(.landscape){flex:none}
 #petZone{display:none!important}
-#diagram .ball{width:18px;height:18px;cursor:grab}
+#diagram .ball{width:15px;height:15px;cursor:grab}
 #diagram .ball:active{cursor:grabbing}
-#diagram .ball span{width:9px;min-width:9px;height:9px;font-size:5.5px}
-#diagram .ball::before{left:3px;top:2px;width:6px;height:4px}
-.mini-ball{width:34px;height:34px}
+#diagram .ball span{width:7px;min-width:7px;height:7px;font-size:5px}
+#diagram .ball::before{left:2px;top:1px;width:5px;height:4px}
+.mini-ball{width:31px;height:31px}
 .mini-ball.ghost-pick{background:rgba(255,255,255,.18)!important;border:2px dashed #e53333!important;box-shadow:none!important}
 .mini-ball.ghost-pick::before,.mini-ball.ghost-pick::after{display:none!important}
 .mini-ball.solid,.ball.solid{background:radial-gradient(circle at 31% 24%,rgba(255,255,255,.88) 0 3%,rgba(255,255,255,.28) 10%,transparent 24%),radial-gradient(circle at 43% 37%,var(--ball-color) 0 56%,color-mix(in srgb,var(--ball-color) 65%,black) 100%)!important}
@@ -571,8 +571,16 @@ function showAim(e){
 }
 function hideAim(){aimGuide.classList.remove("visible")}
 function clampBall(x,y){
-  const r=cloth.getBoundingClientRect(),radius=9*state.zoom+1;
+  const r=cloth.getBoundingClientRect(),radius=7.5*state.zoom+1;
   return {x:Math.max(radius/r.width,Math.min(1-radius/r.width,x)),y:Math.max(radius/r.height,Math.min(1-radius/r.height,y))};
+}
+function groupBounds(balls,lines,notes){
+  const r=cloth.getBoundingClientRect(),mx=(7.5*state.zoom+1)/r.width,my=(7.5*state.zoom+1)/r.height;
+  const xs=[],ys=[];
+  balls.forEach(b=>{xs.push(b.x-mx,b.x+mx);ys.push(b.y-my,b.y+my)});
+  lines.forEach(l=>{xs.push(l.x1,l.x2);ys.push(l.y1,l.y2)});
+  notes.forEach(n=>{xs.push(n.x-.02,n.x+.02);ys.push(n.y-.02,n.y+.02)});
+  return xs.length?{minX:Math.min(...xs),maxX:Math.max(...xs),minY:Math.min(...ys),maxY:Math.max(...ys)}:null;
 }
 const guideDialog=$("#guideDialog"), savedDialog=$("#savedDialog"), memoDialog=$("#memoDialog");
 let pendingMemoPos=null, pointerAction=null,panX=0,panY=0,panAction=null;
@@ -818,7 +826,8 @@ cloth.addEventListener("pointerdown",e=>{
   }else if(state.tool==="memo"){
     pendingMemoPos=normPoint(e);$("#memoText").value="";memoDialog.showModal();
   }else if(state.tool==="group"){
-    snap();const p=normPoint(e);pointerAction={type:"group",p,balls:state.balls.map(x=>({...x})),lines:state.lines.map(x=>({...x})),notes:state.notes.map(x=>({...x}))};cloth.setPointerCapture(e.pointerId)
+    snap();const p=normPoint(e),balls=state.balls.map(x=>({...x})),lines=state.lines.map(x=>({...x})),notes=state.notes.map(x=>({...x}));
+    pointerAction={type:"group",p,balls,lines,notes,bounds:groupBounds(balls,lines,notes)};cloth.setPointerCapture(e.pointerId)
   }
 });
 cloth.addEventListener("pointermove",e=>{
@@ -827,14 +836,9 @@ cloth.addEventListener("pointermove",e=>{
     const l=state.lines.find(x=>x.id===pointerAction.id);if(!l)return;const p=normPoint(e);l.x2=p.x;l.y2=p.y;renderLines();
   }else if(pointerAction.type==="group"){
     const p=normPoint(e),rawDx=p.x-pointerAction.p.x,rawDy=p.y-pointerAction.p.y;
-    const r=cloth.getBoundingClientRect(),mx=(9*state.zoom+1)/r.width,my=(9*state.zoom+1)/r.height;
-    const xs=[],ys=[];
-    pointerAction.balls.forEach(b=>{xs.push(b.x-mx,b.x+mx);ys.push(b.y-my,b.y+my)});
-    pointerAction.lines.forEach(l=>{xs.push(l.x1,l.x2);ys.push(l.y1,l.y2)});
-    pointerAction.notes.forEach(n=>{xs.push(n.x);ys.push(n.y)});
-    if(!xs.length)return;
-    const dx=Math.max(-Math.min(...xs),Math.min(1-Math.max(...xs),rawDx));
-    const dy=Math.max(-Math.min(...ys),Math.min(1-Math.max(...ys),rawDy));
+    const bounds=pointerAction.bounds;if(!bounds)return;
+    const dx=Math.max(-bounds.minX,Math.min(1-bounds.maxX,rawDx));
+    const dy=Math.max(-bounds.minY,Math.min(1-bounds.maxY,rawDy));
     state.balls.forEach((b,i)=>{b.x=pointerAction.balls[i].x+dx;b.y=pointerAction.balls[i].y+dy});
     state.lines.forEach((l,i)=>{const o=pointerAction.lines[i];l.x1=o.x1+dx;l.x2=o.x2+dx;l.y1=o.y1+dy;l.y2=o.y2+dy});
     state.notes.forEach((n,i)=>{n.x=pointerAction.notes[i].x+dx;n.y=pointerAction.notes[i].y+dy});renderBalls();renderLines();renderNotes();
@@ -847,7 +851,7 @@ function addGhostOppositeArrow(line){
   if(!source||Math.hypot(source.x-line.x1,source.y-line.y1)>.07)return;
   const dx=(line.x2-line.x1)*r.width,dy=(line.y2-line.y1)*r.height,len=Math.hypot(dx,dy);
   if(len<8)return;
-  const spacing=18;
+  const spacing=15;
   const pos=clampBall(source.x-(dx/len)*(spacing/r.width),source.y-(dy/len)*(spacing/r.height));
   state.balls=state.balls.filter(b=>!b.ghost);
   state.balls.push({id:state.nextId++,n:0,x:pos.x,y:pos.y,ghost:true});
@@ -959,10 +963,10 @@ async function exportImage(sourceState=state,format="png",title="billiards-layou
 function roundRect(g,x,y,w,h,r){g.beginPath();g.roundRect?g.roundRect(x,y,w,h,r):(g.rect(x,y,w,h))}
 function drawCanvasBall(g,x,y,n,ghost){
   g.save();
-  if(ghost){g.beginPath();g.arc(x,y,9,0,Math.PI*2);g.fillStyle="rgba(255,255,255,.12)";g.fill();g.setLineDash([3,2]);g.lineWidth=2;g.strokeStyle="#e53333";g.stroke();g.restore();return}
-  g.beginPath();g.arc(x,y,9,0,Math.PI*2);g.fillStyle=n===0?"#fff":colors[n];g.fill();g.lineWidth=1.5;g.strokeStyle="#fff";g.stroke();
-  if(n===0){g.fillStyle="#bd2b2b";for(const [dx,dy] of [[-5,-3],[5,-3],[1,6]]){g.beginPath();g.arc(x+dx,y+dy,1.4,0,Math.PI*2);g.fill()}}
-  else{g.beginPath();g.arc(x,y,5,0,Math.PI*2);g.fillStyle="#fff";g.fill();g.fillStyle="#111";g.font="bold 7px sans-serif";g.textAlign="center";g.textBaseline="middle";g.fillText(n,x,y)}
+  if(ghost){g.beginPath();g.arc(x,y,7.5,0,Math.PI*2);g.fillStyle="rgba(255,255,255,.12)";g.fill();g.setLineDash([3,2]);g.lineWidth=1.5;g.strokeStyle="#e53333";g.stroke();g.restore();return}
+  g.beginPath();g.arc(x,y,7.5,0,Math.PI*2);g.fillStyle=n===0?"#fff":colors[n];g.fill();g.lineWidth=1.25;g.strokeStyle="#fff";g.stroke();
+  if(n===0){g.fillStyle="#bd2b2b";for(const [dx,dy] of [[-4,-2.5],[4,-2.5],[.8,5]]){g.beginPath();g.arc(x+dx,y+dy,1.1,0,Math.PI*2);g.fill()}}
+  else{g.beginPath();g.arc(x,y,4,0,Math.PI*2);g.fillStyle="#fff";g.fill();g.fillStyle="#111";g.font="bold 6px sans-serif";g.textAlign="center";g.textBaseline="middle";g.fillText(n,x,y)}
   g.restore()
 }
 
