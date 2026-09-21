@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<title>Billiards Match Records</title>
+<style>
+:root{--green:#0ba577;--green2:#07845f;--line:#dbe8e2;--muted:#6b837a;--shadow:0 12px 34px rgba(24,77,62,.10)}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:Inter,"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;color:#163a32;background:#f5faf7}
+button{font:inherit;cursor:pointer}.app-header{height:72px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center}
+.header-inner{width:100%;max-width:1400px;margin:auto;padding:0 18px;display:flex;justify-content:flex-end}.topnav{display:flex;gap:8px;flex-wrap:nowrap;overflow:auto}
+.topnav button{border:0;background:#f5f8f6;color:#274a41;border-radius:999px;padding:11px 15px;font-weight:800;white-space:nowrap}.topnav .active{background:var(--green);color:#fff}
+.wrap{max-width:1400px;margin:0 auto;padding:18px}.page-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:14px}
+.page-head h1{margin:0;font-size:28px}.page-head p{margin:5px 0 0;color:var(--muted);font-size:13px}
+.panel{background:#fff;border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);overflow:hidden}.table-wrap{overflow:auto}
+table{width:100%;border-collapse:collapse;min-width:900px}th,td{padding:14px 12px;border-bottom:1px solid #e8efeb;text-align:left;vertical-align:top;font-size:14px;line-height:1.55}th{background:#f8fbf9;color:#668078;font-size:13px;white-space:nowrap}
+small{font-size:12px;color:var(--muted)}.badge{display:inline-block;padding:4px 8px;border-radius:999px;font-weight:900}.win{background:#dff7ea;color:#087040}.lose{background:#ffe7e4;color:#bb3a31}.draw{background:#edf1ef;color:#4e625b}
+.actions{display:flex;gap:6px;flex-wrap:nowrap}.actions button{border:0;border-radius:999px;background:#eef7f3;color:#07543d;padding:7px 10px;font-weight:900;white-space:nowrap}.actions .danger{background:#fff0ee;color:#b62222}
+.empty{padding:34px;text-align:center;color:var(--muted)}@media(max-width:620px){.wrap{padding:10px}.page-head h1{font-size:23px}th,td{font-size:13px;padding:11px 9px}}
+</style>
+</head>
+<body>
+<header class="app-header"><div class="header-inner"><nav class="topnav">
+<button type="button" onclick="location.href='index.html'">⌂ 配置図</button>
+<button type="button" onclick="location.href='matches.html'">▣ カウンター</button>
+<button class="active" type="button">▣ 対戦記録</button>
+</nav></div></header>
+<main class="wrap">
+  <div class="page-head"><div><h1>Billiards Match Records</h1><p>保存した対戦記録</p></div></div>
+  <section class="panel"><div class="table-wrap"><table><thead id="recordsHead"></thead><tbody id="recordsBody"></tbody></table></div></section>
+</main>
+<script>
+const $=s=>document.querySelector(s);
+const KEY='poolMatchRecords',DRAFT='poolMatchDraft';
+function load(){try{const v=JSON.parse(localStorage.getItem(KEY));return Array.isArray(v)?v:[]}catch{return[]}}
+function save(v){localStorage.setItem(KEY,JSON.stringify(v))}
+function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function norm(v){v=String(v??'').trim();return v==='自由入力'?'':v}
+function pad(n){return String(Math.max(0,Math.floor(Number(n)||0))).padStart(2,'0')}
+function fmtSec(s){s=Math.max(0,Math.floor(Number(s)||0));return pad(s/3600|0)+':'+pad((s%3600)/60|0)+':'+pad(s%60)}
+function fmtMin(s){s=Math.max(0,Math.floor(Number(s)||0));return pad(s/60|0)+':'+pad(s%60)}
+function resultClass(r){return r==='勝ち'?'win':r==='負け'?'lose':'draw'}
+function formatSavedTime(value){if(!value)return'';const d=new Date(value);return Number.isNaN(d.getTime())?String(value):d.toLocaleString('ja-JP',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})}
+function clockText(r){if(!r.clockUsed)return'';return esc(norm(r.leftName)||'自分')+' '+fmtMin(r.clockLeft??0)+' / '+esc(norm(r.rightName)||'相手')+' '+fmtMin(r.clockRight??0)}
+function meta(r){return[norm(r.game),norm(r.type),norm(r.race)].filter(Boolean).map(esc).join('<br>')}
+function render(){
+ const rows=load(), head=$('#recordsHead'), body=$('#recordsBody');
+ if(!rows.length){head.innerHTML='<tr><th>対戦記録</th></tr>';body.innerHTML='<tr><td class="empty">記録はまだありません。</td></tr>';return}
+ const hasShop=rows.some(r=>norm(r.shop)),hasLeft=rows.some(r=>norm(r.leftName)),hasRight=rows.some(r=>norm(r.rightName)||norm(r.opponent)),hasTime=rows.some(r=>Number(r.matchSec||0)>0),hasClock=rows.some(r=>!!r.clockUsed),hasMeta=rows.some(r=>[norm(r.game),norm(r.type),norm(r.race)].some(Boolean)),hasLM=rows.some(r=>(norm(r.layoutTitle)&&norm(r.layoutTitle)!=='配置図なし')||norm(r.memo));
+ const cols=[
+ {s:true,l:'日付',c:r=>esc(r.date)},{s:hasShop,l:'店舗',c:r=>esc(r.shop)},{s:hasLeft,l:'自分',c:r=>esc(r.leftName)},{s:hasRight,l:'相手',c:r=>esc(r.rightName||r.opponent)},
+ {s:true,l:'スコア',c:r=>pad(r.left)+'-'+pad(r.right)},{s:true,l:'結果',c:r=>'<span class="badge '+resultClass(r.result)+'">'+esc(r.result)+'</span>'},
+ {s:hasTime,l:'試合時間',c:r=>Number(r.matchSec||0)>0?fmtSec(r.matchSec):''},{s:hasClock,l:'チェスクロック',c:r=>clockText(r)},{s:hasMeta,l:'種目/形式/先取',c:r=>meta(r)},
+ {s:hasLM,l:'配置図/メモ',c:r=>{const p=[];if(norm(r.layoutTitle)&&norm(r.layoutTitle)!=='配置図なし')p.push(esc(r.layoutTitle));if(r.layoutUpdatedAt)p.push('<small>配置更新：'+esc(formatSavedTime(r.layoutUpdatedAt))+'</small>');if(norm(r.memo))p.push('<small>'+esc(r.memo)+'</small>');return p.join('<br>')}},
+ {s:true,l:'操作',c:r=>'<div class="actions"><button onclick="editRecord(\''+r.id+'\')">編集</button><button class="danger" onclick="deleteRecord(\''+r.id+'\')">削除</button></div>'}
+ ].filter(x=>x.s);
+ head.innerHTML='<tr>'+cols.map(x=>'<th>'+x.l+'</th>').join('')+'</tr>';
+ body.innerHTML=rows.map(r=>'<tr>'+cols.map(x=>'<td>'+x.c(r)+'</td>').join('')+'</tr>').join('');
+}
+window.editRecord=id=>{const r=load().find(x=>String(x.id)===String(id));if(!r)return;localStorage.setItem(DRAFT,JSON.stringify({...r,recording:true,timeVisible:true,editingId:r.id}));location.href='matches.html'}
+window.deleteRecord=id=>{if(!confirm('この記録を削除しますか？'))return;save(load().filter(x=>String(x.id)!==String(id)));render()}
+window.addEventListener('storage',render);render();
+</script>
+</body></html>
