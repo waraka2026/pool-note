@@ -234,35 +234,233 @@ input,select,textarea{font:inherit}
   .presets,.faces{gap:7px}.face{padding:12px 4px}.face b{font-size:16px}.face strong{font-size:34px}
   .right-panel{padding:11px}.toast{max-width:calc(100vw - 24px);white-space:normal;text-align:center;border-radius:14px}
 }
+
+/* ===== 2026-09-21 COUNTER LAYOUT FIX ===== */
+.app-header{
+  height:72px;
+  padding:0;
+  background:#fff;
+}
+.header-inner{
+  width:100%;
+  max-width:1536px;
+  margin:0 auto;
+  padding:0 16px;
+  display:flex;
+  justify-content:flex-end;
+  align-items:center;
+}
+.topnav{
+  margin-left:auto;
+  display:flex;
+  justify-content:flex-end;
+  align-items:center;
+  gap:8px;
+  flex-wrap:nowrap;
+}
+.topnav button,
+.center-actions button{
+  white-space:nowrap !important;
+  word-break:keep-all;
+}
+.header-actions{display:none!important}
+
+.counter-layout{
+  grid-template-columns:260px minmax(560px,1fr) 320px;
+  grid-template-areas:
+    "left center right"
+    ". records records";
+  align-items:start;
+}
+.left-panel{grid-area:left}
+.center-panel{grid-area:center}
+.right-panel{grid-area:right}
+.records-panel{
+  grid-area:records;
+  grid-column:auto;
+  width:100%;
+  min-width:0;
+  overflow:hidden;
+  align-self:start;
+}
+.left-panel,.right-panel{
+  top:88px;
+  max-height:calc(100vh - 104px);
+}
+.right-panel{
+  position:sticky;
+  z-index:2;
+}
+.left-brand{
+  display:flex;
+  justify-content:flex-start;
+  align-items:center;
+  margin:0 0 10px;
+  overflow:hidden;
+}
+.counter-logo{
+  width:232px;
+  height:62px;
+  position:relative;
+  overflow:hidden;
+  background:#fff;
+}
+.counter-logo img{
+  position:absolute;
+  left:0;
+  top:0;
+  width:275px;
+  height:auto;
+  display:block;
+}
+.logo-top-mask{
+  position:absolute;
+  left:58px;
+  top:0;
+  width:145px;
+  height:16px;
+  background:#fff;
+}
+.logo-word-mask{
+  position:absolute;
+  left:174px;
+  top:17px;
+  width:82px;
+  height:43px;
+  background:#fff;
+}
+.counter-logo-word{
+  position:absolute;
+  left:170px;
+  top:29px;
+  display:flex;
+  align-items:center;
+  font-size:20px;
+  line-height:1;
+  font-weight:1000;
+  letter-spacing:-1px;
+  text-shadow:0 1px 0 #fff,0 1px 2px rgba(25,70,60,.15);
+}
+.counter-logo-word i{font-style:normal}
+.counter-logo-word i:nth-child(1){color:#08a879}
+.counter-logo-word i:nth-child(2){color:#f2a71d}
+.counter-logo-word i:nth-child(3){color:#e9523f}
+.counter-logo-word i:nth-child(4){color:#3f73cf}
+.counter-logo-word i:nth-child(5){color:#8457b5}
+.counter-logo-word i:nth-child(6){color:#0ba577}
+.counter-logo-word i:nth-child(7){color:#f07b31}
+
+.records-head{
+  padding:18px 20px;
+}
+.records-head h2{
+  font-size:22px;
+}
+.records-head span{
+  font-size:13px;
+}
+.records-table{
+  width:100%;
+  min-width:900px;
+  table-layout:auto;
+}
+.records-table th,
+.records-table td{
+  padding:13px 12px;
+  font-size:14px;
+  line-height:1.55;
+  white-space:normal;
+}
+.records-table th{
+  font-size:13px;
+  white-space:nowrap;
+}
+.records-table small{
+  font-size:12px;
+  line-height:1.45;
+}
+.actions{
+  flex-wrap:nowrap;
+}
+.actions button{
+  white-space:nowrap;
+}
+
+@media(max-width:1180px){
+  .counter-layout{
+    grid-template-columns:220px minmax(480px,1fr) 285px;
+    grid-template-areas:
+      "left center right"
+      ". records records";
+  }
+  .counter-logo{width:196px;height:56px}
+  .counter-logo img{width:244px}
+  .logo-top-mask{left:51px;width:129px;height:14px}
+  .logo-word-mask{left:154px;top:15px;width:79px;height:39px}
+  .counter-logo-word{left:151px;top:26px;font-size:18px}
+}
+@media(max-width:900px){
+  .app-header{min-height:64px;height:auto;padding:0}
+  .header-inner{padding:8px 10px}
+  .topnav{width:100%;justify-content:flex-end;overflow-x:auto}
+  .topnav button{flex:0 0 auto}
+  .counter-layout{
+    grid-template-columns:180px minmax(0,1fr);
+    grid-template-areas:
+      "left center"
+      "right right"
+      "records records";
+  }
+  .left-panel{top:76px}
+  .right-panel{position:relative;top:auto;max-height:none}
+  .left-panel .panel-title{display:block}
+  .left-brand{display:flex}
+  .counter-logo{width:158px;height:48px}
+  .counter-logo img{width:207px}
+  .logo-top-mask{left:43px;width:112px;height:12px}
+  .logo-word-mask{left:131px;top:13px;width:70px;height:34px}
+  .counter-logo-word{left:128px;top:22px;font-size:16px}
+  .records-panel{grid-column:auto}
+}
+@media(max-width:620px){
+  .header-inner{padding:7px}
+  .topnav{justify-content:flex-start}
+  .counter-layout{display:block;padding:7px}
+  .left-brand{margin-bottom:8px}
+  .counter-logo{width:220px;height:58px}
+  .counter-logo img{width:263px}
+  .logo-top-mask{left:55px;width:138px;height:15px}
+  .logo-word-mask{left:166px;top:16px;width:86px;height:41px}
+  .counter-logo-word{left:163px;top:27px;font-size:19px}
+  .records-table th,.records-table td{font-size:13px;padding:11px 9px}
+}
+
 </style>
-<!-- build:2026-09-21-1620-same-url -->
+<!-- build:2026-09-21-1648-layout-fix -->
 </head>
 <body>
 
 <header class="app-header">
-  <div class="brand" aria-label="Billiards 9 Counter">
-    <div class="brand-logo-counter">
-      <img class="base-logo" src="assets/brand-logo.png" alt="">
-      <span class="small-mask" aria-hidden="true"></span>
-      <span class="big-mask" aria-hidden="true"></span>
-      <span class="small-counter">BILLIARDS COUNTER</span>
-      <span class="counter-word" aria-hidden="true"><span>C</span><span>o</span><span>u</span><span>n</span><span>t</span><span>e</span><span>r</span></span>
-    </div>
-  </div>
-  <nav class="topnav">
-    <button type="button" onclick="location.href='index.html'">⌂ 配置図</button>
-    <button class="active" type="button">▣ カウンター</button>
-    <button type="button" onclick="document.getElementById('recordsPanel').scrollIntoView({behavior:'smooth'})">▣ 対戦記録</button>
-    <button type="button" onclick="document.getElementById('counterHelp').scrollIntoView({behavior:'smooth'})">? 使い方</button>
-  </nav>
-  <div class="header-actions">
-    <button type="button" onclick="location.href='index.html'">配置図へ戻る</button>
-    <button type="button" onclick="document.getElementById('recordsPanel').scrollIntoView({behavior:'smooth'})">記録一覧</button>
+  <div class="header-inner">
+    <nav class="topnav">
+      <button type="button" onclick="location.href='index.html'">⌂ 配置図</button>
+      <button class="active" type="button">▣ カウンター</button>
+      <button type="button" onclick="document.getElementById('recordsPanel').scrollIntoView({behavior:'smooth'})">▣ 対戦記録</button>
+      <button type="button" onclick="document.getElementById('counterHelp').scrollIntoView({behavior:'smooth'})">? 使い方</button>
+    </nav>
   </div>
 </header>
 
 <main class="counter-layout">
   <aside class="panel left-panel">
+    <div class="left-brand" aria-label="Billiards 9 Counter">
+      <div class="counter-logo">
+        <img src="assets/brand-logo.png" alt="">
+        <span class="logo-top-mask" aria-hidden="true"></span>
+        <span class="logo-word-mask" aria-hidden="true"></span>
+        <span class="counter-logo-word" aria-hidden="true"><i>C</i><i>o</i><i>u</i><i>n</i><i>t</i><i>e</i><i>r</i></span>
+      </div>
+    </div>
     <div class="panel-title"><strong>カウンター操作</strong><small>試合中に使う操作をまとめています</small></div>
     <div class="tool-list">
       <button id="recordOn" class="tool active" type="button"><span class="ico">✓</span><span class="text">記録する</span></button>
@@ -371,7 +569,7 @@ input,select,textarea{font:inherit}
     <div class="records-head"><div><h2>対戦記録一覧表</h2><span>編集・削除・詳細確認</span></div></div>
     <div class="table-wrap">
       <table class="records-table">
-        <thead><tr><th>日付</th><th>店舗</th><th>自分</th><th>相手</th><th>スコア</th><th>結果</th><th>試合時間</th><th>チェスクロック</th><th>種目/形式/先取</th><th>配置図/メモ</th><th>操作</th></tr></thead>
+        <thead id="recordsHead"><tr><th>日付</th><th>店舗</th><th>自分</th><th>相手</th><th>スコア</th><th>結果</th><th>試合時間</th><th>チェスクロック</th><th>種目/形式/先取</th><th>配置図/メモ</th><th>操作</th></tr></thead>
         <tbody id="recordsBody"></tbody>
       </table>
     </div>
@@ -421,7 +619,43 @@ $('#recordOn').onclick=()=>{recording=true;$('#recordOn').classList.add('active'
 function resultClass(r){return r==='勝ち'?'win':r==='負け'?'lose':'draw'}
 function displayMeta(r){return[norm(r.game),norm(r.type),norm(r.race)].filter(Boolean).map(esc).join('<br>')}
 function clockRecordText(r){if(!r.clockUsed)return'';const ln=norm(r.leftName)||'自分',rn=norm(r.rightName)||'相手';return `${esc(ln)} ${fmtMin(r.clockLeft??0)} / ${esc(rn)} ${fmtMin(r.clockRight??0)}`}
-function renderRecords(){const rows=load(store.matches,[]);$('#recordsBody').innerHTML=rows.length?rows.map(r=>`<tr><td>${esc(r.date)}</td><td>${esc(r.shop)}</td><td>${esc(r.leftName||'自分')}</td><td>${esc(r.rightName||'相手')}</td><td>${pad(r.left)}-${pad(r.right)}</td><td><span class="badge ${resultClass(r.result)}">${esc(r.result)}</span></td><td>${fmtSec(r.matchSec||0)}</td><td>${clockRecordText(r)}</td><td>${displayMeta(r)}</td><td>${esc(r.layoutTitle||'配置図なし')}${r.layoutUpdatedAt?`<br><small>配置更新：${esc(formatSavedTime(r.layoutUpdatedAt))}</small>`:''}<br><small>${esc(r.memo)}</small></td><td><div class="actions"><button type="button" onclick="editRecord('${r.id}')">編集</button><button type="button" class="danger" onclick="deleteRecord('${r.id}')">削除</button></div></td></tr>`).join(''):'<tr><td colspan="11">記録はまだありません。</td></tr>'}
+function renderRecords(){
+  const rows=load(store.matches,[]);
+  const head=$('#recordsHead');
+  if(!rows.length){
+    head.innerHTML='<tr><th>対戦記録</th><th>操作</th></tr>';
+    $('#recordsBody').innerHTML='<tr><td>記録はまだありません。</td><td></td></tr>';
+    return;
+  }
+  const hasShop=rows.some(r=>norm(r.shop));
+  const hasLeft=rows.some(r=>norm(r.leftName));
+  const hasRight=rows.some(r=>norm(r.rightName)||norm(r.opponent));
+  const hasTime=rows.some(r=>Number(r.matchSec||0)>0);
+  const hasClock=rows.some(r=>!!r.clockUsed);
+  const hasMeta=rows.some(r=>[norm(r.game),norm(r.type),norm(r.race)].some(Boolean));
+  const hasLayoutMemo=rows.some(r=>(norm(r.layoutTitle)&&norm(r.layoutTitle)!=='配置図なし')||norm(r.memo));
+  const cols=[
+    {show:true,label:'日付',cell:r=>esc(r.date)},
+    {show:hasShop,label:'店舗',cell:r=>esc(r.shop)},
+    {show:hasLeft,label:'自分',cell:r=>esc(r.leftName)},
+    {show:hasRight,label:'相手',cell:r=>esc(r.rightName||r.opponent)},
+    {show:true,label:'スコア',cell:r=>pad(r.left)+'-'+pad(r.right)},
+    {show:true,label:'結果',cell:r=>'<span class="badge '+resultClass(r.result)+'">'+esc(r.result)+'</span>'},
+    {show:hasTime,label:'試合時間',cell:r=>Number(r.matchSec||0)>0?fmtSec(r.matchSec):''},
+    {show:hasClock,label:'チェスクロック',cell:r=>clockRecordText(r)},
+    {show:hasMeta,label:'種目/形式/先取',cell:r=>displayMeta(r)},
+    {show:hasLayoutMemo,label:'配置図/メモ',cell:r=>{
+      const parts=[];
+      if(norm(r.layoutTitle)&&norm(r.layoutTitle)!=='配置図なし') parts.push(esc(r.layoutTitle));
+      if(r.layoutUpdatedAt) parts.push('<small>配置更新：'+esc(formatSavedTime(r.layoutUpdatedAt))+'</small>');
+      if(norm(r.memo)) parts.push('<small>'+esc(r.memo)+'</small>');
+      return parts.join('<br>');
+    }},
+    {show:true,label:'操作',cell:r=>'<div class="actions"><button type="button" onclick="editRecord(\''+r.id+'\')">編集</button><button type="button" class="danger" onclick="deleteRecord(\''+r.id+'\')">削除</button></div>'}
+  ].filter(c=>c.show);
+  head.innerHTML='<tr>'+cols.map(c=>'<th>'+c.label+'</th>').join('')+'</tr>';
+  $('#recordsBody').innerHTML=rows.map(r=>'<tr>'+cols.map(c=>'<td>'+c.cell(r)+'</td>').join('')+'</tr>').join('');
+}
 window.editRecord=id=>{const r=load(store.matches,[]).find(x=>String(x.id)===String(id));if(!r)return;apply(r);editingId=r.id;scrollTo({top:0,behavior:'smooth'});toast('編集画面に読み込みました')};
 window.deleteRecord=id=>{if(!confirm('この記録を削除しますか？'))return;save(store.matches,load(store.matches,[]).filter(x=>String(x.id)!==String(id)));renderRecords()};
 $('#saveMatch').onclick=()=>{if(!recording){toast('記録しない設定です');return}const record=formObj(),arr=load(store.matches,[]),i=arr.findIndex(x=>String(x.id)===String(editingId));if(i>=0)arr[i]=record;else arr.unshift(record);save(store.matches,arr);save(store.draft,draftObj());editingId=null;renderRecords();toast('保存しました')};
