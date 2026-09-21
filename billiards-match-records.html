@@ -163,7 +163,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{color:inherit}
 <div id="toast" class="toast"></div>
 
 <script>
-const $=s=>document.querySelector(s),$=s=>document.querySelectorAll(s),KEY='poolMatchRecords',LAYOUTS='poolNotes';
+const $=s=>document.querySelector(s),qa=s=>Array.from(document.querySelectorAll(s)),KEY='poolMatchRecords',LAYOUTS='poolNotes';
 let editingId=null,calDate=new Date();
 function load(k=KEY,d=[]){try{const v=JSON.parse(localStorage.getItem(k));return v??d}catch{return d}}
 function save(v){localStorage.setItem(KEY,JSON.stringify(v))}
@@ -184,7 +184,7 @@ function refreshLayouts(keep=true){const s=$('#layoutSelect'),cur=keep?s.value:'
 function selectedLayout(){const id=$('#layoutSelect').value;return id?readLayouts().find(x=>String(x.id)===String(id))||null:null}
 function updateLayoutMeta(){const x=selectedLayout();$('#layoutMeta').textContent=x?'選択中：'+(x.title||'名称なし'):'配置図メーカーで保存した配置を選べます。'}
 $('#layoutSelect').addEventListener('change',updateLayoutMeta);$('#layoutRefresh').onclick=()=>{refreshLayouts(true);toast('配置図リストを更新しました')};
-function setActiveViewButton(id){$('.view-btn').forEach(b=>b.classList.toggle('active-view',b.id===id))}
+function setActiveViewButton(id){qa('.view-btn').forEach(b=>b.classList.toggle('active-view',b.id===id))}
 function showView(view){
   $('#entryPanel').hidden=true;$('#entryPanel').style.display='none';$('#cardPanel').hidden=view!=='card';$('#calendarPanel').hidden=view!=='calendar';$('#tablePanel').hidden=view!=='table';
   setActiveViewButton(view==='card'?'cardBtn':view==='calendar'?'calendarBtn':'tableBtn');
@@ -192,7 +192,7 @@ function showView(view){
 }
 function showEntry(edit=false){
   $('#cardPanel').hidden=true;$('#calendarPanel').hidden=true;$('#tablePanel').hidden=true;
-  $('#entryPanel').hidden=false;$('#entryPanel').style.display='block';$('.view-btn').forEach(b=>b.classList.remove('active-view'));
+  $('#entryPanel').hidden=false;$('#entryPanel').style.display='block';qa('.view-btn').forEach(b=>b.classList.remove('active-view'));
   if(!edit)clearForm();scrollTo({top:0,behavior:'smooth'})
 }
 function clearForm(){editingId=null;$('#formTitle').textContent='対戦記録を新規登録';$('#saveRecord').textContent='✓ 新規登録';$('#date').value=new Date().toISOString().slice(0,10);['matchName','shop','opponent','opponentShop','entryFee','leftScoreInput','rightScoreInput','memo'].forEach(id=>$('#'+id).value='');['game','type','race','matchResult'].forEach(id=>$('#'+id).value='');['gameFree','typeFree','raceFree'].forEach(id=>{$('#'+id).value='';$('#'+id).style.display='none'});refreshLayouts(false)}
