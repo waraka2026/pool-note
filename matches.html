@@ -516,8 +516,117 @@ input,select,textarea{font:inherit}
   .record-grid{grid-template-columns:1fr}
 }
 
+
+/* ===== 2026-09-21 LOGO + RECORD DETAIL BOX FIX ===== */
+.left-brand{
+  margin:0 0 10px 0!important;
+  padding:0!important;
+  display:block!important;
+  overflow:visible!important;
+}
+.counter-logo{
+  position:relative!important;
+  width:306px!important;
+  height:70px!important;
+  overflow:visible!important;
+  background:transparent!important;
+}
+.counter-logo img{
+  position:absolute!important;
+  left:0!important;
+  top:0!important;
+  width:306px!important;
+  height:69px!important;
+  object-fit:contain!important;
+  object-position:left center!important;
+  display:block!important;
+}
+.logo-top-mask{
+  position:absolute!important;
+  left:88px!important;
+  top:0!important;
+  width:118px!important;
+  height:20px!important;
+  background:#f5faf7!important;
+  z-index:2!important;
+}
+.logo-word-mask{
+  position:absolute!important;
+  left:210px!important;
+  top:20px!important;
+  width:100px!important;
+  height:48px!important;
+  background:#f5faf7!important;
+  z-index:2!important;
+}
+.counter-logo-word{
+  position:absolute!important;
+  left:211px!important;
+  top:35px!important;
+  z-index:3!important;
+  display:flex!important;
+  align-items:center!important;
+  font-size:24px!important;
+  line-height:1!important;
+  font-weight:1000!important;
+  letter-spacing:-1px!important;
+  white-space:nowrap!important;
+  text-shadow:0 1px 0 #fff,0 1px 2px rgba(25,70,60,.14)!important;
+}
+.counter-logo-word i{font-style:normal!important}
+.counter-logo-word i:nth-child(1){color:#08a879!important}
+.counter-logo-word i:nth-child(2){color:#f2a71d!important}
+.counter-logo-word i:nth-child(3){color:#e9523f!important}
+.counter-logo-word i:nth-child(4){color:#3f73cf!important}
+.counter-logo-word i:nth-child(5){color:#8457b5!important}
+.counter-logo-word i:nth-child(6){color:#0ba577!important}
+.counter-logo-word i:nth-child(7){color:#f07b31!important}
+
+.record-panel{
+  padding:16px!important;
+  box-shadow:0 8px 24px rgba(24,77,62,.06)!important;
+}
+.record-panel .record-fields{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:10px!important;
+}
+.record-panel .field{
+  margin-bottom:0!important;
+}
+.record-detail-panel{
+  padding:16px!important;
+  box-shadow:0 8px 24px rgba(24,77,62,.06)!important;
+}
+.record-detail-panel .layout-box{
+  margin-bottom:10px!important;
+}
+.record-detail-panel .memo-field{
+  margin-bottom:10px!important;
+}
+.record-detail-panel .primary{
+  margin-top:0!important;
+}
+.record-grid,.record-extra{display:contents!important}
+
+@media(max-width:900px){
+  .counter-logo{width:250px!important;height:58px!important}
+  .counter-logo img{width:250px!important;height:56px!important}
+  .logo-top-mask{left:72px!important;width:96px!important;height:16px!important}
+  .logo-word-mask{left:171px!important;top:16px!important;width:82px!important;height:40px!important}
+  .counter-logo-word{left:172px!important;top:29px!important;font-size:20px!important}
+}
+@media(max-width:620px){
+  .counter-logo{width:270px!important;height:62px!important}
+  .counter-logo img{width:270px!important;height:61px!important}
+  .logo-top-mask{left:78px!important;width:104px!important;height:17px!important}
+  .logo-word-mask{left:185px!important;top:17px!important;width:88px!important;height:43px!important}
+  .counter-logo-word{left:186px!important;top:31px!important;font-size:21px!important}
+  .record-panel .record-fields{grid-template-columns:1fr!important}
+}
+
 </style>
-<!-- build:2026-09-21-1725-records-split -->
+<!-- build:2026-09-21-1745-logo-record-box -->
 </head>
 <body>
 <header class="app-header">
@@ -535,7 +644,7 @@ input,select,textarea{font:inherit}
   <div class="left-stack">
     <div class="left-brand" aria-label="Billiards 9 Counter">
       <div class="counter-logo">
-        <img src="assets/brand-logo.png" alt="Billiards 9">
+        <img src="assets/brand-logo.png" alt="Billiards 9 Counter">
         <span class="logo-top-mask" aria-hidden="true"></span>
         <span class="logo-word-mask" aria-hidden="true"></span>
         <span class="counter-logo-word" aria-hidden="true"><i>C</i><i>o</i><i>u</i><i>n</i><i>t</i><i>e</i><i>r</i></span>
@@ -612,38 +721,37 @@ input,select,textarea{font:inherit}
         <div class="record-panel-head">
           <div class="section-title">▣ 記録内容</div>
         </div>
-        <div class="record-grid">
-          <div class="record-fields">
-            <label class="field"><span class="label">日付</span><input id="date" type="date"></label>
-            <label class="field"><span class="label">店舗名</span><input id="shop" placeholder="店舗名を入力"></label>
-            <label class="field"><span class="label">相手</span><input id="opponent" placeholder="相手名"></label>
-            <label class="field"><span class="label">種目</span>
-              <select id="game"><option value=""></option><option>9ボール</option><option>10ボール</option><option>エイトボール</option><option>ローテーション</option><option>自由入力</option></select>
-              <input id="gameFree" class="free" placeholder="種目を自由入力">
-            </label>
-            <label class="field"><span class="label">形式</span>
-              <select id="type"><option value=""></option><option>平場</option><option>セットマッチ</option><option>大会</option><option>練習</option><option>自由入力</option></select>
-              <input id="typeFree" class="free" placeholder="形式を自由入力">
-            </label>
-            <label class="field"><span class="label">先取</span>
-              <select id="race"><option value=""></option><option>3先</option><option>4先</option><option>5先</option><option>7先</option><option>自由入力</option></select>
-              <input id="raceFree" class="free" placeholder="例：点数制・10点">
-            </label>
-          </div>
-          <div class="record-extra">
-            <div class="layout-box">
-              <p class="layout-title">この試合に紐づける配置図</p>
-              <select id="layoutSelect"></select>
-              <div class="layout-actions">
-                <button id="layoutRefresh" class="btn" type="button">配置図リストを更新</button>
-                <a class="btn" href="index.html">配置図を開く</a>
-              </div>
-              <small id="layoutMeta" class="layout-meta"></small>
-            </div>
-            <label class="field"><span class="label">メモ</span><textarea id="memo" placeholder="例：9番前の出しが薄くなった。次は厚めに残す。"></textarea></label>
-            <button id="saveMatch" class="btn primary" type="button">✓ 試合終了して保存</button>
-          </div>
+        <div class="record-fields">
+          <label class="field"><span class="label">日付</span><input id="date" type="date"></label>
+          <label class="field"><span class="label">店舗名</span><input id="shop" placeholder="店舗名を入力"></label>
+          <label class="field"><span class="label">相手</span><input id="opponent" placeholder="相手名"></label>
+          <label class="field"><span class="label">種目</span>
+            <select id="game"><option value=""></option><option>9ボール</option><option>10ボール</option><option>エイトボール</option><option>ローテーション</option><option>自由入力</option></select>
+            <input id="gameFree" class="free" placeholder="種目を自由入力">
+          </label>
+          <label class="field"><span class="label">形式</span>
+            <select id="type"><option value=""></option><option>平場</option><option>セットマッチ</option><option>大会</option><option>練習</option><option>自由入力</option></select>
+            <input id="typeFree" class="free" placeholder="形式を自由入力">
+          </label>
+          <label class="field"><span class="label">先取</span>
+            <select id="race"><option value=""></option><option>3先</option><option>4先</option><option>5先</option><option>7先</option><option>自由入力</option></select>
+            <input id="raceFree" class="free" placeholder="例：点数制・10点">
+          </label>
         </div>
+      </section>
+
+      <section class="panel record-detail-panel">
+        <div class="layout-box">
+          <p class="layout-title">この試合に紐づける配置図</p>
+          <select id="layoutSelect"></select>
+          <div class="layout-actions">
+            <button id="layoutRefresh" class="btn" type="button">配置図リストを更新</button>
+            <a class="btn" href="index.html">配置図を開く</a>
+          </div>
+          <small id="layoutMeta" class="layout-meta"></small>
+        </div>
+        <label class="field memo-field"><span class="label">メモ</span><textarea id="memo" placeholder="例：9番前の出しが薄くなった。次は厚めに残す。"></textarea></label>
+        <button id="saveMatch" class="btn primary" type="button">✓ 試合終了して保存</button>
       </section>
     </div>
 
