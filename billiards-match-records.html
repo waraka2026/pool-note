@@ -70,6 +70,25 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{color:inherit}
 @media(max-width:900px){.app-header{height:auto;min-height:82px}.header-inner{padding:8px 10px;gap:8px}.counter-logo{width:270px;height:62px}.counter-logo img{width:258px;height:58px}.logo-top-mask{left:62px;width:136px;height:17px}.logo-word-mask{left:175px;top:17px;width:90px;height:42px}.counter-logo-word{left:177px;top:30px;font-size:21px}.calendar-grid{grid-template-columns:repeat(7,minmax(85px,1fr));overflow:auto}.calendar-panel{overflow:auto}}
 @media(max-width:620px){
 .match-card-toggle{grid-template-columns:1fr auto;gap:8px}.match-card-date{grid-column:1/-1}.match-card-score{align-self:start}.match-detail-grid{grid-template-columns:1fr 1fr}.header-inner{flex-wrap:wrap}.header-brand{height:62px}.topnav{width:100%;justify-content:flex-start}.wrap{padding:10px}.page-head{align-items:flex-start;flex-direction:column}.page-actions{width:100%}.page-actions .btn{flex:1}.form-grid{grid-template-columns:1fr}.full{grid-column:auto}.calendar-grid{grid-template-columns:repeat(7,92px)}th,td{font-size:13px;padding:11px 9px}.entry-actions{flex-direction:column}.entry-actions .btn{width:100%}}
+
+/* ===== DEFAULT MATCH LIST / BUTTON FIX ===== */
+.match-card-toggle.title-only{
+  grid-template-columns:minmax(0,1fr) auto!important;
+  padding:15px 16px!important;
+  align-items:center!important;
+}
+.match-card-toggle.title-only .match-card-title{
+  font-size:16px!important;
+  font-weight:1000!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+.match-card-toggle.title-only .match-card-arrow{
+  justify-self:end!important;
+}
+#entryPanel[hidden]{display:none!important}
+
 </style>
 </head>
 <body>
@@ -87,7 +106,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{color:inherit}
     <div><h1>Billiards Match Records</h1><p>対戦記録の新規登録・カレンダー・一覧</p></div>
     <div class="page-actions">
       <button id="newEntryBtn" class="btn primary" type="button">＋ 新規登録</button>
-      <button id="cardBtn" class="btn view-btn active-view" type="button">カード形式で見る</button>
+      <button id="cardBtn" class="btn view-btn active-view" type="button">対戦一覧</button>
       <button id="calendarBtn" class="btn view-btn" type="button">カレンダー形式で見る</button>
       <button id="tableBtn" class="btn view-btn" type="button">表形式で見る</button>
       <button id="csvBtn" class="btn" type="button">CSVで抽出</button>
@@ -122,7 +141,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{color:inherit}
 
   <section class="panel card-panel" id="cardPanel">
     <div class="card-panel-head">
-      <div><h2>対戦記録</h2><span>試合をタップすると詳細が開きます</span></div>
+      <div><h2>対戦記録一覧</h2><span>タイトルを押すと記録内容が開きます</span></div>
       <div id="cardCount" class="card-count"></div>
     </div>
     <div id="cardList" class="card-list"></div>
@@ -173,7 +192,7 @@ function showView(view){
 }
 function showEntry(edit=false){
   $('#cardPanel').hidden=true;$('#calendarPanel').hidden=true;$('#tablePanel').hidden=true;
-  $('#entryPanel').hidden=false;$('.view-btn').forEach(b=>b.classList.remove('active-view'));
+  $('#entryPanel').hidden=false;$('#entryPanel').style.display='block';$('.view-btn').forEach(b=>b.classList.remove('active-view'));
   if(!edit)clearForm();scrollTo({top:0,behavior:'smooth'})
 }
 function clearForm(){editingId=null;$('#formTitle').textContent='対戦記録を新規登録';$('#saveRecord').textContent='✓ 新規登録';$('#date').value=new Date().toISOString().slice(0,10);['matchName','shop','opponent','opponentShop','entryFee','leftScoreInput','rightScoreInput','memo'].forEach(id=>$('#'+id).value='');['game','type','race','matchResult'].forEach(id=>$('#'+id).value='');['gameFree','typeFree','raceFree'].forEach(id=>{$('#'+id).value='';$('#'+id).style.display='none'});refreshLayouts(false)}
@@ -185,28 +204,29 @@ function meta(r){return[norm(r.game),norm(r.type),norm(r.race)].filter(Boolean).
 function scoreText(r){if(r.scoreEntered===false)return'';if(r.left==null&&r.right==null)return'';return pad(r.left)+'-'+pad(r.right)}
 
 function renderCards(){
- const rows=load(KEY,[]),list=$('#cardList');$('#cardCount').textContent=rows.length+'試合';
+ const rows=load(KEY,[]),list=$('#cardList');$('#cardCount').textContent=rows.length?rows.length+'試合':'';
  if(!rows.length){list.innerHTML='<div class="card-empty">記録はまだありません。</div>';return}
  list.innerHTML=rows.map(r=>{
-   const title=norm(r.matchName)||norm(r.game)||'対戦記録';
-   const opponent=norm(r.rightName)||norm(r.opponent)||'相手未入力';
-   const venue=norm(r.shop)||'会場未入力';
+   const title=norm(r.matchName)||((r.date?String(r.date).replaceAll('-','/')+' ':'')+'対戦記録');
+   const opponent=norm(r.rightName)||norm(r.opponent)||'';
    const score=scoreText(r);
-   const badge=norm(r.result)?'<span class="badge '+resultClass(r.result)+'">'+esc(r.result)+'</span>':'';
-   const subs=[norm(r.game),norm(r.race),venue].filter(Boolean).map(esc).join(' ・ ');
-   const details=[
-     ['対戦相手',opponent],['相手所属店舗',r.opponentShop],['形式',r.type],['何先',r.race],['エントリーフィー',r.entryFee],
-     ['試合時間',Number(r.matchSec||0)>0?fmtSec(r.matchSec):''],['チェスクロック',r.clockUsed?clockText(r):''],
-     ['配置図',norm(r.layoutTitle)&&norm(r.layoutTitle)!=='配置図なし'?r.layoutTitle:''],['メモ',r.memo]
+   const detailRows=[
+     ['日付',r.date],['試合会場 / 店舗名',r.shop],['対戦相手',opponent],['相手所属店舗',r.opponentShop],
+     ['種目',r.game],['形式',r.type],['何先',r.race],['対戦結果',r.result],['スコア',score],
+     ['エントリーフィー',r.entryFee],['試合時間',Number(r.matchSec||0)>0?fmtSec(r.matchSec):''],
+     ['チェスクロック',r.clockUsed?clockText(r):''],
+     ['配置図',norm(r.layoutTitle)&&norm(r.layoutTitle)!=='配置図なし'?r.layoutTitle:''],
+     ['メモ',r.memo]
    ].filter(x=>norm(x[1]));
    return '<article class="match-card" data-id="'+esc(r.id)+'">'+
-     '<button class="match-card-toggle" type="button" onclick="toggleCard(this)">'+
-       '<div class="match-card-date">'+esc(r.date||'日付未入力')+'</div>'+
-       '<div class="match-card-main"><div class="match-card-title">'+esc(title)+'</div><div class="match-card-sub"><span>'+esc(subs)+'</span><span>vs '+esc(opponent)+'</span></div></div>'+
-       '<div class="match-card-score">'+badge+(score?'<strong>'+esc(score)+'</strong>':'')+'<span class="match-card-arrow">⌄</span></div>'+
+     '<button class="match-card-toggle title-only" type="button" onclick="toggleCard(this)">'+
+       '<div class="match-card-title">'+esc(title)+'</div>'+
+       '<span class="match-card-arrow">⌄</span>'+
      '</button>'+
-     '<div class="match-card-detail"><div class="match-detail-grid">'+details.map(x=>'<div class="match-detail-item '+(x[0]==='メモ'?'match-detail-wide':'')+'"><span class="k">'+esc(x[0])+'</span><span class="v">'+esc(x[1])+'</span></div>').join('')+'</div>'+
-       '<div class="match-card-actions"><button type="button" onclick="editRecord(\''+r.id+'\')">編集</button><button type="button" class="danger" onclick="deleteRecord(\''+r.id+'\')">削除</button></div></div>'+
+     '<div class="match-card-detail">'+
+       (detailRows.length?'<div class="match-detail-grid">'+detailRows.map(x=>'<div class="match-detail-item '+(x[0]==='メモ'?'match-detail-wide':'')+'"><span class="k">'+esc(x[0])+'</span><span class="v">'+esc(x[1])+'</span></div>').join('')+'</div>':'<div class="card-empty">登録内容はありません。</div>')+
+       '<div class="match-card-actions"><button type="button" onclick="editRecord(\''+r.id+'\')">編集</button><button type="button" class="danger" onclick="deleteRecord(\''+r.id+'\')">削除</button></div>'+
+     '</div>'+
    '</article>';
  }).join('');
 }
