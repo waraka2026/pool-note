@@ -366,7 +366,15 @@ dialog::backdrop{background:rgba(11,39,31,.34);backdrop-filter:blur(3px)}
 .row input[type="range"]{flex:1 1 auto;min-width:0;max-width:130px;touch-action:none}
 .row #widthValue{min-width:1.5em;text-align:right;flex:none}
 @media(max-width:860px){.stage{padding:16px 10px 48px}#diagram .table.landscape{width:100%}}
-.brand-stamp{width:52px;height:52px;object-fit:cover;border-radius:12px;flex:none}
+.brand-stamp{width:58px;height:58px;object-fit:contain;flex:none}
+.brand h1{display:flex;align-items:center;gap:6px}
+.brand-nine{position:relative;width:25px;height:25px;flex:none;border-radius:50%;background:radial-gradient(circle at 30% 23%,#fff 0 6%,transparent 21%),linear-gradient(to bottom,#f9f9f4 0 26%,#e8b624 27% 74%,#f9f9f4 75%);border:1px solid #d6d5c7;box-shadow:inset -3px -3px 5px #66532166,0 2px 4px #0004}
+.brand-nine::after{content:"9";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:13px;height:13px;border-radius:50%;background:#fff;color:#222;display:grid;place-items:center;font-size:9px;font-weight:900;line-height:1}
+.mini-ball.cue::after,#diagram .ball.cue::after{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 20% 30%,#bf2728 0 1.5px,transparent 2px),radial-gradient(circle at 76% 24%,#bf2728 0 1.5px,transparent 2px),radial-gradient(circle at 54% 78%,#bf2728 0 1.5px,transparent 2px);pointer-events:none;z-index:4}
+.mini-ball.cue::after{background:radial-gradient(circle at 20% 30%,#bf2728 0 2.5px,transparent 3px),radial-gradient(circle at 76% 24%,#bf2728 0 2.5px,transparent 3px),radial-gradient(circle at 54% 78%,#bf2728 0 2.5px,transparent 3px)}
+.palette-drag-preview{position:fixed;z-index:1000;pointer-events:none;transform:translate(-50%,-50%);opacity:.9}
+.palette-drag-preview .mini-ball{width:24px;height:24px}
+.ball-pick{touch-action:none}
 .tool .ico svg{display:block;width:20px;height:20px}
 /* Rotate the exact same frame image for portrait orientation. */
 #diagram .table:not(.landscape){width:365px;height:650px;overflow:hidden;padding:0;border:0;border-radius:0;background:none;box-shadow:0 14px 30px rgba(26,62,61,.12)}
@@ -381,20 +389,14 @@ dialog::backdrop{background:rgba(11,39,31,.34);backdrop-filter:blur(3px)}
 <body>
 <header class="app-header">
   <div class="brand">
-    <img class="brand-stamp" src="assets/logo-stamp.png" alt="Billiards logo">
-    <div><small>BILLIARDS LAYOUT MAKER</small><h1>Billiards - Layout</h1></div>
+    <img class="brand-stamp" src="assets/logo-bird.png" alt="キューを持つ鳥のロゴ">
+    <div><small>BILLIARDS LAYOUT MAKER</small><h1>Billiards <span class="brand-nine" aria-label="9番ボール"></span> Layout</h1></div>
   </div>
   <nav class="topnav">
     <button class="active">⌂ 配置図</button><button type="button" onclick="location.href='matches.html'">▣ カウンター</button><button type="button" onclick="location.href='matches.html'">▣ 対戦記録</button><button id="guideTop">? 使い方</button>
   </nav>
   <div class="header-actions"><button id="savedTop">▣ 保存一覧</button><button id="guideTop2">⚙ 設定</button></div>
 </header>
-
-<div class="quick-help">
-  <b>球の削除：</b>PCは右クリック／スマホは長押し　
-  <b>メニュー：</b>縦・横 / 移動 / まとめて / 戻る・進む / 矢印・線 / 削除 / メモ / 拡大・縮小 / 保存　
-  <b>右側：</b>ボール / 矢印・線設定 / 撞点 / 表示設定
-</div>
 
 <main id="diagram" class="layout">
   <aside class="panel left-panel">
@@ -489,7 +491,7 @@ dialog::backdrop{background:rgba(11,39,31,.34);backdrop-filter:blur(3px)}
         </div>
         <div class="row"><span>カラー</span><input id="colorPicker" type="color" value="#ffffff"></div>
         <div class="swatches" id="swatches"></div>
-        <div class="row"><span>太さ</span><input id="widthRange" type="range" min="1" max="8" value="3"><b id="widthValue">3</b></div>
+        <div class="row"><span>太さ</span><input id="widthRange" type="range" min="1" max="8" value="1"><b id="widthValue">1</b></div>
         <div class="row"><span>イメージボール</span><button class="switch" id="ghostSwitch" aria-label="イメージボール"><i></i></button></div>
       </div>
     </section>
@@ -549,7 +551,7 @@ const colors = {
   9:"#edbb22",10:"#113d9c",11:"#a91f16",12:"#dc4438",13:"#e9681f",14:"#00583b",15:"#76501b"
 };
 const state = {
-  orientation:"landscape", tool:"move", lineType:"arrow", lineColor:"#ffffff", lineWidth:3,
+  orientation:"landscape", tool:"move", lineType:"arrow", lineColor:"#ffffff", lineWidth:1,
   zoom:1, grid:true, pockets:true, pet:false, ghost:false, tip:{x:.5,y:.5},
   balls:[], lines:[], notes:[], nextId:1
 };
@@ -596,13 +598,53 @@ function buildPalette(){
     m.className="mini-ball"+(n===0?" cue":"")+(n>=1 && n<=8?" solid":"")+(n>=9?" stripe":"");
     if(n) m.style.setProperty("--ball-color", colors[n]);
     if(n){ const s=document.createElement("span"); s.textContent=n; m.appendChild(s); }
-    b.appendChild(m); b.addEventListener("click",()=>addBall(n)); palette.appendChild(b);
+    b.appendChild(m);
+    b.addEventListener("click",e=>{if(e.detail===0)addBall(n)});
+    let drag=null;
+    b.addEventListener("pointerdown",e=>{
+      if(e.button!==0)return;
+      b.setPointerCapture(e.pointerId);
+      drag={x:e.clientX,y:e.clientY,moved:false,preview:null};
+      e.preventDefault();
+    });
+    b.addEventListener("pointermove",e=>{
+      if(!drag)return;
+      if(!drag.moved && Math.hypot(e.clientX-drag.x,e.clientY-drag.y)>5){
+        drag.moved=true;
+        drag.preview=document.createElement("div");
+        drag.preview.className="palette-drag-preview";
+        drag.preview.appendChild(m.cloneNode(true));
+        document.body.appendChild(drag.preview);
+      }
+      if(!drag.moved)return;
+      drag.preview.style.left=e.clientX+"px";
+      drag.preview.style.top=e.clientY+"px";
+      const r=cloth.getBoundingClientRect();
+      if(e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom)showAim(e);
+      else hideAim();
+    });
+    function finishPaletteDrag(e,cancelled){
+      if(!drag)return;
+      const wasMoved=drag.moved;
+      drag.preview?.remove();drag=null;hideAim();
+      if(cancelled)return;
+      const r=cloth.getBoundingClientRect();
+      if(wasMoved){
+        if(e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom){
+          const p=clampBall((e.clientX-r.left)/r.width,(e.clientY-r.top)/r.height);
+          addBall(n,p);
+        }
+      }else addBall(n);
+    }
+    b.addEventListener("pointerup",e=>finishPaletteDrag(e,false));
+    b.addEventListener("pointercancel",e=>finishPaletteDrag(e,true));
+    palette.appendChild(b);
   });
 }
-function addBall(n){
+function addBall(n,position){
   snap();
   const id=state.nextId++;
-  state.balls.push({id,n,x:.5+(Math.random()-.5)*.18,y:.5+(Math.random()-.5)*.18,ghost:false});
+  state.balls.push({id,n,x:position?.x??(.5+(Math.random()-.5)*.18),y:position?.y??(.5+(Math.random()-.5)*.18),ghost:false});
   if(state.ghost && n!==0){
     state.balls.push({id:state.nextId++,n:0,x:.5,y:.35,ghost:true});
   }
@@ -833,8 +875,9 @@ async function exportPng(){
 }
 function roundRect(g,x,y,w,h,r){g.beginPath();g.roundRect?g.roundRect(x,y,w,h,r):(g.rect(x,y,w,h))}
 function drawCanvasBall(g,x,y,n,ghost){
-  g.save();g.globalAlpha=ghost?.35:1;g.beginPath();g.arc(x,y,18,0,Math.PI*2);g.fillStyle=n===0?"#fff":colors[n];g.fill();g.lineWidth=2;g.strokeStyle="#fff";g.stroke();
-  if(n){g.beginPath();g.arc(x,y,7,0,Math.PI*2);g.fillStyle="#fff";g.fill();g.fillStyle="#111";g.font="bold 9px sans-serif";g.textAlign="center";g.textBaseline="middle";g.fillText(n,x,y)}
+  g.save();g.globalAlpha=ghost?.35:1;g.beginPath();g.arc(x,y,12,0,Math.PI*2);g.fillStyle=n===0?"#fff":colors[n];g.fill();g.lineWidth=1.5;g.strokeStyle="#fff";g.stroke();
+  if(n===0){g.fillStyle="#bd2b2b";for(const [dx,dy] of [[-6,-3],[6,-4],[1,7]]){g.beginPath();g.arc(x+dx,y+dy,1.6,0,Math.PI*2);g.fill()}}
+  else{g.beginPath();g.arc(x,y,5,0,Math.PI*2);g.fillStyle="#fff";g.fill();g.fillStyle="#111";g.font="bold 7px sans-serif";g.textAlign="center";g.textBaseline="middle";g.fillText(n,x,y)}
   g.restore()
 }
 
