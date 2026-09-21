@@ -734,8 +734,33 @@ input,select,textarea{font:inherit}
   .left-stack{position:relative!important;top:auto!important}
 }
 
+
+/* ===== 2026-09-21 LARGER HEADER LOGO ===== */
+.app-header{height:100px!important;min-height:100px!important}
+.header-inner{max-width:1460px!important;padding:0 20px!important}
+.header-brand{height:82px!important}
+.header-brand .counter-logo{width:380px!important;height:82px!important}
+.header-brand .counter-logo img{width:360px!important;height:81px!important}
+.header-brand .logo-top-mask{left:86px!important;top:0!important;width:190px!important;height:23px!important}
+.header-brand .logo-word-mask{left:244px!important;top:23px!important;width:126px!important;height:58px!important}
+.header-brand .counter-logo-word{left:247px!important;top:42px!important;font-size:29px!important;letter-spacing:-1.2px!important}
+.left-stack{top:116px!important}
+.record-panel .record-fields{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+.record-detail-panel .memo-field{margin-bottom:10px!important}
+@media(max-width:900px){
+ .app-header{height:auto!important;min-height:82px!important}
+ .header-brand{height:62px!important}
+ .header-brand .counter-logo{width:270px!important;height:62px!important}
+ .header-brand .counter-logo img{width:258px!important;height:58px!important}
+ .header-brand .logo-top-mask{left:62px!important;width:136px!important;height:17px!important}
+ .header-brand .logo-word-mask{left:175px!important;top:17px!important;width:90px!important;height:42px!important}
+ .header-brand .counter-logo-word{left:177px!important;top:30px!important;font-size:21px!important}
+ .left-stack{top:96px!important}
+}
+@media(max-width:620px){.record-panel .record-fields{grid-template-columns:1fr!important}}
+
 </style>
-<!-- build:2026-09-21-1825-record-form -->
+<!-- build:2026-09-21-1900-logo-records -->
 </head>
 <body>
 <header class="app-header">
@@ -831,10 +856,14 @@ input,select,textarea{font:inherit}
         </div>
         <div class="record-fields">
           <label class="field"><span class="label">日付</span><input id="date" type="date"></label>
-          <label class="field"><span class="label">店舗名</span><input id="shop" placeholder="店舗名を入力"></label>
+          <label class="field"><span class="label">試合名</span><input id="matchName" placeholder="例：月例会・B級戦"></label>
+          <label class="field"><span class="label">店舗名 / 試合会場</span><input id="shop" placeholder="店舗名を入力"></label>
           <label class="field"><span class="label">相手</span><input id="opponent" placeholder="相手名"></label>
+          <label class="field"><span class="label">相手の所属店舗</span><input id="opponentShop" placeholder="所属店舗を入力"></label>
+          <label class="field"><span class="label">エントリーフィー</span><input id="entryFee" inputmode="numeric" placeholder="例：3000円"></label>
+          <label class="field"><span class="label">対戦結果</span><select id="matchResult"><option value=""></option><option>勝ち</option><option>負け</option><option>引き分け</option></select></label>
           <label class="field"><span class="label">種目</span>
-            <select id="game"><option value=""></option><option>9ボール</option><option>10ボール</option><option>エイトボール</option><option>ローテーション</option><option>自由入力</option></select>
+            <select id="game"><option value=""></option><option>9ボール</option><option>10ボール</option><option>8ボール</option><option>ローテーション</option><option>自由入力</option></select>
             <input id="gameFree" class="free" placeholder="種目を自由入力">
           </label>
           <label class="field"><span class="label">形式</span>
@@ -849,6 +878,7 @@ input,select,textarea{font:inherit}
       </section>
 
       <section class="panel record-detail-panel">
+        <label class="field memo-field"><span class="label">メモ</span><textarea id="memo" placeholder="例：9番前の出しが薄くなった。次は厚めに残す。"></textarea></label>
         <div class="layout-box">
           <p class="layout-title">この試合に紐づける配置図</p>
           <select id="layoutSelect"></select>
@@ -858,7 +888,6 @@ input,select,textarea{font:inherit}
           </div>
           <small id="layoutMeta" class="layout-meta"></small>
         </div>
-        <label class="field memo-field"><span class="label">メモ</span><textarea id="memo" placeholder="例：9番前の出しが薄くなった。次は厚めに残す。"></textarea></label>
         <button id="saveMatch" class="btn primary" type="button">✓ 試合終了して保存</button>
       </section>
     </div>
@@ -901,10 +930,10 @@ function valueWithFree(id){const sel=$('#'+id),free=$('#'+id+'Free');return sel.
 function setSelectWithFree(id,value,selValue){const sel=$('#'+id),free=$('#'+id+'Free'),options=[...sel.options].map(o=>o.value);const v=norm(value),sv=norm(selValue);if(sv&&options.includes(sv)){sel.value=sv;free.value=v&&v!==sv?v:''}else if(options.includes(v)){sel.value=v;free.value=''}else if(v){sel.value='自由入力';free.value=v}else{sel.value='';free.value=''}free.style.display=sel.value==='自由入力'?'block':'none'}
 ['game','type','race'].forEach(id=>$('#'+id).addEventListener('change',()=>{$('#'+id+'Free').style.display=$('#'+id).value==='自由入力'?'block':'none';autoSave()}));
 function norm(v){v=String(v??'').trim();return v==='自由入力'?'':v}
-function formObj(){const item=selectedLayout();return{id:editingId||Date.now(),date:$('#date').value,shop:$('#shop').value.trim(),opponent:$('#opponent').value.trim(),leftName:$('#leftName').value.trim()||'自分',rightName:$('#rightName').value.trim()||'相手',game:valueWithFree('game'),gameSel:$('#game').value,gameFree:$('#gameFree').value,type:valueWithFree('type'),typeSel:$('#type').value,typeFree:$('#typeFree').value,race:valueWithFree('race'),raceSel:$('#race').value,raceFree:$('#raceFree').value,left,right,result:left>right?'勝ち':left<right?'負け':'引き分け',matchSec:Math.floor(matchSec),clockLeftStart:Number($('#leftClockSelect').value)*60,clockRightStart:Number($('#rightClockSelect').value)*60,clockLeft:Math.floor(clockLeft),clockRight:Math.floor(clockRight),clockUsed,layoutId:$('#layoutSelect').value,layoutTitle:item?(item.title||'名称なし'):'配置図なし',layoutUpdatedAt:item?(item.updatedAt||item.createdAt||item.date||''):'',layoutSnapshot:item?clone(item):null,memo:$('#memo').value,createdAt:new Date().toISOString()}}
+function formObj(){const item=selectedLayout();return{id:editingId||Date.now(),date:$('#date').value,matchName:$('#matchName').value.trim(),shop:$('#shop').value.trim(),opponent:$('#opponent').value.trim(),opponentShop:$('#opponentShop').value.trim(),entryFee:$('#entryFee').value.trim(),leftName:$('#leftName').value.trim()||'自分',rightName:$('#rightName').value.trim()||'相手',game:valueWithFree('game'),gameSel:$('#game').value,gameFree:$('#gameFree').value,type:valueWithFree('type'),typeSel:$('#type').value,typeFree:$('#typeFree').value,race:valueWithFree('race'),raceSel:$('#race').value,raceFree:$('#raceFree').value,left,right,result:$('#matchResult').value||(left>right?'勝ち':left<right?'負け':'引き分け'),matchSec:Math.floor(matchSec),clockLeftStart:Number($('#leftClockSelect').value)*60,clockRightStart:Number($('#rightClockSelect').value)*60,clockLeft:Math.floor(clockLeft),clockRight:Math.floor(clockRight),clockUsed,layoutId:$('#layoutSelect').value,layoutTitle:item?(item.title||'名称なし'):'配置図なし',layoutUpdatedAt:item?(item.updatedAt||item.createdAt||item.date||''):'',layoutSnapshot:item?clone(item):null,memo:$('#memo').value,createdAt:new Date().toISOString()}}
 function draftObj(){return{...formObj(),recording,timeVisible,clockRun:null,editingId}}
 function autoSave(){if(!savePause)save(store.draft,draftObj())}
-function apply(obj){savePause=true;const o=obj||{},exists=o.id&&load(store.matches,[]).some(r=>String(r.id)===String(o.id));editingId=exists?o.id:(o.editingId||null);$('#date').value=o.date||new Date().toISOString().slice(0,10);$('#shop').value=o.shop||'';$('#opponent').value=o.opponent||'';$('#leftName').value=o.leftName||'自分';$('#rightName').value=o.rightName||'相手';left=Number(o.left||0);right=Number(o.right||0);matchSec=Number(o.matchSec||0);timeVisible=o.timeVisible!==false;$('#matchTime').style.display=timeVisible?'block':'none';$('#toggleTime').textContent=timeVisible?'非表示':'表示';$('#leftClockSelect').value=String(o.clockLeftStart?o.clockLeftStart/60:10);$('#rightClockSelect').value=String(o.clockRightStart?o.clockRightStart/60:10);clockLeft=o.clockLeft??Number($('#leftClockSelect').value)*60;clockRight=o.clockRight??Number($('#rightClockSelect').value)*60;clockUsed=!!o.clockUsed;refreshLayouts(false);if(o.layoutId)$('#layoutSelect').value=String(o.layoutId);updateLayoutMeta();$('#memo').value=o.memo||'';setSelectWithFree('game',o.game,o.gameSel);setSelectWithFree('type',o.type,o.typeSel);setSelectWithFree('race',o.race,o.raceSel);recording=o.recording!==false;$('#recordOn').classList.toggle('active',recording);$('#recordOff').classList.toggle('active',!recording);savePause=false;updateScore();updateClock()}
+function apply(obj){savePause=true;const o=obj||{},exists=o.id&&load(store.matches,[]).some(r=>String(r.id)===String(o.id));editingId=exists?o.id:(o.editingId||null);$('#date').value=o.date||new Date().toISOString().slice(0,10);$('#matchName').value=o.matchName||'';$('#shop').value=o.shop||'';$('#opponent').value=o.opponent||'';$('#opponentShop').value=o.opponentShop||'';$('#entryFee').value=o.entryFee||'';$('#matchResult').value=o.result||'';$('#leftName').value=o.leftName||'自分';$('#rightName').value=o.rightName||'相手';left=Number(o.left||0);right=Number(o.right||0);matchSec=Number(o.matchSec||0);timeVisible=o.timeVisible!==false;$('#matchTime').style.display=timeVisible?'block':'none';$('#toggleTime').textContent=timeVisible?'非表示':'表示';$('#leftClockSelect').value=String(o.clockLeftStart?o.clockLeftStart/60:10);$('#rightClockSelect').value=String(o.clockRightStart?o.clockRightStart/60:10);clockLeft=o.clockLeft??Number($('#leftClockSelect').value)*60;clockRight=o.clockRight??Number($('#rightClockSelect').value)*60;clockUsed=!!o.clockUsed;refreshLayouts(false);if(o.layoutId)$('#layoutSelect').value=String(o.layoutId);updateLayoutMeta();$('#memo').value=o.memo||'';setSelectWithFree('game',o.game,o.gameSel);setSelectWithFree('type',o.type,o.typeSel);setSelectWithFree('race',o.race,o.raceSel);recording=o.recording!==false;$('#recordOn').classList.toggle('active',recording);$('#recordOff').classList.toggle('active',!recording);savePause=false;updateScore();updateClock()}
 function resetDraft(){localStorage.removeItem(store.draft);stopTimer();clockUsed=false;apply({date:new Date().toISOString().slice(0,10),leftName:'自分',rightName:'相手'})}
 $('#recordOn').onclick=()=>{recording=true;$('#recordOn').classList.add('active');$('#recordOff').classList.remove('active');autoSave()};$('#recordOff').onclick=()=>{recording=false;$('#recordOff').classList.add('active');$('#recordOn').classList.remove('active');autoSave()};$('#resetAll').onclick=()=>{if(confirm('入力中の内容をリセットしますか？'))resetDraft()};
 function resultClass(r){return r==='勝ち'?'win':r==='負け'?'lose':'draw'}
