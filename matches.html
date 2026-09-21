@@ -625,12 +625,129 @@ input,select,textarea{font:inherit}
   .record-panel .record-fields{grid-template-columns:1fr!important}
 }
 
+
+/* ===== 2026-09-21 HEADER LOGO ROW FIX ===== */
+.app-header{
+  height:88px!important;
+  min-height:88px!important;
+  padding:0!important;
+}
+.header-inner{
+  width:100%!important;
+  max-width:1400px!important;
+  height:100%!important;
+  margin:0 auto!important;
+  padding:0 18px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:18px!important;
+}
+.header-brand{
+  flex:0 0 auto!important;
+  display:flex!important;
+  align-items:center!important;
+  height:72px!important;
+}
+.header-brand .counter-logo{
+  width:294px!important;
+  height:66px!important;
+  position:relative!important;
+  overflow:hidden!important;
+  background:#fff!important;
+}
+.header-brand .counter-logo img{
+  position:absolute!important;
+  left:0!important;
+  top:0!important;
+  width:286px!important;
+  height:64px!important;
+  object-fit:contain!important;
+  object-position:left center!important;
+}
+.header-brand .logo-top-mask{
+  position:absolute!important;
+  left:68px!important;
+  top:0!important;
+  width:150px!important;
+  height:18px!important;
+  background:#fff!important;
+  z-index:2!important;
+}
+.header-brand .logo-word-mask{
+  position:absolute!important;
+  left:194px!important;
+  top:18px!important;
+  width:98px!important;
+  height:46px!important;
+  background:#fff!important;
+  z-index:2!important;
+}
+.header-brand .counter-logo-word{
+  position:absolute!important;
+  left:196px!important;
+  top:33px!important;
+  z-index:3!important;
+  display:flex!important;
+  align-items:center!important;
+  font-size:23px!important;
+  line-height:1!important;
+  font-weight:1000!important;
+  letter-spacing:-1px!important;
+  white-space:nowrap!important;
+}
+.topnav{
+  margin-left:auto!important;
+  display:flex!important;
+  justify-content:flex-end!important;
+  align-items:center!important;
+  gap:8px!important;
+  flex-wrap:nowrap!important;
+}
+.topnav button{white-space:nowrap!important}
+.left-stack{
+  position:sticky!important;
+  top:104px!important;
+}
+.left-brand{display:none!important}
+
+@media(max-width:900px){
+  .app-header{height:auto!important;min-height:76px!important}
+  .header-inner{padding:7px 10px!important;gap:8px!important}
+  .header-brand .counter-logo{width:222px!important;height:52px!important}
+  .header-brand .counter-logo img{width:216px!important;height:50px!important}
+  .header-brand .logo-top-mask{left:51px!important;width:114px!important;height:14px!important}
+  .header-brand .logo-word-mask{left:146px!important;top:14px!important;width:74px!important;height:36px!important}
+  .header-brand .counter-logo-word{left:148px!important;top:25px!important;font-size:18px!important}
+  .topnav{overflow-x:auto!important}
+  .left-stack{top:90px!important}
+}
+@media(max-width:620px){
+  .header-inner{flex-wrap:wrap!important}
+  .header-brand{height:58px!important}
+  .header-brand .counter-logo{width:252px!important;height:56px!important}
+  .header-brand .counter-logo img{width:246px!important;height:55px!important}
+  .header-brand .logo-top-mask{left:58px!important;width:130px!important;height:15px!important}
+  .header-brand .logo-word-mask{left:166px!important;top:15px!important;width:84px!important;height:40px!important}
+  .header-brand .counter-logo-word{left:168px!important;top:28px!important;font-size:20px!important}
+  .topnav{width:100%!important;justify-content:flex-start!important}
+  .left-stack{position:relative!important;top:auto!important}
+}
+
 </style>
-<!-- build:2026-09-21-1745-logo-record-box -->
+<!-- build:2026-09-21-1810-header-row -->
 </head>
 <body>
 <header class="app-header">
   <div class="header-inner">
+    <div class="header-brand" aria-label="Billiards 9 Counter">
+      <div class="counter-logo">
+        <img src="assets/brand-logo.png" alt="Billiards 9 Counter">
+        <span class="logo-top-mask" aria-hidden="true"></span>
+        <span class="logo-word-mask" aria-hidden="true"></span>
+        <span class="counter-logo-word" aria-hidden="true"><i>C</i><i>o</i><i>u</i><i>n</i><i>t</i><i>e</i><i>r</i></span>
+      </div>
+    </div>
     <nav class="topnav">
       <button type="button" onclick="location.href='index.html'">⌂ 配置図</button>
       <button class="active" type="button">▣ カウンター</button>
@@ -642,15 +759,6 @@ input,select,textarea{font:inherit}
 
 <main class="counter-layout">
   <div class="left-stack">
-    <div class="left-brand" aria-label="Billiards 9 Counter">
-      <div class="counter-logo">
-        <img src="assets/brand-logo.png" alt="Billiards 9 Counter">
-        <span class="logo-top-mask" aria-hidden="true"></span>
-        <span class="logo-word-mask" aria-hidden="true"></span>
-        <span class="counter-logo-word" aria-hidden="true"><i>C</i><i>o</i><i>u</i><i>n</i><i>t</i><i>e</i><i>r</i></span>
-      </div>
-    </div>
-
     <aside class="panel left-panel">
       <div class="panel-title"><strong>カウンター操作</strong><small>試合中に使う操作をまとめています</small></div>
       <div class="tool-list">
