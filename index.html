@@ -130,7 +130,7 @@ body{overflow-x:hidden}
 }
 .ball span{background:#fff;border-radius:50%;min-width:15px;height:15px;display:grid;place-items:center;font-size:9px}
 .ball.cue span{display:none}
-.ball.ghost{background:rgba(255,255,255,.18)!important;border:2px dashed rgba(255,255,255,.9);box-shadow:none}
+.ball.ghost{background:rgba(255,255,255,.12)!important;border:2px dashed #e53333!important;box-shadow:none!important;opacity:1}
 .ball.ghost span{display:none}
 #lineSvg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;z-index:8;pointer-events:none}
 .draw-line{pointer-events:stroke}
@@ -336,7 +336,7 @@ dialog::backdrop{background:rgba(11,39,31,.34);backdrop-filter:blur(3px)}
 #diagram .table:not(.landscape) .p5{left:30px;bottom:30px}#diagram .table:not(.landscape) .p6{right:30px;bottom:30px}
 #diagram .table:not(.landscape) .p3{left:13px;top:50%;transform:translateY(-50%)}#diagram .table:not(.landscape) .p4{right:13px;top:50%;transform:translateY(-50%)}
 /* Keep the supplied frame pixels, and replace only the marked-up playing cloth. */
-#diagram .table.landscape{padding:0;border:0;border-radius:0;background:#e6e8e8 url("assets/reference-table.png") -7px -11px / 104.12% 105.79% no-repeat;box-shadow:0 14px 30px rgba(26,62,61,.12)}
+#diagram .table.landscape{padding:0;border:0;border-radius:0;background:transparent url("assets/reference-table-hd.png") -7px -11px / 104.12% 105.79% no-repeat;box-shadow:0 14px 30px rgba(26,62,61,.12)}
 #diagram .table.landscape::before,#diagram .table.landscape::after{display:none!important;content:none!important}
 #diagram .table.landscape .corner-cap,#diagram .table.landscape .side-cap,#diagram .table.landscape .rail-sights,#diagram .table.landscape .pocket{display:none!important}
 #diagram .table.landscape .cloth{position:absolute;left:6.7%;top:12.4%;width:86.4%;height:75.2%;border:0;border-radius:0;box-shadow:none;clip-path:polygon(10px 0,calc(100% - 10px) 0,100% 10px,100% calc(100% - 10px),calc(100% - 10px) 100%,10px 100%,0 calc(100% - 10px),0 10px)}
@@ -379,7 +379,7 @@ dialog::backdrop{background:rgba(11,39,31,.34);backdrop-filter:blur(3px)}
 .tool .ico svg{display:block;width:20px;height:20px}
 /* Rotate the exact same frame image for portrait orientation. */
 #diagram .table:not(.landscape){width:365px;height:650px;overflow:hidden;padding:0;border:0;border-radius:28px;background:none;box-shadow:0 14px 30px rgba(26,62,61,.12)}
-#diagram .table:not(.landscape)::before{content:""!important;display:block!important;position:absolute;left:0;top:100%;width:178.0822%;height:56.1538%;border:0;border-radius:0;background:#e6e8e8 url("assets/reference-table.png") 26% 52% / 104.12% 105.79% no-repeat;box-shadow:none;transform-origin:top left;transform:rotate(-90deg);z-index:0}
+#diagram .table:not(.landscape)::before{content:""!important;display:block!important;position:absolute;left:0;top:100%;width:178.0822%;height:56.1538%;border:0;border-radius:0;background:transparent url("assets/reference-table-hd.png") 26% 52% / 104.12% 105.79% no-repeat;box-shadow:none;transform-origin:top left;transform:rotate(-90deg);z-index:0}
 #diagram .table:not(.landscape)::after{display:none!important;content:none!important}
 #diagram .table:not(.landscape) .corner-cap,#diagram .table:not(.landscape) .side-cap,#diagram .table:not(.landscape) .rail-sights,#diagram .table:not(.landscape) .pocket{display:none!important}
 #diagram .table:not(.landscape) .cloth{position:absolute;left:12.4%;top:6.7%;width:75.2%;height:86.4%;border:0;border-radius:0;box-shadow:none;clip-path:polygon(10px 0,calc(100% - 10px) 0,100% 10px,100% calc(100% - 10px),calc(100% - 10px) 100%,10px 100%,0 calc(100% - 10px),0 10px)}
@@ -660,9 +660,6 @@ function addBall(n,position){
   snap();
   const id=state.nextId++;
   state.balls.push({id,n,x:position?.x??(.5+(Math.random()-.5)*.18),y:position?.y??(.5+(Math.random()-.5)*.18),ghost:false});
-  if(state.ghost && n!==0){
-    state.balls.push({id:state.nextId++,n:0,x:.5,y:.35,ghost:true});
-  }
   renderBalls();
 }
 function removeBall(id){ snap(); state.balls=state.balls.filter(b=>b.id!==id); renderBalls(); }
@@ -678,6 +675,11 @@ function renderBalls(){
     let longTimer=null, moved=false;
     el.addEventListener("pointerdown",e=>{
       if(state.tool==="erase"){ e.preventDefault();e.stopPropagation();removeBall(b.id);return; }
+      if(state.tool==="arrow"||state.tool==="line"){
+        snap();
+        const line={id:state.nextId++,type:state.tool==="arrow"?"arrow":"line",x1:b.x,y1:b.y,x2:b.x,y2:b.y,color:state.lineColor,width:state.lineWidth};
+        state.lines.push(line);pointerAction={type:"draw",id:line.id};renderLines();el.setPointerCapture(e.pointerId);e.preventDefault();e.stopPropagation();return;
+      }
       moved=false; el.setPointerCapture(e.pointerId); snap();showAim(e);
       const start={x:e.clientX,y:e.clientY,bx:b.x,by:b.y};
       longTimer=setTimeout(()=>{ if(!moved){ removeBall(b.id); }},650);
@@ -693,7 +695,7 @@ function renderBalls(){
       el.style.left=b.x*100+"%";el.style.top=b.y*100+"%";
       renderLines();
     });
-    el.addEventListener("pointerup",()=>{clearTimeout(longTimer);pointerAction=null;hideAim()});
+    el.addEventListener("pointerup",()=>{clearTimeout(longTimer);if(pointerAction?.type==="draw"){const line=state.lines.find(l=>l.id===pointerAction.id);if(line)addGhostOppositeArrow(line)}pointerAction=null;hideAim()});
     el.addEventListener("pointercancel",()=>{clearTimeout(longTimer);pointerAction=null;hideAim()});
     el.addEventListener("contextmenu",e=>{e.preventDefault();removeBall(b.id)});
     cloth.appendChild(el);
@@ -795,7 +797,26 @@ cloth.addEventListener("pointermove",e=>{
     state.notes.forEach((n,i)=>{n.x=pointerAction.notes[i].x+dx;n.y=pointerAction.notes[i].y+dy});renderBalls();renderLines();renderNotes();
   }
 });
-cloth.addEventListener("pointerup",()=>pointerAction=null);
+function addGhostOppositeArrow(line){
+  if(!state.ghost||line.type!=="arrow")return;
+  const r=cloth.getBoundingClientRect();
+  const source=state.balls.filter(b=>!b.ghost).sort((a,b)=>Math.hypot(a.x-line.x1,a.y-line.y1)-Math.hypot(b.x-line.x1,b.y-line.y1))[0];
+  if(!source||Math.hypot(source.x-line.x1,source.y-line.y1)>.07)return;
+  const dx=(line.x2-line.x1)*r.width,dy=(line.y2-line.y1)*r.height,len=Math.hypot(dx,dy);
+  if(len<8)return;
+  const spacing=21;
+  const pos=clampBall(source.x-(dx/len)*(spacing/r.width),source.y-(dy/len)*(spacing/r.height));
+  state.balls=state.balls.filter(b=>!b.ghost);
+  state.balls.push({id:state.nextId++,n:0,x:pos.x,y:pos.y,ghost:true});
+  renderBalls();
+}
+cloth.addEventListener("pointerup",()=>{
+  if(pointerAction?.type==="draw"){
+    const line=state.lines.find(l=>l.id===pointerAction.id);
+    if(line)addGhostOppositeArrow(line);
+  }
+  pointerAction=null;
+});
 
 $("#memoOk").addEventListener("click",()=>{
   const text=$("#memoText").value.trim(); if(text&&pendingMemoPos){snap();state.notes.push({id:state.nextId++,text,...pendingMemoPos});renderNotes()}
@@ -866,10 +887,10 @@ async function exportImage(sourceState=state,format="png",title="billiards-layou
   const c=document.createElement("canvas");c.width=W;c.height=H;const g=c.getContext("2d");
   g.fillStyle="#f6fbf8";g.fillRect(0,0,W,H);
   const x=45,y=45,w=W-90,h=H-90;
-  const frame=new Image();frame.src="assets/reference-table.png";
+  const frame=new Image();frame.src="assets/reference-table-hd.png";
   try{await frame.decode()}catch(error){alert("台の枠を読み込めませんでした");return}
-  if(portrait){g.save();g.translate(x,y+h);g.rotate(-Math.PI/2);g.drawImage(frame,5,8,461,259,0,0,h,w);g.restore()}
-  else g.drawImage(frame,5,8,461,259,x,y,w,h);
+  if(portrait){g.save();g.translate(x,y+h);g.rotate(-Math.PI/2);g.drawImage(frame,20,32,1844,1036,0,0,h,w);g.restore()}
+  else g.drawImage(frame,20,32,1844,1036,x,y,w,h);
   const cx=x+w*(portrait?.124:.067),cy=y+h*(portrait?.067:.124);
   const cw=w*(portrait?.752:.864),ch=h*(portrait?.864:.752);
   g.fillStyle="#149fa2";roundRect(g,cx,cy,cw,ch,10);g.fill();
@@ -894,7 +915,9 @@ async function exportImage(sourceState=state,format="png",title="billiards-layou
 }
 function roundRect(g,x,y,w,h,r){g.beginPath();g.roundRect?g.roundRect(x,y,w,h,r):(g.rect(x,y,w,h))}
 function drawCanvasBall(g,x,y,n,ghost){
-  g.save();g.globalAlpha=ghost?.35:1;g.beginPath();g.arc(x,y,12,0,Math.PI*2);g.fillStyle=n===0?"#fff":colors[n];g.fill();g.lineWidth=1.5;g.strokeStyle="#fff";g.stroke();
+  g.save();
+  if(ghost){g.beginPath();g.arc(x,y,10.5,0,Math.PI*2);g.fillStyle="rgba(255,255,255,.12)";g.fill();g.setLineDash([3,2]);g.lineWidth=2;g.strokeStyle="#e53333";g.stroke();g.restore();return}
+  g.beginPath();g.arc(x,y,10.5,0,Math.PI*2);g.fillStyle=n===0?"#fff":colors[n];g.fill();g.lineWidth=1.5;g.strokeStyle="#fff";g.stroke();
   if(n===0){g.fillStyle="#bd2b2b";for(const [dx,dy] of [[-6,-3],[6,-4],[1,7]]){g.beginPath();g.arc(x+dx,y+dy,1.6,0,Math.PI*2);g.fill()}}
   else{g.beginPath();g.arc(x,y,5,0,Math.PI*2);g.fillStyle="#fff";g.fill();g.fillStyle="#111";g.font="bold 7px sans-serif";g.textAlign="center";g.textBaseline="middle";g.fillText(n,x,y)}
   g.restore()
