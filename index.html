@@ -369,7 +369,9 @@ dialog::backdrop{background:rgba(11,39,31,.34);backdrop-filter:blur(3px)}
 .row input[type="range"]{flex:1 1 auto;min-width:0;max-width:130px;touch-action:none}
 .row #widthValue{min-width:1.5em;text-align:right;flex:none}
 @media(max-width:860px){.stage{padding:16px 10px 48px}#diagram .table.landscape{width:100%}.brand{min-width:0}.brand-logo{width:310px;height:66px}}
-.brand-logo{display:block;width:440px;height:86px;object-fit:contain;object-position:left center;flex:none}
+.brand-logo{display:block;width:440px;height:86px;object-fit:contain;object-position:left center;flex:none;position:relative;transform:translate(calc(max(0px,(100vw - 1536px)/2) + 70px),31.5px)}
+@media(max-width:1100px){.brand-logo{transform:translate(48px,31.5px)}}
+@media(max-width:860px){.brand-logo{transform:translate(-38px,18px)}}
 .brand h1{display:flex;align-items:center;gap:6px}
 .brand-nine{position:relative;width:25px;height:25px;flex:none;border-radius:50%;background:radial-gradient(circle at 30% 23%,#fff 0 6%,transparent 21%),linear-gradient(to bottom,#f9f9f4 0 26%,#e8b624 27% 74%,#f9f9f4 75%);border:1px solid #d6d5c7;box-shadow:inset -3px -3px 5px #66532166,0 2px 4px #0004}
 .brand-nine::after{content:"9";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:13px;height:13px;border-radius:50%;background:#fff;color:#222;display:grid;place-items:center;font-size:9px;font-weight:900;line-height:1}
